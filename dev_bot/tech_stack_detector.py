@@ -14,16 +14,16 @@
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
 
 
 class TechStackDetector:
     """技术栈检测器"""
-    
+
     def __init__(self, project_root: Optional[Path] = None):
         self.project_root = project_root or Path.cwd()
         self.tech_stack = {}
-    
+
     def detect(self) -> Dict[str, Any]:
         """检测技术栈"""
         self.tech_stack = {
@@ -37,7 +37,7 @@ class TechStackDetector:
             "other_tools": self._detect_other_tools(),
         }
         return self.tech_stack
-    
+
     def _detect_language(self) -> str:
         """检测编程语言"""
         # 检查源代码文件
@@ -51,15 +51,15 @@ class TechStackDetector:
             '.rb': 'Ruby',
             '.php': 'PHP',
         }
-        
-        counts = {ext: 0 for ext in source_files}
-        
+
+        counts = dict.fromkeys(source_files, 0)
+
         for file_path in self.project_root.rglob('*'):
             if file_path.is_file():
                 for ext in source_files:
                     if file_path.suffix == ext:
                         counts[ext] += 1
-        
+
         # 返回文件数量最多的语言
         dominant_lang = max(counts, key=counts.get)
         if counts[dominant_lang] > 0:
@@ -67,17 +67,17 @@ class TechStackDetector:
             if dominant_lang == '.py':
                 return f"Python {sys.version.split()[0]}"
             return source_files[dominant_lang]
-        
+
         return "Unknown"
-    
+
     def _detect_frameworks(self) -> List[str]:
         """检测框架"""
         frameworks = []
-        
+
         # 检查 Python 框架
         pyproject = self.project_root / "pyproject.toml"
         if pyproject.exists():
-            with open(pyproject, 'r', encoding='utf-8') as f:
+            with open(pyproject, encoding='utf-8') as f:
                 content = f.read()
                 if 'fastapi' in content.lower():
                     frameworks.append("FastAPI")
@@ -85,15 +85,15 @@ class TechStackDetector:
                     frameworks.append("Flask")
                 if 'django' in content.lower():
                     frameworks.append("Django")
-        
+
         # 检查 JavaScript/TypeScript 框架
         package_json = self.project_root / "package.json"
         if package_json.exists():
-            with open(package_json, 'r', encoding='utf-8') as f:
+            with open(package_json, encoding='utf-8') as f:
                 content = f.read()
                 data = json.loads(content)
                 deps = {**data.get('dependencies', {}), **data.get('devDependencies', {})}
-                
+
                 if 'react' in deps:
                     frameworks.append("React")
                 if 'vue' in deps:
@@ -106,14 +106,14 @@ class TechStackDetector:
                     frameworks.append("Next.js")
                 if 'nuxt' in deps:
                     frameworks.append("Nuxt.js")
-        
+
         return frameworks
-    
+
     def _detect_database(self) -> str:
         """检测数据库"""
         pyproject = self.project_root / "pyproject.toml"
         if pyproject.exists():
-            with open(pyproject, 'r', encoding='utf-8') as f:
+            with open(pyproject, encoding='utf-8') as f:
                 content = f.read()
                 if 'sqlalchemy' in content.lower():
                     return "SQLAlchemy ORM"
@@ -125,14 +125,14 @@ class TechStackDetector:
                     return "SQLite"
                 if 'mongodb' in content.lower() or 'pymongo' in content.lower():
                     return "MongoDB"
-        
+
         package_json = self.project_root / "package.json"
         if package_json.exists():
-            with open(package_json, 'r', encoding='utf-8') as f:
+            with open(package_json, encoding='utf-8') as f:
                 content = f.read()
                 data = json.loads(content)
                 deps = {**data.get('dependencies', {}), **data.get('devDependencies', {})}
-                
+
                 if 'pg' in deps or 'postgres' in deps:
                     return "PostgreSQL"
                 if 'mysql' in deps or 'mysql2' in deps:
@@ -141,42 +141,42 @@ class TechStackDetector:
                     return "SQLite"
                 if 'mongodb' in deps or 'mongoose' in deps:
                     return "MongoDB"
-        
+
         return "Unknown"
-    
+
     def _detect_test_framework(self) -> str:
         """检测测试框架"""
         pyproject = self.project_root / "pyproject.toml"
         if pyproject.exists():
-            with open(pyproject, 'r', encoding='utf-8') as f:
+            with open(pyproject, encoding='utf-8') as f:
                 content = f.read()
                 if 'pytest' in content.lower():
                     return "pytest"
                 if 'unittest' in content.lower():
                     return "unittest"
-        
+
         package_json = self.project_root / "package.json"
         if package_json.exists():
-            with open(package_json, 'r', encoding='utf-8') as f:
+            with open(package_json, encoding='utf-8') as f:
                 content = f.read()
                 data = json.loads(content)
                 deps = {**data.get('dependencies', {}), **data.get('devDependencies', {})}
-                
+
                 if 'jest' in deps:
                     return "Jest"
                 if 'mocha' in deps:
                     return "Mocha"
                 if 'jasmine' in deps:
                     return "Jasmine"
-        
+
         return "Unknown"
-    
+
     def _detect_build_tool(self) -> str:
         """检测构建工具"""
         # 检查 Python 构建工具
         pyproject = self.project_root / "pyproject.toml"
         if pyproject.exists():
-            with open(pyproject, 'r', encoding='utf-8') as f:
+            with open(pyproject, encoding='utf-8') as f:
                 content = f.read()
                 if 'hatchling' in content.lower():
                     return "Hatchling"
@@ -184,15 +184,15 @@ class TechStackDetector:
                     return "Setuptools"
                 if 'poetry' in content.lower():
                     return "Poetry"
-        
+
         # 检查 JavaScript/TypeScript 构建工具
         package_json = self.project_root / "package.json"
         if package_json.exists():
-            with open(package_json, 'r', encoding='utf-8') as f:
+            with open(package_json, encoding='utf-8') as f:
                 content = f.read()
                 data = json.loads(content)
                 deps = {**data.get('dependencies', {}), **data.get('devDependencies', {})}
-                
+
                 if 'vite' in deps:
                     return "Vite"
                 if 'webpack' in deps:
@@ -201,9 +201,9 @@ class TechStackDetector:
                     return "Rollup"
                 if 'esbuild' in deps:
                     return "esbuild"
-        
+
         return "Unknown"
-    
+
     def _detect_dependency_manager(self) -> str:
         """检测依赖管理工具"""
         if (self.project_root / "pyproject.toml").exists():
@@ -215,31 +215,31 @@ class TechStackDetector:
                 return "Pipenv"
             if (self.project_root / "requirements.txt").exists():
                 return "pip"
-        
+
         if (self.project_root / "package.json").exists():
             if (self.project_root / "yarn.lock").exists():
                 return "Yarn"
             if (self.project_root / "pnpm-lock.yaml").exists():
                 return "pnpm"
             return "npm"
-        
+
         if (self.project_root / "go.mod").exists():
             return "Go Modules"
-        
+
         if (self.project_root / "Cargo.toml").exists():
             return "Cargo"
-        
+
         return "Unknown"
-    
+
     def _detect_code_style(self) -> List[str]:
         """检测代码规范工具"""
         style_tools = []
-        
+
         # Python 代码规范
         if (self.project_root / "ruff.toml").exists():
             style_tools.append("ruff")
         if (self.project_root / "pyproject.toml").exists():
-            with open(self.project_root / "pyproject.toml", 'r', encoding='utf-8') as f:
+            with open(self.project_root / "pyproject.toml", encoding='utf-8') as f:
                 content = f.read()
                 if 'black' in content.lower():
                     style_tools.append("Black")
@@ -247,19 +247,19 @@ class TechStackDetector:
                     style_tools.append("Flake8")
                 if 'pylint' in content.lower():
                     style_tools.append("Pylint")
-        
+
         # JavaScript/TypeScript 代码规范
         if (self.project_root / ".eslintrc.js").exists() or (self.project_root / ".eslintrc.json").exists():
             style_tools.append("ESLint")
         if (self.project_root / ".prettierrc").exists() or (self.project_root / ".prettierrc.json").exists():
             style_tools.append("Prettier")
-        
+
         return style_tools if style_tools else ["None"]
-    
+
     def _detect_other_tools(self) -> List[str]:
         """检测其他工具"""
         tools = []
-        
+
         # CI/CD
         if (self.project_root / ".github" / "workflows").exists():
             tools.append("GitHub Actions")
@@ -267,24 +267,24 @@ class TechStackDetector:
             tools.append("GitLab CI")
         if (self.project_root / "Jenkinsfile").exists():
             tools.append("Jenkins")
-        
+
         # 容器化
         if (self.project_root / "Dockerfile").exists():
             tools.append("Docker")
         if (self.project_root / "docker-compose.yml").exists():
             tools.append("Docker Compose")
-        
+
         # 文档
         if (self.project_root / "docs").exists():
             tools.append("Documentation")
-        
+
         return tools if tools else ["None"]
-    
+
     def generate_report(self) -> str:
         """生成技术栈报告"""
         if not self.tech_stack:
             self.detect()
-        
+
         report = [
             "技术栈识别报告：",
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
@@ -300,7 +300,7 @@ class TechStackDetector:
             "",
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
         ]
-        
+
         return "\n".join(report)
 
 
@@ -320,7 +320,7 @@ if __name__ == "__main__":
     # 演示使用
     detector = TechStackDetector()
     tech_stack = detector.detect()
-    
+
     print("检测到的技术栈:")
     print(json.dumps(tech_stack, indent=2, ensure_ascii=False))
     print()

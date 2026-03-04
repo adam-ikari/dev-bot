@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 SDD CLI - Spec Driven Development 命令行工具
@@ -7,9 +6,8 @@ SDD CLI - Spec Driven Development 命令行工具
 
 import argparse
 import sys
-from pathlib import Path
 
-from dev_bot.cli.commands import InitCommand, NewSpecCommand, ValidateCommand, AISpecCommand
+from dev_bot.cli.commands import AISpecCommand, InitCommand, NewSpecCommand, ValidateCommand
 
 
 def main():
@@ -26,9 +24,9 @@ def main():
   sdd ai-spec user-auth --type feature --desc "用户认证功能"  # 使用 AI 创建 spec
         """
     )
-    
+
     subparsers = parser.add_subparsers(dest='command', help='可用命令')
-    
+
     # init 命令
     init_parser = subparsers.add_parser(
         'init',
@@ -44,7 +42,7 @@ def main():
         default='standard',
         help='项目模板类型'
     )
-    
+
     # new-spec 命令
     spec_parser = subparsers.add_parser(
         'new-spec',
@@ -64,7 +62,7 @@ def main():
         '--output',
         help='输出目录（默认：specs/）'
     )
-    
+
     # validate 命令
     validate_parser = subparsers.add_parser(
         'validate',
@@ -74,7 +72,7 @@ def main():
         'spec_file',
         help='spec 文件路径'
     )
-    
+
     # ai-spec 命令
     ai_parser = subparsers.add_parser(
         'ai-spec',
@@ -103,14 +101,14 @@ def main():
         '--output',
         help='输出目录（默认：specs/）'
     )
-    
+
     # 解析参数
     args = parser.parse_args()
-    
+
     if not args.command:
         parser.print_help()
         sys.exit(1)
-    
+
     # 执行命令
     commands = {
         'init': InitCommand,
@@ -118,7 +116,7 @@ def main():
         'validate': ValidateCommand,
         'ai-spec': AISpecCommand,
     }
-    
+
     command_class = commands.get(args.command)
     if command_class:
         cmd = command_class(args)

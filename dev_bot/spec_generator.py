@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Spec 生成器 - 从已有工程代码生成 spec
@@ -8,34 +7,34 @@ Spec 生成器 - 从已有工程代码生成 spec
 import json
 import subprocess
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Dict
 
 from dev_bot.project_scanner import scan_project
 
 
 class SpecGenerator:
     """Spec 生成器"""
-    
+
     def __init__(self, project_path: Path, ai_tool: str = "iflow"):
         self.project_path = Path(project_path)
         self.ai_tool = ai_tool
         self.project_info = None
-    
+
     def analyze_project(self) -> Dict[str, Any]:
         """分析工程"""
         self.project_info = scan_project(self.project_path)
         return self.project_info
-    
+
     def generate_spec(self, spec_type: str = "feature", spec_name: str = None) -> Dict[str, Any]:
         """生成 spec"""
         if not self.project_info:
             self.analyze_project()
-        
+
         if spec_name is None:
             spec_name = self.project_path.name
-        
+
         prompt = self._generate_prompt(spec_type, spec_name)
-        
+
         try:
             result = subprocess.run(
                 [self.ai_tool],
@@ -44,7 +43,7 @@ class SpecGenerator:
                 text=True,
                 timeout=180
             )
-            
+
             if result.returncode == 0:
                 spec = self._parse_ai_response(result.stdout, spec_name, spec_type)
                 return spec
@@ -53,15 +52,15 @@ class SpecGenerator:
         except Exception as e:
             print(f"错误: {e}")
             return self._generate_fallback_spec(spec_name, spec_type)
-    
+
     def _generate_prompt(self, spec_type: str, spec_name: str) -> str:
         """生成 AI prompt"""
         structure = self.project_info.get("structure", {})
         code = self.project_info.get("code", {})
-        
+
         structure_str = json.dumps(structure, indent=2, ensure_ascii=False)
         code_str = json.dumps(code, indent=2, ensure_ascii=False)
-        
+
         prompt = f"""请基于以下工程信息，生成一个 {spec_type} 类型的规格说明（spec）：
 
 工程名称: {spec_name}
@@ -91,7 +90,7 @@ class SpecGenerator:
   }},
   "description": "基于代码分析生成的规格说明",
 """
-        
+
         if spec_type == "feature":
             prompt += """
   "requirements": [
@@ -224,15 +223,15 @@ class SpecGenerator:
     }
   }
 """
-        
+
         prompt += "\n}"
-        
+
         return prompt
-    
+
     def _parse_ai_response(self, response: str, name: str, spec_type: str) -> Dict[str, Any]:
         """解析 AI 返回的内容"""
         content = response.strip()
-        
+
         # 移除 markdown 代码块标记
         if content.startswith('```'):
             lines = content.split('\n')
@@ -241,18 +240,18 @@ class SpecGenerator:
             if content.endswith('```'):
                 content = content[:-3]
             content = content.strip()
-        
+
         try:
             spec = json.loads(content)
             return spec
         except json.JSONDecodeError:
             print("AI 返回的内容无法解析为 JSON，使用回退方案")
             return self._generate_fallback_spec(name, spec_type)
-    
+
     def _generate_fallback_spec(self, name: str, spec_type: str) -> Dict[str, Any]:
         """生成回退 spec（基于代码分析）"""
         import datetime
-        
+
         spec = {
             "spec_version": "1.0",
             "metadata": {
@@ -265,10 +264,10 @@ class SpecGenerator:
             },
             "description": f"基于代码分析自动生成的 {spec_type} 规格",
         }
-        
+
         structure = self.project_info.get("structure", {})
         code = self.project_info.get("code", {})
-        
+
         if spec_type == "feature":
             # 从代码中提取需求
             requirements = []
@@ -280,13 +279,13 @@ class SpecGenerator:
                     "priority": "medium",
                     "status": "implemented"
                 })
-            
+
             spec.update({
                 "requirements": requirements,
                 "user_stories": [],
                 "acceptance_criteria": []
             })
-        
+
         elif spec_type == "api":
             # 从代码中提取端点
             endpoints = []
@@ -304,14 +303,14 @@ class SpecGenerator:
                         }
                     }
                 })
-            
+
             spec.update({
                 "base_path": "/api",
                 "endpoints": endpoints,
                 "models": [],
                 "authentication": {}
             })
-        
+
         elif spec_type == "component":
             # 从代码中提取方法
             methods = []
@@ -321,7 +320,7 @@ class SpecGenerator:
                     "description": f"在 {func['file']} 中定义的函数",
                     "returns": "any"
                 })
-            
+
             spec.update({
                 "props": [],
                 "events": [],
@@ -329,7 +328,7 @@ class SpecGenerator:
                 "methods": methods,
                 "examples": []
             })
-        
+
         elif spec_type == "service":
             # 从代码中提取依赖
             dependencies = []
@@ -341,17 +340,17 @@ class SpecGenerator:
                         "version": "latest",
                         "type": lang
                     })
-            
+
             spec.update({
                 "interfaces": [],
                 "dependencies": dependencies,
                 "configuration": {}
             })
-        
+
         return spec
 
 
-def generate_spec_from_project(project_path: Path, spec_type: str = "feature", 
+def generate_spec_from_project(project_path: Path, spec_type: str = "feature",
                                 spec_name: str = None, ai_tool: str = "iflow") -> Dict[str, Any]:
     """从工程生成 spec"""
     generator = SpecGenerator(project_path, ai_tool)

@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 测试 Spec 和代码一致性分析功能
 """
 
 import json
-from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import pytest
 
-from dev_bot.core import AIOrchestrator, REPLManager, SpecManager
+from dev_bot.core import AIOrchestrator, SpecManager
 
 
 @pytest.fixture
@@ -32,7 +30,7 @@ def ai_orchestrator(tmp_path):
     # 创建临时日志目录
     log_dir = tmp_path / ".ai-logs"
     log_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # 创建 AIOrchestrator 并指定日志目录
     return AIOrchestrator(log_dir=log_dir)
 
@@ -56,13 +54,13 @@ def sample_spec(test_project_root):
             "登出功能"
         ]
     }
-    
+
     spec_file = test_project_root / "specs" / "test-feature.json"
     spec_file.parent.mkdir(parents=True, exist_ok=True)
-    
+
     with open(spec_file, 'w', encoding='utf-8') as f:
         json.dump(spec_data, f, ensure_ascii=False, indent=2)
-    
+
     return spec_file
 
 
@@ -122,14 +120,14 @@ def test_spec_manager_analyze_spec_code_consistency_with_ai(
         'summary': '发现不一致',
         'recommendation': '实现登录功能'
     })
-    
+
     with patch.object(ai_orchestrator, 'call_ai', return_value=mock_ai_response):
         result = spec_manager.analyze_spec_code_consistency(
             code_summary="代码摘要",
             ai_orchestrator=ai_orchestrator,
             tech_stack="Python"
         )
-    
+
     assert result['is_consistent'] == False
     assert result['consistency_score'] == 0.7
     assert len(result['issues']) == 1
@@ -146,7 +144,7 @@ def test_spec_manager_analyze_spec_code_consistency_ai_error(
             ai_orchestrator=ai_orchestrator,
             tech_stack="Python"
         )
-    
+
     assert result['is_consistent'] == True
     assert 'AI 调用失败' in result['summary']
 
@@ -161,7 +159,7 @@ def test_spec_manager_analyze_spec_code_consistency_json_error(
             ai_orchestrator=ai_orchestrator,
             tech_stack="Python"
         )
-    
+
     assert result['is_consistent'] == True
     assert '无法解析分析结果' in result['summary']
 

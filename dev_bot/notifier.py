@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 通知模块 - 邮件和通知功能
@@ -8,16 +7,16 @@
 import os
 import smtplib
 import subprocess
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from pathlib import Path
-from typing import Optional, Dict, Any
 from datetime import datetime
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 
 class Notifier:
     """通知管理器"""
-    
+
     def __init__(self, config_path: Optional[Path] = None):
         """
         初始化通知管理器
@@ -28,7 +27,7 @@ class Notifier:
         self.config_path = config_path or Path.cwd() / ".notifyrc"
         self.config = self._load_config()
         self.enabled = self.config.get('enabled', False)
-    
+
     def _load_config(self) -> Dict[str, Any]:
         """加载配置文件"""
         config = {
@@ -56,11 +55,11 @@ class Notifier:
                 'enabled': True
             }
         }
-        
+
         if self.config_path.exists():
             try:
                 import json
-                with open(self.config_path, 'r', encoding='utf-8') as f:
+                with open(self.config_path, encoding='utf-8') as f:
                     user_config = json.load(f)
                     # 深度合并配置
                     for key, value in user_config.items():
@@ -70,9 +69,9 @@ class Notifier:
                             config[key] = value
             except Exception as e:
                 print(f"  ! 加载通知配置失败: {e}")
-        
+
         return config
-    
+
     def notify(self, title: str, message: str, level: str = "info"):
         """
         发送通知
@@ -84,26 +83,26 @@ class Notifier:
         """
         if not self.enabled:
             return
-        
+
         print(f"\n📢 [{level.upper()}] {title}")
         print(f"   {message}\n")
-        
+
         # 桌面通知
         if self.config.get('desktop', {}).get('enabled', True):
             self._send_desktop_notification(title, message, level)
-        
+
         # 邮件通知
         if self.config.get('email', {}).get('enabled', False):
             self._send_email_notification(title, message, level)
-        
+
         # Slack 通知
         if self.config.get('slack', {}).get('enabled', False):
             self._send_slack_notification(title, message, level)
-        
+
         # Discord 通知
         if self.config.get('discord', {}).get('enabled', False):
             self._send_discord_notification(title, message, level)
-    
+
     def _send_desktop_notification(self, title: str, message: str, level: str):
         """发送桌面通知"""
         try:
@@ -123,18 +122,18 @@ class Notifier:
                     ], check=False)
         except Exception as e:
             print(f"  ! 桌面通知失败: {e}")
-    
+
     def _send_email_notification(self, title: str, message: str, level: str):
         """发送邮件通知"""
         try:
             email_config = self.config['email']
-            
+
             # 创建邮件
             msg = MIMEMultipart()
             msg['From'] = email_config['from_addr']
             msg['To'] = email_config['to_addr']
             msg['Subject'] = f"[Dev-Bot] {title}"
-            
+
             # 邮件正文
             body = f"""
 级别: {level.upper()}
@@ -146,7 +145,7 @@ class Notifier:
 此邮件由 Dev-Bot 自动发送
 """
             msg.attach(MIMEText(body, 'plain', 'utf-8'))
-            
+
             # 发送邮件
             with smtplib.SMTP(
                 email_config['smtp_server'],
@@ -159,19 +158,19 @@ class Notifier:
                     email_config['password']
                 )
                 server.send_message(msg)
-            
+
             print(f"  ✓ 邮件通知已发送: {email_config['to_addr']}")
-            
+
         except Exception as e:
             print(f"  ! 邮件通知失败: {e}")
-    
+
     def _send_slack_notification(self, title: str, message: str, level: str):
         """发送 Slack 通知"""
         try:
             import requests
-            
+
             slack_config = self.config['slack']
-            
+
             # 设置颜色
             colors = {
                 'info': '#36a64f',
@@ -179,7 +178,7 @@ class Notifier:
                 'error': '#ff0000',
                 'critical': '#ff0000'
             }
-            
+
             payload = {
                 'channel': slack_config.get('channel', '#general'),
                 'username': 'Dev-Bot',
@@ -191,28 +190,28 @@ class Notifier:
                     'ts': int(datetime.now().timestamp())
                 }]
             }
-            
+
             response = requests.post(
                 slack_config['webhook_url'],
                 json=payload,
                 timeout=10
             )
-            
+
             if response.status_code == 200:
-                print(f"  ✓ Slack 通知已发送")
+                print("  ✓ Slack 通知已发送")
             else:
                 print(f"  ! Slack 通知失败: {response.status_code}")
-                
+
         except Exception as e:
             print(f"  ! Slack 通知失败: {e}")
-    
+
     def _send_discord_notification(self, title: str, message: str, level: str):
         """发送 Discord 通知"""
         try:
             import requests
-            
+
             discord_config = self.config['discord']
-            
+
             # 设置颜色
             colors = {
                 'info': 0x36a64f,
@@ -220,7 +219,7 @@ class Notifier:
                 'error': 0xff0000,
                 'critical': 0xff0000
             }
-            
+
             payload = {
                 'username': 'Dev-Bot',
                 'avatar_url': 'https://cdn.icon-icons.com/icons2/2107/PNG/512/extension_robot_icon_130739.png',
@@ -231,21 +230,21 @@ class Notifier:
                     'timestamp': datetime.now().isoformat()
                 }]
             }
-            
+
             response = requests.post(
                 discord_config['webhook_url'],
                 json=payload,
                 timeout=10
             )
-            
+
             if response.status_code in [200, 204]:
-                print(f"  ✓ Discord 通知已发送")
+                print("  ✓ Discord 通知已发送")
             else:
                 print(f"  ! Discord 通知失败: {response.status_code}")
-                
+
         except Exception as e:
             print(f"  ! Discord 通知失败: {e}")
-    
+
     def check_critical_patterns(self, output: str) -> bool:
         """
         检查输出中是否包含关键错误模式
@@ -270,7 +269,7 @@ class Notifier:
             '认证失败',
             '未授权'
         ]
-        
+
         output_lower = output.lower()
         for pattern in critical_patterns:
             if pattern.lower() in output_lower:
@@ -280,7 +279,7 @@ class Notifier:
                     level='critical'
                 )
                 return True
-        
+
         return False
 
 
@@ -311,13 +310,13 @@ def create_sample_config():
             "enabled": True
         }
     }
-    
+
     import json
     config_path = Path.cwd() / ".notifyrc"
-    
+
     with open(config_path, 'w', encoding='utf-8') as f:
         json.dump(config, f, indent=2, ensure_ascii=False)
-    
+
     print(f"✓ 示例配置文件已创建: {config_path}")
     print("  请编辑此文件以配置你的通知设置")
     return config_path

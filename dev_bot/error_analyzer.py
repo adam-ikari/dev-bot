@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 错误分析器 - 使用 AI 分析错误并提供修复建议
@@ -7,28 +6,27 @@
 
 import json
 import subprocess
-import sys
 import traceback
 from pathlib import Path
-from typing import Dict, Any, Optional, List
+from typing import Any, Dict
 
 
 class ErrorAnalyzer:
     """错误分析器"""
-    
+
     def __init__(self, ai_tool: str = "iflow"):
         self.ai_tool = ai_tool
         self.error_log_dir = Path(".error-logs")
         self.error_log_dir.mkdir(exist_ok=True)
-    
+
     def analyze_error(self, error: Exception, context: Dict[str, Any] = None) -> Dict[str, Any]:
         """分析错误"""
         # 收集错误信息
         error_info = self._collect_error_info(error, context)
-        
+
         # 生成分析 prompt
         prompt = self._generate_analysis_prompt(error_info)
-        
+
         # 调用 AI 分析
         try:
             result = subprocess.run(
@@ -38,25 +36,25 @@ class ErrorAnalyzer:
                 text=True,
                 timeout=120
             )
-            
+
             if result.returncode == 0:
                 analysis = self._parse_ai_response(result.stdout)
             else:
                 analysis = self._get_fallback_analysis(error_info)
-        except Exception as e:
+        except Exception:
             analysis = self._get_fallback_analysis(error_info)
-        
+
         # 保存分析结果
         self._save_analysis(error_info, analysis)
-        
+
         return analysis
-    
+
     def _collect_error_info(self, error: Exception, context: Dict[str, Any] = None) -> Dict[str, Any]:
         """收集错误信息"""
         error_type = type(error).__name__
         error_message = str(error)
         error_traceback = traceback.format_exc()
-        
+
         # 获取相关代码上下文
         tb = traceback.extract_tb(error.__traceback__)
         error_location = None
@@ -67,7 +65,7 @@ class ErrorAnalyzer:
                 "line": last_frame.lineno,
                 "function": last_frame.name
             }
-        
+
         return {
             "error_type": error_type,
             "error_message": error_message,
@@ -76,7 +74,7 @@ class ErrorAnalyzer:
             "context": context or {},
             "timestamp": self._get_timestamp()
         }
-    
+
     def _generate_analysis_prompt(self, error_info: Dict[str, Any]) -> str:
         """生成分析 prompt"""
         prompt = f"""请分析以下错误并提供修复建议：
@@ -120,13 +118,13 @@ class ErrorAnalyzer:
 
 只返回 JSON，不要有任何其他文字。
 """
-        
+
         return prompt
-    
+
     def _parse_ai_response(self, response: str) -> Dict[str, Any]:
         """解析 AI 响应"""
         content = response.strip()
-        
+
         # 移除 markdown 代码块标记
         if content.startswith('```'):
             lines = content.split('\n')
@@ -135,17 +133,17 @@ class ErrorAnalyzer:
             if content.endswith('```'):
                 content = content[:-3]
             content = content.strip()
-        
+
         try:
             return json.loads(content)
         except json.JSONDecodeError:
             return {"error": "无法解析 AI 响应", "raw_response": content}
-    
+
     def _get_fallback_analysis(self, error_info: Dict[str, Any]) -> Dict[str, Any]:
         """获取回退分析"""
         error_type = error_info.get('error_type', 'Unknown')
         error_message = error_info.get('error_message', '')
-        
+
         analysis = {
             "error_analysis": {
                 "root_cause": f"发生 {error_type} 错误",
@@ -173,39 +171,39 @@ class ErrorAnalyzer:
             ],
             "additional_notes": f"错误消息: {error_message}"
         }
-        
+
         return analysis
-    
+
     def _save_analysis(self, error_info: Dict[str, Any], analysis: Dict[str, Any]):
         """保存分析结果"""
         timestamp = error_info.get('timestamp', 'unknown').replace(':', '-').replace(' ', '_')
         filename = f"error_{timestamp}.json"
         log_file = self.error_log_dir / filename
-        
+
         with open(log_file, 'w', encoding='utf-8') as f:
             json.dump({
                 "error_info": error_info,
                 "analysis": analysis
             }, f, indent=2, ensure_ascii=False)
-    
+
     def _get_timestamp(self) -> str:
         """获取时间戳"""
         from datetime import datetime
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
+
     def display_analysis(self, analysis: Dict[str, Any]):
         """显示分析结果"""
         print("\n" + "=" * 60)
         print("🔍 错误分析结果")
         print("=" * 60)
-        
+
         # 显示错误分析
         error_analysis = analysis.get('error_analysis', {})
         print(f"\n错误类型: {error_analysis.get('severity', 'unknown').upper()}")
         print(f"严重程度: {error_analysis.get('severity', 'unknown')}")
         print(f"根本原因: {error_analysis.get('root_cause', 'N/A')}")
         print(f"错误类别: {error_analysis.get('category', 'N/A')}")
-        
+
         # 显示修复建议
         fixes = analysis.get('suggested_fixes', [])
         if fixes:
@@ -213,53 +211,53 @@ class ErrorAnalyzer:
             for i, fix in enumerate(fixes, 1):
                 print(f"\n  [{i}] {fix.get('description', 'N/A')}")
                 if fix.get('code_change'):
-                    print(f"      代码修改:")
+                    print("      代码修改:")
                     for line in fix['code_change'].split('\n'):
                         print(f"        {line}")
                 if fix.get('steps'):
-                    print(f"      步骤:")
+                    print("      步骤:")
                     for step in fix.get('steps', []):
                         print(f"        - {step}")
-        
+
         # 显示预防建议
         tips = analysis.get('prevention_tips', [])
         if tips:
-            print(f"\n预防建议:")
+            print("\n预防建议:")
             for tip in tips:
                 print(f"  • {tip}")
-        
+
         # 显示额外说明
         notes = analysis.get('additional_notes')
         if notes:
             print(f"\n额外说明: {notes}")
-        
+
         print("\n" + "=" * 60)
-    
+
     def can_auto_fix(self, analysis: Dict[str, Any]) -> bool:
         """检查是否可以自动修复"""
         severity = analysis.get('error_analysis', {}).get('severity', 'medium')
         fixes = analysis.get('suggested_fixes', [])
-        
+
         # 只有低严重程度的错误且有明确的修复步骤时才自动修复
         if severity in ['low', 'medium'] and fixes:
             return True
-        
+
         return False
-    
+
     def apply_auto_fix(self, analysis: Dict[str, Any], project_path: Path) -> bool:
         """应用自动修复"""
         fixes = analysis.get('suggested_fixes', [])
-        
+
         if not fixes:
             print("  ! 没有可用的修复方案")
             return False
-        
-        print(f"\n🔧 尝试自动修复...")
-        
+
+        print("\n🔧 尝试自动修复...")
+
         success = False
         for i, fix in enumerate(fixes, 1):
             print(f"  应用修复方案 #{i}: {fix.get('description', 'N/A')}")
-            
+
             # 尝试应用修复
             try:
                 result = self._apply_fix(fix, project_path)
@@ -271,30 +269,30 @@ class ErrorAnalyzer:
                     print(f"  ✗ 修复方案 #{i} 应用失败")
             except Exception as e:
                 print(f"  ✗ 修复方案 #{i} 应用出错: {e}")
-        
+
         return success
-    
+
     def _apply_fix(self, fix: Dict[str, Any], project_path: Path) -> bool:
         """应用单个修复方案"""
         files_to_modify = fix.get('files_to_modify', [])
-        
+
         if not files_to_modify:
             # 如果没有指定文件，尝试从错误位置推断
             print("    ! 未指定要修改的文件，需要手动修复")
             return False
-        
+
         for file_path in files_to_modify:
             full_path = project_path / file_path
-            
+
             if not full_path.exists():
                 print(f"    ! 文件不存在: {file_path}")
                 continue
-            
+
             try:
                 # 读取文件
-                with open(full_path, 'r', encoding='utf-8') as f:
+                with open(full_path, encoding='utf-8') as f:
                     content = f.read()
-                
+
                 # 应用代码修改
                 code_change = fix.get('code_change', '')
                 if code_change and not code_change.startswith('#'):
@@ -303,19 +301,19 @@ class ErrorAnalyzer:
                     print(f"    ! 需要手动应用代码修改到 {file_path}")
                     print(f"    修改内容: {code_change}")
                     return False
-                
+
                 print(f"    ✓ 文件 {file_path} 标记为需要修改")
-                
+
             except Exception as e:
                 print(f"    ! 修改文件 {file_path} 失败: {e}")
                 return False
-        
+
         return True
 
 
 class RobustDevBot:
     """增强鲁棒性的 Dev-Bot"""
-    
+
     def __init__(self, ai_tool: str = "iflow", auto_fix: bool = True, auto_restart: bool = True, max_retries: int = 3):
         self.ai_tool = ai_tool
         self.error_analyzer = ErrorAnalyzer(ai_tool)
@@ -325,23 +323,23 @@ class RobustDevBot:
         self.max_retries = max_retries
         self.retry_count = 0
         self.project_path = Path.cwd()
-    
+
     def run_with_error_handling(self, func, *args, **kwargs):
         """运行函数并处理错误"""
         while self.retry_count < self.max_retries:
             try:
                 # 执行函数
                 result = func(*args, **kwargs)
-                
+
                 # 成功执行，重置重试计数
                 self.retry_count = 0
                 return result
-                
+
             except Exception as e:
                 self.error_count += 1
                 print(f"\n❌ 发生错误 #{self.error_count} (尝试 #{self.retry_count + 1}/{self.max_retries}): {type(e).__name__}")
                 print(f"错误消息: {str(e)}")
-                
+
                 # 分析错误
                 print("\n🔍 正在分析错误...")
                 context = {
@@ -350,39 +348,39 @@ class RobustDevBot:
                     "kwargs_keys": list(kwargs.keys()) if kwargs else [],
                     "retry_count": self.retry_count
                 }
-                
+
                 analysis = self.error_analyzer.analyze_error(e, context)
-                
+
                 # 显示分析结果
                 self.error_analyzer.display_analysis(analysis)
-                
+
                 # 尝试自动修复
                 if self.auto_fix and self.error_analyzer.can_auto_fix(analysis):
-                    print(f"\n🔧 尝试自动修复...")
+                    print("\n🔧 尝试自动修复...")
                     fix_success = self.error_analyzer.apply_auto_fix(analysis, self.project_path)
-                    
+
                     if fix_success:
-                        print(f"✓ 自动修复成功，准备重试...")
+                        print("✓ 自动修复成功，准备重试...")
                         self.retry_count += 1
-                        
+
                         # 等待一段时间后重试
                         import time
                         time.sleep(2)
                         continue
                     else:
-                        print(f"✗ 自动修复失败")
-                
+                        print("✗ 自动修复失败")
+
                 # 增加重试计数
                 self.retry_count += 1
-                
+
                 # 检查是否达到最大重试次数
                 if self.retry_count >= self.max_retries:
                     print(f"\n❌ 达到最大重试次数 ({self.max_retries})，停止执行")
                     break
-                
+
                 # 询问是否继续
                 if not self.auto_restart:
-                    print(f"\n是否继续重试? (y/n): ", end='')
+                    print("\n是否继续重试? (y/n): ", end='')
                     try:
                         response = input().strip().lower()
                         if response != 'y':
@@ -391,13 +389,13 @@ class RobustDevBot:
                     except (EOFError, KeyboardInterrupt):
                         print("\n用户中断")
                         break
-                
+
                 # 等待一段时间后重试
-                print(f"\n⏳ 等待 2 秒后重试...")
+                print("\n⏳ 等待 2 秒后重试...")
                 import time
                 time.sleep(2)
                 print(f"🔄 开始重试 #{self.retry_count}...\n")
-        
+
         # 返回 None 表示失败
         return None
 
@@ -429,14 +427,14 @@ def error_handler(func):
         except Exception as e:
             print(f"\n❌ 函数 {func.__name__} 出错: {type(e).__name__}")
             print(f"错误消息: {str(e)}")
-            
+
             # 分析错误
             analyze_and_handle_error(e, {
                 "function": func.__name__,
                 "module": func.__module__
             })
-            
+
             # 重新抛出异常或返回 None
             raise
-    
+
     return wrapper

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Spec 交互工具 - 在开发循环中与 AI 交互补充 spec
@@ -8,43 +7,43 @@ Spec 交互工具 - 在开发循环中与 AI 交互补充 spec
 import json
 import subprocess
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 
 class SpecAssistant:
     """Spec 助手 - 辅助在开发循环中管理和增强 spec"""
-    
+
     def __init__(self, spec_file: Optional[Path] = None, ai_tool: str = "iflow"):
         self.spec_file = spec_file
         self.ai_tool = ai_tool
         self.spec = None
-        
+
         if spec_file and spec_file.exists():
             self._load_spec()
-    
+
     def _load_spec(self):
         """加载 spec 文件"""
         if self.spec_file and self.spec_file.exists():
-            with open(self.spec_file, 'r', encoding='utf-8') as f:
+            with open(self.spec_file, encoding='utf-8') as f:
                 self.spec = json.load(f)
-    
+
     def _save_spec(self):
         """保存 spec 文件"""
         if self.spec_file and self.spec:
             with open(self.spec_file, 'w', encoding='utf-8') as f:
                 json.dump(self.spec, f, indent=2, ensure_ascii=False)
-    
+
     def interactive_enhance(self, aspect: str = "all"):
         """交互式增强 spec"""
         if not self.spec:
             print("❌ 未加载 spec 文件")
             return False
-        
+
         print(f"📝 正在增强 spec: {aspect}")
-        
+
         # 生成 prompt
         prompt = self._generate_interactive_prompt(aspect)
-        
+
         # 调用 AI
         try:
             result = subprocess.run(
@@ -54,7 +53,7 @@ class SpecAssistant:
                 text=True,
                 timeout=120
             )
-            
+
             if result.returncode == 0:
                 print("\n" + result.stdout)
                 return True
@@ -64,11 +63,11 @@ class SpecAssistant:
         except Exception as e:
             print(f"❌ 错误: {e}")
             return False
-    
+
     def _generate_interactive_prompt(self, aspect: str) -> str:
         """生成交互式 prompt"""
         spec_content = json.dumps(self.spec, indent=2, ensure_ascii=False)
-        
+
         prompts = {
             'analyze': f"""请分析以下 spec 文件，提供详细的改进建议：
 
@@ -132,14 +131,14 @@ class SpecAssistant:
 请返回增强后的完整 spec。
 """
         }
-        
+
         return prompts.get(aspect, prompts['all'])
-    
+
     def ask_question(self, question: str) -> str:
         """向 AI 提问关于 spec 的问题"""
         if not self.spec:
             return "❌ 未加载 spec 文件"
-        
+
         prompt = f"""基于以下 spec 回答问题：
 
 Spec 内容：
@@ -151,7 +150,7 @@ Spec 内容：
 
 请提供详细的答案。
 """
-        
+
         try:
             result = subprocess.run(
                 [self.ai_tool],
@@ -160,23 +159,23 @@ Spec 内容：
                 text=True,
                 timeout=60
             )
-            
+
             if result.returncode == 0:
                 return result.stdout
             else:
                 return f"❌ AI 调用失败: {result.stderr}"
         except Exception as e:
             return f"❌ 错误: {e}"
-    
+
     def generate_missing_parts(self) -> Dict[str, Any]:
         """生成缺失的部分"""
         if not self.spec:
             return {}
-        
+
         spec_type = self.spec.get('metadata', {}).get('type', 'feature')
-        
+
         missing = {}
-        
+
         if spec_type == 'feature':
             if not self.spec.get('requirements'):
                 missing['requirements'] = []
@@ -184,48 +183,48 @@ Spec 内容：
                 missing['user_stories'] = []
             if not self.spec.get('acceptance_criteria'):
                 missing['acceptance_criteria'] = []
-        
+
         elif spec_type == 'api':
             if not self.spec.get('endpoints'):
                 missing['endpoints'] = []
             if not self.spec.get('models'):
                 missing['models'] = []
-        
+
         elif spec_type == 'component':
             if not self.spec.get('props'):
                 missing['props'] = []
             if not self.spec.get('methods'):
                 missing['methods'] = []
-        
+
         return missing
-    
+
     def suggest_improvements(self) -> list:
         """建议改进"""
         suggestions = []
-        
+
         if not self.spec:
             return ["❌ 未加载 spec 文件"]
-        
+
         # 检查描述
         description = self.spec.get('description', '')
         if len(description) < 50:
             suggestions.append("描述过于简短，建议补充更多细节")
-        
+
         # 检查需求
         requirements = self.spec.get('requirements', [])
         if not requirements:
             suggestions.append("缺少需求列表，建议添加")
-        
+
         # 检查用户故事
         user_stories = self.spec.get('user_stories', [])
         if not user_stories and requirements:
             suggestions.append("有需求但缺少用户故事，建议补充")
-        
+
         # 检查验收标准
         acceptance_criteria = self.spec.get('acceptance_criteria', [])
         if not acceptance_criteria and requirements:
             suggestions.append("有需求但缺少验收标准，建议补充")
-        
+
         return suggestions
 
 

@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-from .core import DevBotCore, create_bot
 from .auto_restart import AutoRestartManager, get_restart_manager
+from .core import DevBotCore, create_bot
 from .tech_stack_detector import (
     TechStackDetector,
     detect_tech_stack,

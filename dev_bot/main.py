@@ -731,10 +731,6 @@ def main() -> None:
                     env=os.environ.copy()
                 )
 
-                # 读取提示词文件并传递给 AI 工具
-                with open(prompt_file, encoding='utf-8') as prompt_file_handle:
-                    prompt_content = prompt_file_handle.read()
-
                 # 添加用户输入上下文（REPL 模式）
                 pending_inputs = user_input_manager.get_pending_inputs()
                 if pending_inputs:
@@ -886,9 +882,6 @@ if __name__ == "__main__":
     # 启动主程序
     main()
 
-# 导出 main_loop 供外部调用
-__all__ = ['Config', 'main_loop', 'main']
-
 ################################################################################
 # AI 分析和决策
 ################################################################################
@@ -921,19 +914,19 @@ def analyze_and_decide(config: Config, session_output: Path, session_num: int, a
 
         # 检查代码质量
         code_quality = _check_code_quality()
-        
+
         # 验证 spec 文件
         spec_validation = _validate_spec_files()
-        
+
         # 检查测试结果
         test_results = _check_test_results()
-        
+
         # 检查用户输入（REPL 模式）
         recent_user_inputs = user_input_manager.get_recent_inputs(count=5)
         user_inputs_text = ""
         if recent_user_inputs:
             user_inputs_text = "最近的用户输入：\n" + "\n".join(recent_user_inputs)
-        
+
         # 构建质量评估报告
         quality_report = _build_quality_report(code_quality, spec_validation, test_results)
 
@@ -1333,7 +1326,7 @@ def _check_code_quality() -> Dict[str, Any]:
         'syntax_errors': [],
         'summary': ''
     }
-    
+
     try:
         # 运行 ruff 检查
         result = subprocess.run(
@@ -1342,11 +1335,11 @@ def _check_code_quality() -> Dict[str, Any]:
             text=True,
             timeout=30
         )
-        
+
         if result.returncode != 0:
             output = result.stdout
             lines = output.split('\n')
-            
+
             for line in lines:
                 if 'E' in line and 'W' in line:
                     # 统计错误和警告
@@ -1354,14 +1347,14 @@ def _check_code_quality() -> Dict[str, Any]:
                         quality_info['ruff_errors'] += 1
                     if 'W' in line:
                         quality_info['ruff_warnings'] += 1
-                    
+
                     # 检查语法错误
                     if 'E999' in line or 'E902' in line or 'E9' in line:
                         quality_info['syntax_errors'].append(line.strip())
                         quality_info['has_errors'] = True
                     elif 'W' in line:
                         quality_info['has_warnings'] = True
-        
+
         # 构建摘要
         if quality_info['ruff_errors'] > 0 or quality_info['ruff_warnings'] > 0:
             quality_info['summary'] = (
@@ -1372,11 +1365,11 @@ def _check_code_quality() -> Dict[str, Any]:
                 quality_info['summary'] += f", {len(quality_info['syntax_errors'])} 个语法错误"
         else:
             quality_info['summary'] = "代码质量检查通过"
-            
+
     except Exception as e:
         quality_info['summary'] = f"代码质量检查失败: {e}"
         quality_info['has_errors'] = True
-    
+
     return quality_info
 
 
@@ -1394,34 +1387,34 @@ def _validate_spec_files() -> Dict[str, Any]:
         'invalid_specs': [],
         'summary': ''
     }
-    
+
     specs_dir = Path('specs')
     if not specs_dir.exists():
         validation_info['summary'] = "specs 目录不存在"
         return validation_info
-    
+
     try:
         spec_files = list(specs_dir.glob('*.json'))
         validation_info['spec_count'] = len(spec_files)
-        
+
         for spec_file in spec_files:
             try:
-                with open(spec_file, 'r', encoding='utf-8') as f:
+                with open(spec_file, encoding='utf-8') as f:
                     spec_data = json.load(f)
-                
+
                 # 检查必需字段
                 required_fields = ['name', 'type', 'description']
                 missing_fields = [
                     field for field in required_fields if field not in spec_data
                 ]
-                
+
                 if missing_fields:
                     validation_info['invalid_specs'].append({
                         'file': spec_file.name,
                         'error': f'缺少字段: {", ".join(missing_fields)}'
                     })
                     validation_info['has_errors'] = True
-                
+
                 # 检查 type 是否有效
                 valid_types = ['feature', 'api', 'component', 'service']
                 if 'type' in spec_data and spec_data['type'] not in valid_types:
@@ -1430,14 +1423,14 @@ def _validate_spec_files() -> Dict[str, Any]:
                         'error': f'无效的 type: {spec_data["type"]}'
                     })
                     validation_info['has_errors'] = True
-                    
+
             except json.JSONDecodeError as e:
                 validation_info['invalid_specs'].append({
                     'file': spec_file.name,
                     'error': f'JSON 解析错误: {e}'
                 })
                 validation_info['has_errors'] = True
-        
+
         # 构建摘要
         if validation_info['invalid_specs']:
             validation_info['summary'] = (
@@ -1449,11 +1442,11 @@ def _validate_spec_files() -> Dict[str, Any]:
             validation_info['has_warnings'] = True
         else:
             validation_info['summary'] = f"所有 {validation_info['spec_count']} 个 spec 文件验证通过"
-            
+
     except Exception as e:
         validation_info['summary'] = f"Spec 验证失败: {e}"
         validation_info['has_errors'] = True
-    
+
     return validation_info
 
 
@@ -1472,7 +1465,7 @@ def _check_test_results() -> Dict[str, Any]:
         'errors': 0,
         'summary': ''
     }
-    
+
     try:
         # 运行测试
         result = subprocess.run(
@@ -1481,15 +1474,15 @@ def _check_test_results() -> Dict[str, Any]:
             text=True,
             timeout=60
         )
-        
+
         output = result.stdout
-        
+
         # 解析测试结果
         import re
         passed_match = re.search(r'(\d+) passed', output)
         failed_match = re.search(r'(\d+) failed', output)
         error_match = re.search(r'(\d+) error', output)
-        
+
         if passed_match:
             test_info['passed'] = int(passed_match.group(1))
         if failed_match:
@@ -1498,7 +1491,7 @@ def _check_test_results() -> Dict[str, Any]:
         if error_match:
             test_info['errors'] = int(error_match.group(1))
             test_info['has_errors'] = True
-        
+
         # 构建摘要
         if test_info['failed'] > 0 or test_info['errors'] > 0:
             test_info['summary'] = (
@@ -1507,15 +1500,15 @@ def _check_test_results() -> Dict[str, Any]:
             )
         else:
             test_info['summary'] = f"所有 {test_info['passed']} 个测试通过"
-            
+
     except Exception as e:
         test_info['summary'] = f"测试检查失败: {e}"
         test_info['has_errors'] = True
-    
+
     return test_info
 
 
-def _build_quality_report(code_quality: Dict[str, Any], 
+def _build_quality_report(code_quality: Dict[str, Any],
                           spec_validation: Dict[str, Any],
                           test_results: Dict[str, Any]) -> str:
     """
@@ -1552,36 +1545,16 @@ def _build_quality_report(code_quality: Dict[str, Any],
         "",
         "=" * 60
     ]
-    
+
     # 添加详细信息
     if code_quality['syntax_errors']:
         report.append("\n⚠️  语法错误:")
         for error in code_quality['syntax_errors'][:3]:
             report.append(f"  - {error}")
-    
+
     if spec_validation['invalid_specs']:
         report.append("\n⚠️  无效 Spec:")
         for invalid in spec_validation['invalid_specs'][:3]:
             report.append(f"  - {invalid['file']}: {invalid['error']}")
-    
+
     return "\n".join(report)
-
-
-# 为了兼容性，将 main 函数的逻辑提取为 main_loop
-def main_loop(config: Config) -> None:
-    """主开发循环 - 供外部调用"""
-    # 直接调用 main 函数（它已经接收 config 参数）
-    # 由于 main() 内部会创建 Config，我们需要临时修改全局配置路径
-    import os
-    original_cwd = os.getcwd()
-
-    try:
-        # 切换到配置文件所在的目录
-        os.chdir(config.config_path.parent)
-
-        # 直接调用 main 函数
-        main()
-
-    finally:
-        # 恢复原始工作目录
-        os.chdir(original_cwd)

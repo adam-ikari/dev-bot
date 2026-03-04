@@ -15,13 +15,13 @@ def temp_config():
         "prompt_file": "PROMPT.md",
         "timeout": 300
     }
-    
+
     with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
         json.dump(config_data, f)
         temp_path = f.name
-    
+
     yield temp_path
-    
+
     Path(temp_path).unlink(missing_ok=True)
 
 
@@ -38,7 +38,7 @@ def test_config_get_default():
     with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
         json.dump({"ai_command": "test"}, f)
         temp_path = f.name
-    
+
     try:
         config = Config(temp_path)
         assert config.get('nonexistent', 'default') == 'default'
