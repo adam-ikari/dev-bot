@@ -1,0 +1,56 @@
+{
+  "error_info": {
+    "error_type": "AttributeError",
+    "error_message": "'AutoProjectDevelopment' object has no attribute '_start_ai_development_loop'",
+    "error_traceback": "Traceback (most recent call last):\n  File \"/home/user/project/dev-bot/dev_bot/auto_project_dev.py\", line 73, in run\n    self._run_auto_mode()\n    ~~~~~~~~~~~~~~~~~~~^^\n  File \"/home/user/project/dev-bot/dev_bot/auto_project_dev.py\", line 145, in _run_auto_mode\n    self._start_ai_development_loop({})\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'AutoProjectDevelopment' object has no attribute '_start_ai_development_loop'\n",
+    "error_location": {
+      "file": "/home/user/project/dev-bot/dev_bot/auto_project_dev.py",
+      "line": 145,
+      "function": "_run_auto_mode"
+    },
+    "context": {
+      "mode": "auto",
+      "project_path": "/home/user/project/dev-bot",
+      "restart_count": 2
+    },
+    "timestamp": "2026-03-04 20:55:12"
+  },
+  "analysis": {
+    "error_analysis": {
+      "root_cause": "在 _run_auto_mode 方法中调用了 _start_ai_development_loop 方法，但该方法在 AutoProjectDevelopment 类中不存在",
+      "severity": "high",
+      "category": "missing_method"
+    },
+    "suggested_fixes": [
+      {
+        "description": "实现缺失的 _start_ai_development_loop 方法",
+        "code_change": "在 AutoProjectDevelopment 类中添加 _start_ai_development_loop 方法，该方法应接受一个字典参数（context），并启动 AI 开发循环",
+        "files_to_modify": [
+          "/home/user/project/dev-bot/dev_bot/auto_project_dev.py"
+        ],
+        "steps": [
+          "检查 auto_project_dev.py 文件中是否已有类似的开发循环逻辑",
+          "如果存在类似逻辑，将其重构为 _start_ai_development_loop 方法",
+          "如果不存在，根据 AI 开发流程实现该方法"
+        ]
+      },
+      {
+        "description": "检查方法名是否拼写错误",
+        "code_change": "确认是否应为其他已存在的方法名，如 _start_development_loop 或 start_ai_development_loop",
+        "files_to_modify": [
+          "/home/user/project/dev-bot/dev_bot/auto_project_dev.py"
+        ],
+        "steps": [
+          "搜索 auto_project_dev.py 中所有以 'start' 和 'loop' 相关的方法",
+          "确认正确的方法名并更新调用"
+        ]
+      }
+    ],
+    "prevention_tips": [
+      "在添加方法调用前，确保目标方法已在类中定义",
+      "使用 IDE 的代码导航功能验证方法是否存在",
+      "添加单元测试覆盖所有方法调用路径"
+    ],
+    "additional_notes": "该错误发生在 auto 模式下运行时的第 145 行，可能是重构过程中方法名称变更导致的不一致"
+  }
+}

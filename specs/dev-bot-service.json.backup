@@ -1,0 +1,424 @@
+{
+  "spec_version": "1.0",
+  "metadata": {
+    "name": "dev-bot-service",
+    "type": "service",
+    "version": "1.0.0",
+    "author": "adam-ikari",
+    "created": "2026-03-04",
+    "updated": "2026-03-04T19:04:34.156655"
+  },
+  "description": "AI驱动的开发代理服务，提供项目分析、规格生成和开发会话管理功能",
+  "interfaces": [
+    {
+      "name": "ProjectScanner",
+      "methods": [
+        {
+          "name": "scan",
+          "description": "扫描项目目录结构和文件",
+          "parameters": [],
+          "returns": {
+            "directories": "array",
+            "files": "array",
+            "languages": "object",
+            "frameworks": "array",
+            "dependencies": "object"
+          }
+        },
+        {
+          "name": "_detect_languages",
+          "description": "检测项目使用的编程语言",
+          "parameters": [],
+          "returns": {}
+        },
+        {
+          "name": "_detect_frameworks",
+          "description": "检测项目使用的框架",
+          "parameters": [],
+          "returns": {}
+        },
+        {
+          "name": "_detect_dependencies",
+          "description": "检测项目依赖项",
+          "parameters": [],
+          "returns": {}
+        }
+      ]
+    },
+    {
+      "name": "CodeAnalyzer",
+      "methods": [
+        {
+          "name": "analyze",
+          "description": "分析代码结构和类/函数定义",
+          "parameters": [],
+          "returns": {
+            "classes": "array",
+            "functions": "array"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AutoProjectDevelopment",
+      "methods": [
+        {
+          "name": "run",
+          "description": "运行自动开发流程（分析、生成、验证、增强、建议）",
+          "parameters": [],
+          "returns": {}
+        },
+        {
+          "name": "_analyze_project",
+          "description": "分析项目结构和代码",
+          "parameters": [],
+          "returns": {}
+        },
+        {
+          "name": "_generate_specs",
+          "description": "生成项目规格说明",
+          "parameters": [
+            "project_info"
+          ],
+          "returns": {}
+        },
+        {
+          "name": "_validate_specs",
+          "description": "验证生成的规格说明",
+          "parameters": [],
+          "returns": {}
+        },
+        {
+          "name": "_enhance_specs",
+          "description": "增强规格说明",
+          "parameters": [],
+          "returns": {}
+        }
+      ]
+    },
+    {
+      "name": "SpecGenerator",
+      "methods": [
+        {
+          "name": "analyze_project",
+          "description": "分析项目以生成规格说明",
+          "parameters": [],
+          "returns": {}
+        },
+        {
+          "name": "generate_spec",
+          "description": "生成指定类型的规格说明",
+          "parameters": [
+            "spec_type",
+            "spec_name"
+          ],
+          "returns": {}
+        }
+      ]
+    },
+    {
+      "name": "SpecAssistant",
+      "methods": [
+        {
+          "name": "interactive_enhance",
+          "description": "交互式增强规格说明",
+          "parameters": [
+            "aspect"
+          ],
+          "returns": {}
+        },
+        {
+          "name": "ask_question",
+          "description": "向AI询问规格相关的问题",
+          "parameters": [
+            "question"
+          ],
+          "returns": {}
+        },
+        {
+          "name": "generate_missing_parts",
+          "description": "生成规格说明中缺失的部分",
+          "parameters": [],
+          "returns": {}
+        },
+        {
+          "name": "suggest_improvements",
+          "description": "建议规格说明的改进点",
+          "parameters": [],
+          "returns": {}
+        }
+      ]
+    },
+    {
+      "name": "NonBlockingSpecInquirer",
+      "methods": [
+        {
+          "name": "start_analysis",
+          "description": "启动规格说明分析",
+          "parameters": [],
+          "returns": {}
+        },
+        {
+          "name": "stop_analysis",
+          "description": "停止规格说明分析",
+          "parameters": [],
+          "returns": {}
+        },
+        {
+          "name": "get_pending_questions",
+          "description": "获取待处理的问题列表",
+          "parameters": [
+            "max_count"
+          ],
+          "returns": {}
+        },
+        {
+          "name": "acknowledge_question",
+          "description": "确认已处理问题",
+          "parameters": [
+            "question_id"
+          ],
+          "returns": {}
+        },
+        {
+          "name": "ask_ai_for_suggestion",
+          "description": "向AI询问建议",
+          "parameters": [
+            "question"
+          ],
+          "returns": {}
+        }
+      ]
+    },
+    {
+      "name": "DevelopmentSession",
+      "methods": [
+        {
+          "name": "check_spec_questions",
+          "description": "检查规格说明中的问题",
+          "parameters": [],
+          "returns": {}
+        },
+        {
+          "name": "get_question_detail",
+          "description": "获取问题详细信息",
+          "parameters": [
+            "question_id"
+          ],
+          "returns": {}
+        },
+        {
+          "name": "handle_question",
+          "description": "处理问题",
+          "parameters": [
+            "question_id",
+            "action"
+          ],
+          "returns": {}
+        }
+      ]
+    },
+    {
+      "name": "ErrorAnalyzer",
+      "methods": [
+        {
+          "name": "analyze_errors",
+          "description": "分析项目中的错误和异常",
+          "parameters": [
+            "project_path"
+          ],
+          "returns": {
+            "errors": "array",
+            "warnings": "array",
+            "suggestions": "array"
+          }
+        },
+        {
+          "name": "generate_error_report",
+          "description": "生成错误分析报告",
+          "parameters": [
+            "format"
+          ],
+          "returns": {
+            "report": "string"
+          }
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "pytest",
+      "version": ">=1.0.0",
+      "type": "external"
+    },
+    {
+      "name": "pytest-cov",
+      "version": ">=1.0.0",
+      "type": "external"
+    },
+    {
+      "name": "ruff",
+      "version": ">=1.0.0",
+      "type": "external"
+    },
+    {
+      "name": "pyyaml",
+      "version": ">=1.0.0",
+      "type": "external"
+    }
+  ],
+  "configuration": {
+    "prompt_file": {
+      "type": "string",
+      "required": true,
+      "description": "AI提示词文件路径"
+    },
+    "ai_command": {
+      "type": "string",
+      "required": true,
+      "description": "AI工具命令"
+    },
+    "ai_command_args": {
+      "type": "array",
+      "required": false,
+      "description": "AI工具命令参数"
+    },
+    "timeout": {
+      "type": "integer",
+      "required": true,
+      "description": "超时时间（秒）"
+    },
+    "wait_interval": {
+      "type": "integer",
+      "required": true,
+      "description": "等待间隔（秒）"
+    },
+    "log_dir": {
+      "type": "string",
+      "required": true,
+      "description": "日志目录路径"
+    },
+    "stats_file": {
+      "type": "string",
+      "required": true,
+      "description": "统计文件路径"
+    },
+    "auto_commit": {
+      "type": "boolean",
+      "required": false,
+      "description": "是否自动提交到git"
+    },
+    "git_commit_template": {
+      "type": "string",
+      "required": false,
+      "description": "Git提交模板"
+    }
+  },
+  "api_endpoints": [
+    {
+      "name": "/api/v1/scan",
+      "method": "POST",
+      "description": "扫描项目",
+      "parameters": [
+        {
+          "name": "project_path",
+          "type": "string"
+        }
+      ],
+      "returns": {
+        "scan_result": "object"
+      }
+    },
+    {
+      "name": "/api/v1/spec/generate",
+      "method": "POST",
+      "description": "生成规格说明",
+      "parameters": [
+        {
+          "name": "spec_type",
+          "type": "string"
+        },
+        {
+          "name": "project_info",
+          "type": "object"
+        }
+      ],
+      "returns": {
+        "spec": "object"
+      }
+    },
+    {
+      "name": "/api/v1/spec/analyze",
+      "method": "POST",
+      "description": "分析规格说明",
+      "parameters": [
+        {
+          "name": "spec",
+          "type": "object"
+        }
+      ],
+      "returns": {
+        "analysis": "object"
+      }
+    },
+    {
+      "name": "/api/v1/session/start",
+      "method": "POST",
+      "description": "启动开发会话",
+      "parameters": [
+        {
+          "name": "project_path",
+          "type": "string"
+        }
+      ],
+      "returns": {
+        "session_id": "string"
+      }
+    }
+  ],
+  "error_handling": {
+    "retry_policy": {
+      "max_attempts": 3,
+      "backoff_factor": 2,
+      "retry_on": [
+        "timeout",
+        "network_error",
+        "rate_limit"
+      ]
+    },
+    "error_codes": {
+      "SCAN_FAILED": "E001",
+      "SPEC_GENERATION_FAILED": "E002",
+      "AI_SERVICE_UNAVAILABLE": "E003",
+      "INVALID_CONFIG": "E004"
+    }
+  },
+  "performance": {
+    "max_scan_size": 1000000,
+    "max_file_size": 10485760,
+    "scan_timeout": 300,
+    "cache_ttl": 3600
+  },
+  "security": {
+    "sanitization_enabled": true,
+    "max_file_path_length": 4096,
+    "allowed_file_extensions": [
+      ".py",
+      ".js",
+      ".ts",
+      ".java",
+      ".go",
+      ".rs",
+      ".cpp",
+      ".c",
+      ".h"
+    ],
+    "blocked_patterns": [
+      "password",
+      "secret",
+      "api_key",
+      "token"
+    ]
+  }
+}

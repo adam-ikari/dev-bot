@@ -8,7 +8,6 @@ set -e
 
 VERSION=${1:-$(date +%Y.%m.%d)}
 RELEASE_DIR="release"
-BINARY_NAME="dev-bot"
 
 echo "========================================"
 echo "Dev-Bot 发布脚本"
@@ -16,26 +15,28 @@ echo "版本: $VERSION"
 echo "========================================"
 
 # 清理旧的发布文件
-rm -rf "$RELEASE_DIR"
+rm -rf "$RELEASE_DIR" "dist" "build" "*.egg-info"
 mkdir -p "$RELEASE_DIR"
 
-# 检查 Python 环境
-if ! command -v python3 &> /dev/null; then
-    echo "错误: Python3 未安装"
+# 检查 uv 是否安装
+if ! command -v uv &> /dev/null; then
+    echo "错误: uv 未安装，请先安装 uv"
+    echo "安装命令: pip install uv"
     exit 1
 fi
 
-# 安装 PyInstaller
-echo "安装 PyInstaller..."
-python3 -m pip install pyinstaller --quiet
+# 构建 Python 包
+echo "构建 Python 包..."
+uv build
 
-# 构建 Linux 二进制文件
-echo "构建 Linux x86_64..."
-pyinstaller --onefile --name "$BINARY_NAME" main.py --distpath "$RELEASE_DIR/linux-amd64"
+# 复制构建产物到发布目录
+echo "复制构建产物..."
+cp dist/*.whl "$RELEASE_DIR/"
+cp dist/*.tar.gz "$RELEASE_DIR/"
 
-# 构建示例配置文件
+# 复制配置文件
 echo "复制配置文件..."
-cp config.json "$RELEASE_DIR/config.json"
+cp config.json "$RELEASE_DIR/"
 
 # 创建发布说明
 echo "创建发布说明..."
@@ -44,11 +45,25 @@ cat > "$RELEASE_DIR/README.md" << 'EOF'
 
 AI 驱动开发代理 - 可配置版本
 
-## 快速开始
+## 安装
+
+### 使用 uv 安装（推荐）
+
+```bash
+uv pip install dev_bot-*.whl
+```
+
+### 使用 pip 安装
+
+```bash
+pip install dev_bot-*.whl
+```
+
+## 配置
 
 1. 复制配置文件：
    ```bash
-   cp config.json config.local.json
+   cp config.json ~/.config/dev-bot/config.json
    ```
 
 2. 根据需要修改配置：
@@ -61,10 +76,13 @@ AI 驱动开发代理 - 可配置版本
    }
    ```
 
-3. 运行：
-   ```bash
-   ./dev-bot
-   ```
+## 使用
+
+安装后可以直接运行：
+
+```bash
+dev-bot
+```
 
 ## 配置说明
 
@@ -72,19 +90,20 @@ AI 驱动开发代理 - 可配置版本
 
 ## 系统要求
 
-- Linux x86_64
+- Python 3.8+
 - AI 工具（如 iflow、claude 等）需要在系统 PATH 中
 EOF
 
 # 创建压缩包
 echo "创建发布包..."
 cd "$RELEASE_DIR"
-tar -czf "dev-bot-${VERSION}-linux-amd64.tar.gz" linux-amd64/ README.md config.json
+tar -czf "dev-bot-${VERSION}.tar.gz" *.whl *.tar.gz README.md config.json
 cd ..
 
 echo "========================================"
 echo "发布完成！"
 echo "========================================"
-echo "发布文件: $RELEASE_DIR/dev-bot-${VERSION}-linux-amd64.tar.gz"
-echo "二进制文件: $RELEASE_DIR/linux-amd64/$BINARY_NAME"
+echo "发布文件: $RELEASE_DIR/dev-bot-${VERSION}.tar.gz"
+echo "Wheel 文件: $RELEASE_DIR/dev_bot-*.whl"
+echo "源码包: $RELEASE_DIR/dev_bot-*.tar.gz"
 echo "========================================"

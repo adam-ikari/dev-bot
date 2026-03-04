@@ -1,0 +1,423 @@
+{
+  "spec_version": "1.0",
+  "metadata": {
+    "name": "config-validation",
+    "type": "feature",
+    "version": "1.1.0",
+    "author": "Dev-Bot Team",
+    "created": "2026-03-04",
+    "updated": "2026-03-04T19:18:15.855480"
+  },
+  "description": "配置验证系统 - 验证配置文件的格式、必需字段和字段类型",
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "title": "配置文件格式验证",
+      "description": "验证配置文件是否为有效的 JSON 格式",
+      "priority": "high",
+      "status": "pending"
+    },
+    {
+      "id": "REQ-002",
+      "title": "必需字段检查",
+      "description": "检查配置文件是否包含所有必需的字段",
+      "priority": "high",
+      "status": "pending"
+    },
+    {
+      "id": "REQ-003",
+      "title": "字段类型验证",
+      "description": "验证配置字段的类型是否正确",
+      "priority": "high",
+      "status": "pending"
+    },
+    {
+      "id": "REQ-004",
+      "title": "字段值范围验证",
+      "description": "验证字段值是否在有效范围内",
+      "priority": "medium",
+      "status": "pending"
+    },
+    {
+      "id": "REQ-005",
+      "title": "友好的错误提示",
+      "description": "提供清晰、具体的错误提示信息",
+      "priority": "high",
+      "status": "pending"
+    },
+    {
+      "id": "REQ-006",
+      "title": "自定义验证规则",
+      "description": "支持通过配置文件定义自定义验证规则和验证函数",
+      "priority": "medium",
+      "status": "pending"
+    },
+    {
+      "id": "REQ-007",
+      "title": "配置文件继承",
+      "description": "支持配置文件的继承和覆盖机制",
+      "priority": "low",
+      "status": "pending"
+    },
+    {
+      "id": "REQ-008",
+      "title": "配置文件环境变量替换",
+      "description": "支持在配置文件中使用环境变量占位符并进行替换",
+      "priority": "medium",
+      "status": "pending"
+    },
+    {
+      "id": "REQ-009",
+      "title": "配置文件格式化",
+      "description": "提供配置文件自动格式化功能，确保统一的代码风格",
+      "priority": "low",
+      "status": "pending"
+    },
+    {
+      "id": "REQ-010",
+      "title": "配置文件依赖检查",
+      "description": "验证配置文件中引用的其他配置文件是否存在且有效",
+      "priority": "medium",
+      "status": "pending"
+    },
+    {
+      "id": "REQ-011",
+      "title": "配置文件加密支持",
+      "description": "支持敏感配置字段的加密存储和自动解密验证",
+      "priority": "medium",
+      "status": "pending"
+    },
+    {
+      "id": "REQ-012",
+      "title": "配置文件版本兼容性检查",
+      "description": "检查配置文件的 schema 版本是否与验证器兼容",
+      "priority": "medium",
+      "status": "pending"
+    },
+    {
+      "id": "REQ-013",
+      "title": "配置文件实时监控",
+      "description": "监控配置文件的变更并自动触发重新验证",
+      "priority": "low",
+      "status": "pending"
+    },
+    {
+      "id": "REQ-014",
+      "title": "配置文件完整性校验",
+      "description": "支持通过校验和或签名验证配置文件的完整性",
+      "priority": "low",
+      "status": "pending"
+    }
+  ],
+  "user_stories": [
+    {
+      "id": "US-001",
+      "as_a": "开发者",
+      "i_want_to": "配置文件有自动验证",
+      "so_that": "我可以快速发现配置错误"
+    },
+    {
+      "id": "US-002",
+      "as_a": "用户",
+      "i_want_to": "看到清晰的错误提示",
+      "so_that": "我可以快速修复配置问题"
+    },
+    {
+      "id": "US-003",
+      "as_a": "运维人员",
+      "i_want_to": "使用环境变量配置不同环境",
+      "so_that": "我可以轻松在开发、测试、生产环境间切换"
+    },
+    {
+      "id": "US-004",
+      "as_a": "架构师",
+      "i_want_to": "定义自定义验证规则",
+      "so_that": "我可以确保配置符合特定的业务约束"
+    },
+    {
+      "id": "US-005",
+      "as_a": "安全工程师",
+      "i_want_to": "敏感配置字段可以加密存储",
+      "so_that": "配置文件中的密码和密钥不会被明文暴露"
+    },
+    {
+      "id": "US-006",
+      "as_a": "DevOps工程师",
+      "i_want_to": "配置文件变更时自动验证",
+      "so_that": "部署前能及时发现配置问题"
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "requirement_id": "REQ-001",
+      "criteria": [
+        "JSON 格式错误时显示语法错误位置",
+        "显示期望的 JSON 格式示例"
+      ]
+    },
+    {
+      "requirement_id": "REQ-002",
+      "criteria": [
+        "列出所有缺失的必需字段",
+        "显示字段所在的配置文件路径"
+      ]
+    },
+    {
+      "requirement_id": "REQ-003",
+      "criteria": [
+        "显示字段名称和当前类型",
+        "显示期望的类型",
+        "提供类型转换建议"
+      ]
+    },
+    {
+      "requirement_id": "REQ-004",
+      "criteria": [
+        "数值字段验证最小值和最大值",
+        "字符串字段验证长度限制",
+        "枚举字段验证有效值"
+      ]
+    },
+    {
+      "requirement_id": "REQ-005",
+      "criteria": [
+        "错误消息使用用户友好的语言",
+        "提供修复建议",
+        "包含错误代码便于查找"
+      ]
+    },
+    {
+      "requirement_id": "REQ-006",
+      "criteria": [
+        "支持注册自定义验证函数",
+        "支持通过 JSON Schema 定义复杂验证规则",
+        "自定义验证失败时显示自定义错误消息"
+      ]
+    },
+    {
+      "requirement_id": "REQ-007",
+      "criteria": [
+        "支持通过 extends 字段继承基础配置",
+        "子配置可以覆盖父配置的字段",
+        "继承链路支持多级继承",
+        "循环继承时给出明确的错误提示"
+      ]
+    },
+    {
+      "requirement_id": "REQ-008",
+      "criteria": [
+        "支持 ${ENV_VAR} 格式的环境变量占位符",
+        "环境变量未定义时提供默认值或报错",
+        "支持嵌套字段中的环境变量替换"
+      ]
+    },
+    {
+      "requirement_id": "REQ-009",
+      "criteria": [
+        "支持 JSON 格式化（缩进、排序）",
+        "保留注释（如使用 JSON5 或 JSONC 格式）",
+        "提供格式化前后的对比视图"
+      ]
+    },
+    {
+      "requirement_id": "REQ-010",
+      "criteria": [
+        "检测引用的配置文件是否存在",
+        "验证引用的配置文件格式是否正确",
+        "显示引用链路和错误位置"
+      ]
+    },
+    {
+      "requirement_id": "REQ-011",
+      "criteria": [
+        "支持标记加密字段",
+        "自动解密并验证加密字段的内容",
+        "解密失败时显示清晰的错误信息"
+      ]
+    },
+    {
+      "requirement_id": "REQ-012",
+      "criteria": [
+        "读取配置文件的 schema 版本",
+        "与验证器支持的版本列表进行比对",
+        "版本不兼容时显示兼容性警告"
+      ]
+    },
+    {
+      "requirement_id": "REQ-013",
+      "criteria": [
+        "支持文件系统监控（inotify/watchdog）",
+        "配置文件变更时自动触发验证",
+        "支持配置热重载通知机制"
+      ]
+    },
+    {
+      "requirement_id": "REQ-014",
+      "criteria": [
+        "支持 MD5/SHA256 校验和计算",
+        "支持签名验证（如使用 PGP）",
+        "校验失败时拒绝加载配置"
+      ]
+    }
+  ],
+  "implementation": {
+    "module": "dev_bot.config_validator",
+    "classes": [
+      {
+        "name": "ConfigValidator",
+        "methods": [
+          "validate(config_path: Path) -> ValidationResult",
+          "validate_schema(config: dict, schema: dict) -> List[ValidationError]",
+          "format_error(error: ValidationError) -> str"
+        ]
+      },
+      {
+        "name": "ValidationError",
+        "properties": [
+          "field_path: str",
+          "error_type: str",
+          "expected: Any",
+          "actual: Any",
+          "message: str"
+        ]
+      },
+      {
+        "name": "ValidationResult",
+        "properties": [
+          "is_valid: bool",
+          "errors: List[ValidationError]"
+        ]
+      }
+    ],
+    "config_schemas": {
+      "dev-bot": {
+        "required_fields": [
+          "ai_command",
+          "prompt_file"
+        ],
+        "field_types": {
+          "ai_command": "str",
+          "prompt_file": "str",
+          "timeout_seconds": "int",
+          "auto_commit": "bool"
+        },
+        "field_ranges": {
+          "timeout_seconds": {
+            "min": 1,
+            "max": 3600
+          }
+        }
+      },
+      "sdd": {
+        "required_fields": [
+          "name",
+          "type",
+          "version"
+        ],
+        "field_types": {
+          "name": "str",
+          "type": "str",
+          "version": "str"
+        }
+      }
+    }
+  },
+  "tests": [
+    {
+      "name": "test_valid_config",
+      "description": "测试有效的配置文件",
+      "expected": "验证通过，无错误"
+    },
+    {
+      "name": "test_invalid_json",
+      "description": "测试无效的 JSON 格式",
+      "expected": "返回格式错误"
+    },
+    {
+      "name": "test_missing_required_fields",
+      "description": "测试缺少必需字段",
+      "expected": "列出所有缺失字段"
+    },
+    {
+      "name": "test_invalid_field_types",
+      "description": "测试字段类型错误",
+      "expected": "显示类型不匹配错误"
+    },
+    {
+      "name": "test_out_of_range_values",
+      "description": "测试超出范围的值",
+      "expected": "显示范围错误"
+    },
+    {
+      "name": "test_custom_validation_rules",
+      "description": "测试自定义验证规则",
+      "expected": "自定义验证规则正确执行"
+    },
+    {
+      "name": "test_config_inheritance",
+      "description": "测试配置继承功能",
+      "expected": "正确合并基础配置和覆盖配置"
+    },
+    {
+      "name": "test_circular_inheritance_detection",
+      "description": "测试循环继承检测",
+      "expected": "检测到循环继承并报错"
+    },
+    {
+      "name": "test_environment_variable_resolution",
+      "description": "测试环境变量替换",
+      "expected": "正确替换环境变量占位符"
+    },
+    {
+      "name": "test_undefined_env_var_handling",
+      "description": "测试未定义环境变量处理",
+      "expected": "正确处理未定义的环境变量"
+    },
+    {
+      "name": "test_config_formatting",
+      "description": "测试配置文件格式化",
+      "expected": "输出格式化后的配置"
+    },
+    {
+      "name": "test_dependency_validation",
+      "description": "测试配置文件依赖检查",
+      "expected": "正确检测缺失的依赖配置"
+    },
+    {
+      "name": "test_encrypted_field_validation",
+      "description": "测试加密字段验证",
+      "expected": "正确解密并验证加密字段"
+    },
+    {
+      "name": "test_version_compatibility_check",
+      "description": "测试版本兼容性检查",
+      "expected": "正确识别不兼容的配置版本"
+    },
+    {
+      "name": "test_config_file_watching",
+      "description": "测试配置文件实时监控",
+      "expected": "文件变更时自动触发验证"
+    },
+    {
+      "name": "test_checksum_validation",
+      "description": "测试配置文件完整性校验",
+      "expected": "校验和不匹配时拒绝加载"
+    }
+  ],
+  "implementation.classes": {
+    "name": "SchemaRegistry",
+    "methods": [
+      "register_schema(name: str, schema: dict) -> None",
+      "get_schema(name: str) -> dict",
+      "validate_config(config: dict, schema_name: str) -> ValidationResult"
+    ]
+  },
+  "config_schemas": {
+    "dev-bot": {
+      "field_patterns": {
+        "ai_command": "^[a-zA-Z_-]+$",
+        "prompt_file": "^[a-zA-Z0-9_./-]+\\.md$"
+      }
+    }
+  }
+}

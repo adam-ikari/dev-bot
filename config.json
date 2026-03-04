@@ -1,1 +1,1 @@
-{"ai_command": "iflow", "prompt_file": "PROMPT.md", "timeout": 300}
+{"ai_command": "iflow", "prompt_file": "PROMPT.md", "timeout": 300, "auto_restart": {"enabled": true, "max_restart_count": 3, "restart_delay": 5, "ai_analysis": true}}

@@ -1,0 +1,46 @@
+{
+  "error_info": {
+    "error_type": "AttributeError",
+    "error_message": "'AutoProjectDevelopment' object has no attribute '_start_ai_development_loop'",
+    "error_traceback": "Traceback (most recent call last):\n  File \"/home/user/project/dev-bot/dev_bot/auto_project_dev.py\", line 73, in run\n    self._run_auto_mode()\n    ~~~~~~~~~~~~~~~~~~~^^\n  File \"/home/user/project/dev-bot/dev_bot/auto_project_dev.py\", line 145, in _run_auto_mode\n    self._start_ai_development_loop({})\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'AutoProjectDevelopment' object has no attribute '_start_ai_development_loop'\n",
+    "error_location": {
+      "file": "/home/user/project/dev-bot/dev_bot/auto_project_dev.py",
+      "line": 145,
+      "function": "_run_auto_mode"
+    },
+    "context": {
+      "mode": "auto",
+      "project_path": "/home/user/project/dev-bot",
+      "restart_count": 1
+    },
+    "timestamp": "2026-03-04 20:54:55"
+  },
+  "analysis": {
+    "error_analysis": {
+      "root_cause": "The method '_start_ai_development_loop' is being called on line 145 in '_run_auto_mode' but this method does not exist in the AutoProjectDevelopment class. This is likely a missing method implementation or a method name mismatch.",
+      "severity": "high",
+      "category": "missing_method"
+    },
+    "suggested_fixes": [
+      {
+        "description": "Implement the missing '_start_ai_development_loop' method in the AutoProjectDevelopment class",
+        "code_change": "Add the method to handle the AI development loop initialization with parameters for development context",
+        "files_to_modify": [
+          "/home/user/project/dev-bot/dev_bot/auto_project_dev.py"
+        ],
+        "steps": [
+          "Read the auto_project_dev.py file to understand the class structure and existing methods",
+          "Identify what the '_start_ai_development_loop' method should do based on context",
+          "Implement the method with appropriate parameters (e.g., context dict)",
+          "Test the implementation by running the auto mode"
+        ]
+      }
+    ],
+    "prevention_tips": [
+      "Add unit tests to verify all referenced methods exist before runtime",
+      "Use static analysis tools to detect missing method calls",
+      "Implement method stubs or abstract base classes to enforce interface contracts"
+    ],
+    "additional_notes": "The error occurs at restart_count=1, suggesting this may be a newly added feature or refactored code that wasn't fully implemented. Check if this method was removed during recent code changes."
+  }
+}

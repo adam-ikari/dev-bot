@@ -1,0 +1,2236 @@
+{
+  "structure": {
+    "directories": [
+      "dev_bot",
+      "dev_bot/cli",
+      "templates",
+      "templates/specs",
+      "specs",
+      "standalone",
+      "tests"
+    ],
+    "files": [
+      {
+        "path": "pytest.ini",
+        "size": 113,
+        "extension": ".ini"
+      },
+      {
+        "path": "SDD_CLI_README.md",
+        "size": 2906,
+        "extension": ".md"
+      },
+      {
+        "path": "README.md",
+        "size": 4441,
+        "extension": ".md"
+      },
+      {
+        "path": "config.json",
+        "size": 67,
+        "extension": ".json"
+      },
+      {
+        "path": "DEVELOPMENT_PLAN.md",
+        "size": 2135,
+        "extension": ".md"
+      },
+      {
+        "path": "pyproject.toml",
+        "size": 1115,
+        "extension": ".toml"
+      },
+      {
+        "path": "uv.lock",
+        "size": 152938,
+        "extension": ".lock"
+      },
+      {
+        "path": "dev_bot/project_scanner.py",
+        "size": 12111,
+        "extension": ".py"
+      },
+      {
+        "path": "dev_bot/auto_project_dev.py",
+        "size": 23344,
+        "extension": ".py"
+      },
+      {
+        "path": "dev_bot/spec_generator.py",
+        "size": 9908,
+        "extension": ".py"
+      },
+      {
+        "path": "dev_bot/spec_assistant.py",
+        "size": 6655,
+        "extension": ".py"
+      },
+      {
+        "path": "dev_bot/error_analyzer.py",
+        "size": 15884,
+        "extension": ".py"
+      },
+      {
+        "path": "dev_bot/cli/commands.py",
+        "size": 16929,
+        "extension": ".py"
+      },
+      {
+        "path": "dev_bot/cli/__init__.py",
+        "size": 0,
+        "extension": ".py"
+      },
+      {
+        "path": "dev_bot/cli/main.py",
+        "size": 3292,
+        "extension": ".py"
+      },
+      {
+        "path": "dev_bot/cli/enhance.py",
+        "size": 8323,
+        "extension": ".py"
+      },
+      {
+        "path": "dev_bot/cli/extract.py",
+        "size": 3954,
+        "extension": ".py"
+      },
+      {
+        "path": "dev_bot/nonblocking_inquirer.py",
+        "size": 12864,
+        "extension": ".py"
+      },
+      {
+        "path": "dev_bot/notifier.py",
+        "size": 10342,
+        "extension": ".py"
+      },
+      {
+        "path": "dev_bot/__init__.py",
+        "size": 112,
+        "extension": ".py"
+      },
+      {
+        "path": "dev_bot/main.py",
+        "size": 29305,
+        "extension": ".py"
+      },
+      {
+        "path": "dev_bot/auto_dev_cmd.py",
+        "size": 167,
+        "extension": ".py"
+      },
+      {
+        "path": "dev_bot/development_session.py",
+        "size": 3228,
+        "extension": ".py"
+      },
+      {
+        "path": "dev_bot/cli.py",
+        "size": 8247,
+        "extension": ".py"
+      },
+      {
+        "path": "dev_bot/git_manager.py",
+        "size": 12414,
+        "extension": ".py"
+      },
+      {
+        "path": "templates/specs/feature.json",
+        "size": 1039,
+        "extension": ".json"
+      },
+      {
+        "path": "templates/specs/api.json",
+        "size": 1147,
+        "extension": ".json"
+      },
+      {
+        "path": "templates/specs/component.json",
+        "size": 1385,
+        "extension": ".json"
+      },
+      {
+        "path": "templates/specs/service.json",
+        "size": 1810,
+        "extension": ".json"
+      },
+      {
+        "path": "SELF_DEVELOPMENT_LOG.md",
+        "size": 1581,
+        "extension": ".md"
+      },
+      {
+        "path": "analyze_self.py",
+        "size": 2585,
+        "extension": ".py"
+      },
+      {
+        "path": "specs/config-validation.json.backup",
+        "size": 3561,
+        "extension": ".backup"
+      },
+      {
+        "path": "specs/dev-bot-service.json.backup",
+        "size": 7011,
+        "extension": ".backup"
+      },
+      {
+        "path": "specs/dev-bot-feature.json.backup",
+        "size": 7543,
+        "extension": ".backup"
+      },
+      {
+        "path": "specs/config-validation.json",
+        "size": 8343,
+        "extension": ".json"
+      },
+      {
+        "path": "specs/dev-bot-service.json",
+        "size": 9741,
+        "extension": ".json"
+      },
+      {
+        "path": "specs/dev-bot-feature.json",
+        "size": 14177,
+        "extension": ".json"
+      },
+      {
+        "path": "standalone/README.md",
+        "size": 1842,
+        "extension": ".md"
+      },
+      {
+        "path": "standalone/LICENSE",
+        "size": 1068,
+        "extension": ""
+      },
+      {
+        "path": "standalone/PROMPT.md",
+        "size": 380,
+        "extension": ".md"
+      },
+      {
+        "path": "standalone/setup.sh",
+        "size": 4652,
+        "extension": ".sh"
+      },
+      {
+        "path": "SDD_AI_GUIDE.md",
+        "size": 4966,
+        "extension": ".md"
+      },
+      {
+        "path": "ANALYSIS_REPORT.md",
+        "size": 5957,
+        "extension": ".md"
+      },
+      {
+        "path": "ruff.toml",
+        "size": 364,
+        "extension": ".toml"
+      },
+      {
+        "path": "release.sh",
+        "size": 2226,
+        "extension": ".sh"
+      },
+      {
+        "path": "tests/__init__.py",
+        "size": 0,
+        "extension": ".py"
+      },
+      {
+        "path": "tests/test_config.py",
+        "size": 1452,
+        "extension": ".py"
+      }
+    ],
+    "languages": {
+      "Python": 21
+    },
+    "frameworks": [],
+    "dependencies": {
+      "python": [
+        "dependencies",
+        "pyyaml>",
+        "dev-dependencies",
+        "pytest>",
+        "pytest-cov>",
+        "ruff>",
+        "pyyaml>"
+      ]
+    }
+  },
+  "code": {
+    "classes": [
+      {
+        "name": "ProjectScanner",
+        "file": "dev_bot/project_scanner.py",
+        "methods": [
+          "__init__",
+          "scan",
+          "_scan_directory",
+          "_detect_languages",
+          "_detect_frameworks",
+          "_detect_dependencies",
+          "_has_file",
+          "_read_file",
+          "_parse_requirements_txt",
+          "_parse_pyproject_toml",
+          "_parse_package_json",
+          "_parse_pom_xml"
+        ]
+      },
+      {
+        "name": "CodeAnalyzer",
+        "file": "dev_bot/project_scanner.py",
+        "methods": [
+          "__init__",
+          "analyze",
+          "_analyze_python_files",
+          "_analyze_js_files"
+        ]
+      },
+      {
+        "name": "AutoProjectDevelopment",
+        "file": "dev_bot/auto_project_dev.py",
+        "methods": [
+          "__init__",
+          "run",
+          "_run_auto_mode",
+          "_run_analyze_mode",
+          "_run_generate_mode",
+          "_run_validate_mode",
+          "_run_enhance_mode",
+          "_run_suggest_mode",
+          "_analyze_project",
+          "_save_analysis",
+          "_load_analysis",
+          "_generate_specs",
+          "_determine_spec_types",
+          "_get_spec_name",
+          "_validate_specs",
+          "_enhance_specs",
+          "_generate_suggestions",
+          "_generate_ai_suggestions",
+          "_get_fallback_suggestions",
+          "_display_suggestions",
+          "_start_ai_development_loop",
+          "_create_default_config",
+          "_show_next_steps",
+          "_commit_changes"
+        ]
+      },
+      {
+        "name": "Args",
+        "file": "dev_bot/auto_project_dev.py",
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "Args",
+        "file": "dev_bot/auto_project_dev.py",
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "SpecGenerator",
+        "file": "dev_bot/spec_generator.py",
+        "methods": [
+          "__init__",
+          "analyze_project",
+          "generate_spec",
+          "_generate_prompt",
+          "_parse_ai_response",
+          "_generate_fallback_spec"
+        ]
+      },
+      {
+        "name": "SpecAssistant",
+        "file": "dev_bot/spec_assistant.py",
+        "methods": [
+          "__init__",
+          "_load_spec",
+          "_save_spec",
+          "interactive_enhance",
+          "_generate_interactive_prompt",
+          "ask_question",
+          "generate_missing_parts",
+          "suggest_improvements"
+        ]
+      },
+      {
+        "name": "ErrorAnalyzer",
+        "file": "dev_bot/error_analyzer.py",
+        "methods": [
+          "__init__",
+          "analyze_error",
+          "_collect_error_info",
+          "_generate_analysis_prompt",
+          "_parse_ai_response",
+          "_get_fallback_analysis",
+          "_save_analysis",
+          "_get_timestamp",
+          "display_analysis",
+          "can_auto_fix",
+          "apply_auto_fix",
+          "_apply_fix"
+        ]
+      },
+      {
+        "name": "RobustDevBot",
+        "file": "dev_bot/error_analyzer.py",
+        "methods": [
+          "__init__",
+          "run_with_error_handling"
+        ]
+      },
+      {
+        "name": "SpecQuestion",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "methods": [
+          "__init__"
+        ]
+      },
+      {
+        "name": "NonBlockingSpecInquirer",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "methods": [
+          "__init__",
+          "_load_spec",
+          "start_analysis",
+          "stop_analysis",
+          "_analysis_loop",
+          "_analyze_spec",
+          "_check_missing_parts",
+          "_check_incomplete_requirements",
+          "_check_requirements_without_stories",
+          "_check_requirements_without_criteria",
+          "_add_question",
+          "get_pending_questions",
+          "acknowledge_question",
+          "dismiss_question",
+          "ask_ai_for_suggestion",
+          "get_stats",
+          "print_pending_questions"
+        ]
+      },
+      {
+        "name": "Notifier",
+        "file": "dev_bot/notifier.py",
+        "methods": [
+          "__init__",
+          "_load_config",
+          "notify",
+          "_send_desktop_notification",
+          "_send_email_notification",
+          "_send_slack_notification",
+          "_send_discord_notification",
+          "check_critical_patterns"
+        ]
+      },
+      {
+        "name": "Config",
+        "file": "dev_bot/main.py",
+        "methods": [
+          "__init__",
+          "_load_config",
+          "_validate_config",
+          "get",
+          "get_prompt_file",
+          "get_ai_command",
+          "get_ai_command_args",
+          "get_timeout",
+          "get_wait_interval",
+          "get_log_dir",
+          "get_stats_file",
+          "get_session_counter_file",
+          "get_auto_commit",
+          "get_git_commit_template"
+        ]
+      },
+      {
+        "name": "Colors",
+        "file": "dev_bot/main.py",
+        "methods": []
+      },
+      {
+        "name": "TimeoutMonitor",
+        "file": "dev_bot/main.py",
+        "methods": [
+          "__init__",
+          "run",
+          "stop"
+        ]
+      },
+      {
+        "name": "DevelopmentSession",
+        "file": "dev_bot/development_session.py",
+        "methods": [
+          "__init__",
+          "check_spec_questions",
+          "get_question_detail",
+          "handle_question",
+          "cleanup"
+        ]
+      },
+      {
+        "name": "GitManager",
+        "file": "dev_bot/git_manager.py",
+        "methods": [
+          "__init__",
+          "init_repo",
+          "_create_gitignore",
+          "_create_initial_commit",
+          "commit_changes",
+          "create_branch",
+          "switch_branch",
+          "merge_branch",
+          "get_status",
+          "display_status",
+          "create_tag",
+          "get_history"
+        ]
+      },
+      {
+        "name": "BaseCommand",
+        "file": "dev_bot/cli/commands.py",
+        "methods": [
+          "__init__",
+          "execute",
+          "_print_success",
+          "_print_error",
+          "_print_info"
+        ]
+      },
+      {
+        "name": "InitCommand",
+        "file": "dev_bot/cli/commands.py",
+        "methods": [
+          "execute",
+          "_create_project_structure",
+          "_create_config",
+          "_create_example_spec"
+        ]
+      },
+      {
+        "name": "NewSpecCommand",
+        "file": "dev_bot/cli/commands.py",
+        "methods": [
+          "execute",
+          "_generate_spec"
+        ]
+      },
+      {
+        "name": "ValidateCommand",
+        "file": "dev_bot/cli/commands.py",
+        "methods": [
+          "__init__",
+          "execute",
+          "_validate_spec"
+        ]
+      },
+      {
+        "name": "AISpecCommand",
+        "file": "dev_bot/cli/commands.py",
+        "methods": [
+          "execute",
+          "_generate_prompt",
+          "_call_ai_tool",
+          "_parse_ai_response",
+          "_generate_spec"
+        ]
+      },
+      {
+        "name": "EnhanceSpecCommand",
+        "file": "dev_bot/cli/enhance.py",
+        "methods": [
+          "__init__",
+          "execute",
+          "_generate_enhance_prompt",
+          "_call_ai_tool",
+          "_merge_enhancement",
+          "_apply_enhancement",
+          "_print_success",
+          "_print_error",
+          "_print_info",
+          "_print_warning"
+        ]
+      },
+      {
+        "name": "ExtractSpecCommand",
+        "file": "dev_bot/cli/extract.py",
+        "methods": [
+          "__init__",
+          "execute",
+          "_print_success",
+          "_print_error",
+          "_print_info",
+          "_print_summary"
+        ]
+      }
+    ],
+    "functions": [
+      {
+        "name": "analyze_dev_bot",
+        "file": "analyze_self.py",
+        "args": []
+      },
+      {
+        "name": "scan_project",
+        "file": "dev_bot/project_scanner.py",
+        "args": [
+          "project_path"
+        ]
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/project_scanner.py",
+        "args": [
+          "self",
+          "project_path"
+        ]
+      },
+      {
+        "name": "scan",
+        "file": "dev_bot/project_scanner.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_scan_directory",
+        "file": "dev_bot/project_scanner.py",
+        "args": [
+          "self",
+          "path",
+          "base_path"
+        ]
+      },
+      {
+        "name": "_detect_languages",
+        "file": "dev_bot/project_scanner.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_detect_frameworks",
+        "file": "dev_bot/project_scanner.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_detect_dependencies",
+        "file": "dev_bot/project_scanner.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_has_file",
+        "file": "dev_bot/project_scanner.py",
+        "args": [
+          "self",
+          "filename"
+        ]
+      },
+      {
+        "name": "_read_file",
+        "file": "dev_bot/project_scanner.py",
+        "args": [
+          "self",
+          "filename"
+        ]
+      },
+      {
+        "name": "_parse_requirements_txt",
+        "file": "dev_bot/project_scanner.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_parse_pyproject_toml",
+        "file": "dev_bot/project_scanner.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_parse_package_json",
+        "file": "dev_bot/project_scanner.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_parse_pom_xml",
+        "file": "dev_bot/project_scanner.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/project_scanner.py",
+        "args": [
+          "self",
+          "project_path"
+        ]
+      },
+      {
+        "name": "analyze",
+        "file": "dev_bot/project_scanner.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_analyze_python_files",
+        "file": "dev_bot/project_scanner.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_analyze_js_files",
+        "file": "dev_bot/project_scanner.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "main",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": []
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self",
+          "project_path",
+          "ai_tool",
+          "mode",
+          "auto_fix",
+          "auto_restart",
+          "auto_git"
+        ]
+      },
+      {
+        "name": "run",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_run_auto_mode",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_run_analyze_mode",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_run_generate_mode",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_run_validate_mode",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_run_enhance_mode",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_run_suggest_mode",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_analyze_project",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_save_analysis",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self",
+          "project_info"
+        ]
+      },
+      {
+        "name": "_load_analysis",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_generate_specs",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self",
+          "project_info"
+        ]
+      },
+      {
+        "name": "_determine_spec_types",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self",
+          "project_info"
+        ]
+      },
+      {
+        "name": "_get_spec_name",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self",
+          "spec_type"
+        ]
+      },
+      {
+        "name": "_validate_specs",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_enhance_specs",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_generate_suggestions",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self",
+          "project_info"
+        ]
+      },
+      {
+        "name": "_generate_ai_suggestions",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self",
+          "project_info"
+        ]
+      },
+      {
+        "name": "_get_fallback_suggestions",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_display_suggestions",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self",
+          "suggestions"
+        ]
+      },
+      {
+        "name": "_start_ai_development_loop",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self",
+          "suggestions"
+        ]
+      },
+      {
+        "name": "_create_default_config",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_show_next_steps",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_commit_changes",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self",
+          "spec_file"
+        ]
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/auto_project_dev.py",
+        "args": [
+          "self",
+          "spec_file",
+          "ai_tool"
+        ]
+      },
+      {
+        "name": "generate_spec_from_project",
+        "file": "dev_bot/spec_generator.py",
+        "args": [
+          "project_path",
+          "spec_type",
+          "spec_name",
+          "ai_tool"
+        ]
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/spec_generator.py",
+        "args": [
+          "self",
+          "project_path",
+          "ai_tool"
+        ]
+      },
+      {
+        "name": "analyze_project",
+        "file": "dev_bot/spec_generator.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "generate_spec",
+        "file": "dev_bot/spec_generator.py",
+        "args": [
+          "self",
+          "spec_type",
+          "spec_name"
+        ]
+      },
+      {
+        "name": "_generate_prompt",
+        "file": "dev_bot/spec_generator.py",
+        "args": [
+          "self",
+          "spec_type",
+          "spec_name"
+        ]
+      },
+      {
+        "name": "_parse_ai_response",
+        "file": "dev_bot/spec_generator.py",
+        "args": [
+          "self",
+          "response",
+          "name",
+          "spec_type"
+        ]
+      },
+      {
+        "name": "_generate_fallback_spec",
+        "file": "dev_bot/spec_generator.py",
+        "args": [
+          "self",
+          "name",
+          "spec_type"
+        ]
+      },
+      {
+        "name": "create_spec_assistant",
+        "file": "dev_bot/spec_assistant.py",
+        "args": [
+          "spec_file",
+          "ai_tool"
+        ]
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/spec_assistant.py",
+        "args": [
+          "self",
+          "spec_file",
+          "ai_tool"
+        ]
+      },
+      {
+        "name": "_load_spec",
+        "file": "dev_bot/spec_assistant.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_save_spec",
+        "file": "dev_bot/spec_assistant.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "interactive_enhance",
+        "file": "dev_bot/spec_assistant.py",
+        "args": [
+          "self",
+          "aspect"
+        ]
+      },
+      {
+        "name": "_generate_interactive_prompt",
+        "file": "dev_bot/spec_assistant.py",
+        "args": [
+          "self",
+          "aspect"
+        ]
+      },
+      {
+        "name": "ask_question",
+        "file": "dev_bot/spec_assistant.py",
+        "args": [
+          "self",
+          "question"
+        ]
+      },
+      {
+        "name": "generate_missing_parts",
+        "file": "dev_bot/spec_assistant.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "suggest_improvements",
+        "file": "dev_bot/spec_assistant.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "get_global_error_analyzer",
+        "file": "dev_bot/error_analyzer.py",
+        "args": [
+          "ai_tool"
+        ]
+      },
+      {
+        "name": "analyze_and_handle_error",
+        "file": "dev_bot/error_analyzer.py",
+        "args": [
+          "error",
+          "context",
+          "ai_tool"
+        ]
+      },
+      {
+        "name": "error_handler",
+        "file": "dev_bot/error_analyzer.py",
+        "args": [
+          "func"
+        ]
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/error_analyzer.py",
+        "args": [
+          "self",
+          "ai_tool"
+        ]
+      },
+      {
+        "name": "analyze_error",
+        "file": "dev_bot/error_analyzer.py",
+        "args": [
+          "self",
+          "error",
+          "context"
+        ]
+      },
+      {
+        "name": "_collect_error_info",
+        "file": "dev_bot/error_analyzer.py",
+        "args": [
+          "self",
+          "error",
+          "context"
+        ]
+      },
+      {
+        "name": "_generate_analysis_prompt",
+        "file": "dev_bot/error_analyzer.py",
+        "args": [
+          "self",
+          "error_info"
+        ]
+      },
+      {
+        "name": "_parse_ai_response",
+        "file": "dev_bot/error_analyzer.py",
+        "args": [
+          "self",
+          "response"
+        ]
+      },
+      {
+        "name": "_get_fallback_analysis",
+        "file": "dev_bot/error_analyzer.py",
+        "args": [
+          "self",
+          "error_info"
+        ]
+      },
+      {
+        "name": "_save_analysis",
+        "file": "dev_bot/error_analyzer.py",
+        "args": [
+          "self",
+          "error_info",
+          "analysis"
+        ]
+      },
+      {
+        "name": "_get_timestamp",
+        "file": "dev_bot/error_analyzer.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "display_analysis",
+        "file": "dev_bot/error_analyzer.py",
+        "args": [
+          "self",
+          "analysis"
+        ]
+      },
+      {
+        "name": "can_auto_fix",
+        "file": "dev_bot/error_analyzer.py",
+        "args": [
+          "self",
+          "analysis"
+        ]
+      },
+      {
+        "name": "apply_auto_fix",
+        "file": "dev_bot/error_analyzer.py",
+        "args": [
+          "self",
+          "analysis",
+          "project_path"
+        ]
+      },
+      {
+        "name": "_apply_fix",
+        "file": "dev_bot/error_analyzer.py",
+        "args": [
+          "self",
+          "fix",
+          "project_path"
+        ]
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/error_analyzer.py",
+        "args": [
+          "self",
+          "ai_tool",
+          "auto_fix",
+          "auto_restart",
+          "max_retries"
+        ]
+      },
+      {
+        "name": "run_with_error_handling",
+        "file": "dev_bot/error_analyzer.py",
+        "args": [
+          "self",
+          "func"
+        ]
+      },
+      {
+        "name": "wrapper",
+        "file": "dev_bot/error_analyzer.py",
+        "args": []
+      },
+      {
+        "name": "create_spec_inquirer",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "spec_file",
+          "ai_tool"
+        ]
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self",
+          "question_id",
+          "question",
+          "context",
+          "priority"
+        ]
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self",
+          "spec_file",
+          "ai_tool"
+        ]
+      },
+      {
+        "name": "_load_spec",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "start_analysis",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "stop_analysis",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_analysis_loop",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_analyze_spec",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_check_missing_parts",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_check_incomplete_requirements",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_check_requirements_without_stories",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_check_requirements_without_criteria",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_add_question",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self",
+          "question_id",
+          "question",
+          "context",
+          "priority"
+        ]
+      },
+      {
+        "name": "get_pending_questions",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self",
+          "max_count"
+        ]
+      },
+      {
+        "name": "acknowledge_question",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self",
+          "question_id"
+        ]
+      },
+      {
+        "name": "dismiss_question",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self",
+          "question_id"
+        ]
+      },
+      {
+        "name": "ask_ai_for_suggestion",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self",
+          "question"
+        ]
+      },
+      {
+        "name": "get_stats",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "print_pending_questions",
+        "file": "dev_bot/nonblocking_inquirer.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "create_sample_config",
+        "file": "dev_bot/notifier.py",
+        "args": []
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/notifier.py",
+        "args": [
+          "self",
+          "config_path"
+        ]
+      },
+      {
+        "name": "_load_config",
+        "file": "dev_bot/notifier.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "notify",
+        "file": "dev_bot/notifier.py",
+        "args": [
+          "self",
+          "title",
+          "message",
+          "level"
+        ]
+      },
+      {
+        "name": "_send_desktop_notification",
+        "file": "dev_bot/notifier.py",
+        "args": [
+          "self",
+          "title",
+          "message",
+          "level"
+        ]
+      },
+      {
+        "name": "_send_email_notification",
+        "file": "dev_bot/notifier.py",
+        "args": [
+          "self",
+          "title",
+          "message",
+          "level"
+        ]
+      },
+      {
+        "name": "_send_slack_notification",
+        "file": "dev_bot/notifier.py",
+        "args": [
+          "self",
+          "title",
+          "message",
+          "level"
+        ]
+      },
+      {
+        "name": "_send_discord_notification",
+        "file": "dev_bot/notifier.py",
+        "args": [
+          "self",
+          "title",
+          "message",
+          "level"
+        ]
+      },
+      {
+        "name": "check_critical_patterns",
+        "file": "dev_bot/notifier.py",
+        "args": [
+          "self",
+          "output"
+        ]
+      },
+      {
+        "name": "ensure_log_dir",
+        "file": "dev_bot/main.py",
+        "args": [
+          "log_dir"
+        ]
+      },
+      {
+        "name": "print_border",
+        "file": "dev_bot/main.py",
+        "args": []
+      },
+      {
+        "name": "print_separator",
+        "file": "dev_bot/main.py",
+        "args": []
+      },
+      {
+        "name": "print_status",
+        "file": "dev_bot/main.py",
+        "args": [
+          "level",
+          "message"
+        ]
+      },
+      {
+        "name": "print_banner",
+        "file": "dev_bot/main.py",
+        "args": [
+          "config"
+        ]
+      },
+      {
+        "name": "print_session_header",
+        "file": "dev_bot/main.py",
+        "args": [
+          "session_num"
+        ]
+      },
+      {
+        "name": "get_session_num",
+        "file": "dev_bot/main.py",
+        "args": [
+          "config"
+        ]
+      },
+      {
+        "name": "update_session_num",
+        "file": "dev_bot/main.py",
+        "args": [
+          "config",
+          "session_num"
+        ]
+      },
+      {
+        "name": "init_stats",
+        "file": "dev_bot/main.py",
+        "args": [
+          "config"
+        ]
+      },
+      {
+        "name": "read_stat",
+        "file": "dev_bot/main.py",
+        "args": [
+          "config",
+          "key",
+          "default"
+        ]
+      },
+      {
+        "name": "analyze_with_ai_tool",
+        "file": "dev_bot/main.py",
+        "args": [
+          "config",
+          "log_file",
+          "session_num"
+        ]
+      },
+      {
+        "name": "create_session_record",
+        "file": "dev_bot/main.py",
+        "args": [
+          "config",
+          "session_num",
+          "status",
+          "duration",
+          "log_file"
+        ]
+      },
+      {
+        "name": "commit_to_git",
+        "file": "dev_bot/main.py",
+        "args": [
+          "config",
+          "session_num",
+          "record_file",
+          "status"
+        ]
+      },
+      {
+        "name": "update_stats",
+        "file": "dev_bot/main.py",
+        "args": [
+          "config",
+          "session_num",
+          "status",
+          "duration",
+          "record_file"
+        ]
+      },
+      {
+        "name": "interruptible_sleep",
+        "file": "dev_bot/main.py",
+        "args": [
+          "seconds"
+        ]
+      },
+      {
+        "name": "signal_handler",
+        "file": "dev_bot/main.py",
+        "args": [
+          "signum",
+          "frame"
+        ]
+      },
+      {
+        "name": "ignore_signal_handler",
+        "file": "dev_bot/main.py",
+        "args": [
+          "signum",
+          "frame"
+        ]
+      },
+      {
+        "name": "main",
+        "file": "dev_bot/main.py",
+        "args": []
+      },
+      {
+        "name": "main_loop",
+        "file": "dev_bot/main.py",
+        "args": [
+          "config"
+        ]
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/main.py",
+        "args": [
+          "self",
+          "config_path"
+        ]
+      },
+      {
+        "name": "_load_config",
+        "file": "dev_bot/main.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_validate_config",
+        "file": "dev_bot/main.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "get",
+        "file": "dev_bot/main.py",
+        "args": [
+          "self",
+          "key",
+          "default"
+        ]
+      },
+      {
+        "name": "get_prompt_file",
+        "file": "dev_bot/main.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "get_ai_command",
+        "file": "dev_bot/main.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "get_ai_command_args",
+        "file": "dev_bot/main.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "get_timeout",
+        "file": "dev_bot/main.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "get_wait_interval",
+        "file": "dev_bot/main.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "get_log_dir",
+        "file": "dev_bot/main.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "get_stats_file",
+        "file": "dev_bot/main.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "get_session_counter_file",
+        "file": "dev_bot/main.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "get_auto_commit",
+        "file": "dev_bot/main.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "get_git_commit_template",
+        "file": "dev_bot/main.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/main.py",
+        "args": [
+          "self",
+          "log_file",
+          "main_pid",
+          "session_num",
+          "timeout_seconds"
+        ]
+      },
+      {
+        "name": "run",
+        "file": "dev_bot/main.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "stop",
+        "file": "dev_bot/main.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "example_usage",
+        "file": "dev_bot/development_session.py",
+        "args": []
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/development_session.py",
+        "args": [
+          "self",
+          "spec_file",
+          "ai_tool"
+        ]
+      },
+      {
+        "name": "check_spec_questions",
+        "file": "dev_bot/development_session.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "get_question_detail",
+        "file": "dev_bot/development_session.py",
+        "args": [
+          "self",
+          "question_id"
+        ]
+      },
+      {
+        "name": "handle_question",
+        "file": "dev_bot/development_session.py",
+        "args": [
+          "self",
+          "question_id",
+          "action"
+        ]
+      },
+      {
+        "name": "cleanup",
+        "file": "dev_bot/development_session.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "main",
+        "file": "dev_bot/cli.py",
+        "args": []
+      },
+      {
+        "name": "auto_setup_git",
+        "file": "dev_bot/git_manager.py",
+        "args": [
+          "project_path",
+          "initial_commit"
+        ]
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/git_manager.py",
+        "args": [
+          "self",
+          "project_path"
+        ]
+      },
+      {
+        "name": "init_repo",
+        "file": "dev_bot/git_manager.py",
+        "args": [
+          "self",
+          "initial_commit",
+          "commit_message"
+        ]
+      },
+      {
+        "name": "_create_gitignore",
+        "file": "dev_bot/git_manager.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_create_initial_commit",
+        "file": "dev_bot/git_manager.py",
+        "args": [
+          "self",
+          "commit_message"
+        ]
+      },
+      {
+        "name": "commit_changes",
+        "file": "dev_bot/git_manager.py",
+        "args": [
+          "self",
+          "message",
+          "files"
+        ]
+      },
+      {
+        "name": "create_branch",
+        "file": "dev_bot/git_manager.py",
+        "args": [
+          "self",
+          "branch_name",
+          "from_branch"
+        ]
+      },
+      {
+        "name": "switch_branch",
+        "file": "dev_bot/git_manager.py",
+        "args": [
+          "self",
+          "branch_name"
+        ]
+      },
+      {
+        "name": "merge_branch",
+        "file": "dev_bot/git_manager.py",
+        "args": [
+          "self",
+          "branch_name",
+          "message"
+        ]
+      },
+      {
+        "name": "get_status",
+        "file": "dev_bot/git_manager.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "display_status",
+        "file": "dev_bot/git_manager.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "create_tag",
+        "file": "dev_bot/git_manager.py",
+        "args": [
+          "self",
+          "tag_name",
+          "message"
+        ]
+      },
+      {
+        "name": "get_history",
+        "file": "dev_bot/git_manager.py",
+        "args": [
+          "self",
+          "limit"
+        ]
+      },
+      {
+        "name": "temp_config",
+        "file": "tests/test_config.py",
+        "args": []
+      },
+      {
+        "name": "test_config_load",
+        "file": "tests/test_config.py",
+        "args": [
+          "temp_config"
+        ]
+      },
+      {
+        "name": "test_config_get_default",
+        "file": "tests/test_config.py",
+        "args": []
+      },
+      {
+        "name": "test_config_ai_command",
+        "file": "tests/test_config.py",
+        "args": [
+          "temp_config"
+        ]
+      },
+      {
+        "name": "test_config_timeout",
+        "file": "tests/test_config.py",
+        "args": [
+          "temp_config"
+        ]
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self",
+          "args"
+        ]
+      },
+      {
+        "name": "execute",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_print_success",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self",
+          "message"
+        ]
+      },
+      {
+        "name": "_print_error",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self",
+          "message"
+        ]
+      },
+      {
+        "name": "_print_info",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self",
+          "message"
+        ]
+      },
+      {
+        "name": "execute",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_create_project_structure",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self",
+          "project_path",
+          "template"
+        ]
+      },
+      {
+        "name": "_create_config",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self",
+          "project_path"
+        ]
+      },
+      {
+        "name": "_create_example_spec",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self",
+          "project_path"
+        ]
+      },
+      {
+        "name": "execute",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_generate_spec",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self",
+          "name",
+          "spec_type"
+        ]
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self",
+          "args"
+        ]
+      },
+      {
+        "name": "execute",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_validate_spec",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self",
+          "spec"
+        ]
+      },
+      {
+        "name": "execute",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_generate_prompt",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self",
+          "name",
+          "spec_type",
+          "description"
+        ]
+      },
+      {
+        "name": "_call_ai_tool",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self",
+          "ai_tool",
+          "prompt"
+        ]
+      },
+      {
+        "name": "_parse_ai_response",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self",
+          "response",
+          "name",
+          "spec_type"
+        ]
+      },
+      {
+        "name": "_generate_spec",
+        "file": "dev_bot/cli/commands.py",
+        "args": [
+          "self",
+          "name",
+          "spec_type"
+        ]
+      },
+      {
+        "name": "main",
+        "file": "dev_bot/cli/main.py",
+        "args": []
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/cli/enhance.py",
+        "args": [
+          "self",
+          "args"
+        ]
+      },
+      {
+        "name": "execute",
+        "file": "dev_bot/cli/enhance.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_generate_enhance_prompt",
+        "file": "dev_bot/cli/enhance.py",
+        "args": [
+          "self",
+          "spec",
+          "aspect"
+        ]
+      },
+      {
+        "name": "_call_ai_tool",
+        "file": "dev_bot/cli/enhance.py",
+        "args": [
+          "self",
+          "ai_tool",
+          "prompt"
+        ]
+      },
+      {
+        "name": "_merge_enhancement",
+        "file": "dev_bot/cli/enhance.py",
+        "args": [
+          "self",
+          "spec",
+          "enhancement",
+          "aspect"
+        ]
+      },
+      {
+        "name": "_apply_enhancement",
+        "file": "dev_bot/cli/enhance.py",
+        "args": [
+          "self",
+          "spec",
+          "section",
+          "action",
+          "content"
+        ]
+      },
+      {
+        "name": "_print_success",
+        "file": "dev_bot/cli/enhance.py",
+        "args": [
+          "self",
+          "message"
+        ]
+      },
+      {
+        "name": "_print_error",
+        "file": "dev_bot/cli/enhance.py",
+        "args": [
+          "self",
+          "message"
+        ]
+      },
+      {
+        "name": "_print_info",
+        "file": "dev_bot/cli/enhance.py",
+        "args": [
+          "self",
+          "message"
+        ]
+      },
+      {
+        "name": "_print_warning",
+        "file": "dev_bot/cli/enhance.py",
+        "args": [
+          "self",
+          "message"
+        ]
+      },
+      {
+        "name": "__init__",
+        "file": "dev_bot/cli/extract.py",
+        "args": [
+          "self",
+          "args"
+        ]
+      },
+      {
+        "name": "execute",
+        "file": "dev_bot/cli/extract.py",
+        "args": [
+          "self"
+        ]
+      },
+      {
+        "name": "_print_success",
+        "file": "dev_bot/cli/extract.py",
+        "args": [
+          "self",
+          "message"
+        ]
+      },
+      {
+        "name": "_print_error",
+        "file": "dev_bot/cli/extract.py",
+        "args": [
+          "self",
+          "message"
+        ]
+      },
+      {
+        "name": "_print_info",
+        "file": "dev_bot/cli/extract.py",
+        "args": [
+          "self",
+          "message"
+        ]
+      },
+      {
+        "name": "_print_summary",
+        "file": "dev_bot/cli/extract.py",
+        "args": [
+          "self",
+          "spec"
+        ]
+      },
+      {
+        "name": "debounce",
+        "file": ".venv/lib/python3.14/site-packages/coverage/htmlfiles/coverage_html.js",
+        "args": []
+      },
+      {
+        "name": "checkVisible",
+        "file": ".venv/lib/python3.14/site-packages/coverage/htmlfiles/coverage_html.js",
+        "args": []
+      },
+      {
+        "name": "on_click",
+        "file": ".venv/lib/python3.14/site-packages/coverage/htmlfiles/coverage_html.js",
+        "args": []
+      },
+      {
+        "name": "getCellValue",
+        "file": ".venv/lib/python3.14/site-packages/coverage/htmlfiles/coverage_html.js",
+        "args": []
+      },
+      {
+        "name": "rowComparator",
+        "file": ".venv/lib/python3.14/site-packages/coverage/htmlfiles/coverage_html.js",
+        "args": []
+      },
+      {
+        "name": "sortColumn",
+        "file": ".venv/lib/python3.14/site-packages/coverage/htmlfiles/coverage_html.js",
+        "args": []
+      },
+      {
+        "name": "or",
+        "file": ".venv/lib/python3.14/site-packages/coverage/htmlfiles/coverage_html.js",
+        "args": []
+      },
+      {
+        "name": "or",
+        "file": ".venv/lib/python3.14/site-packages/coverage/htmlfiles/coverage_html.js",
+        "args": []
+      },
+      {
+        "name": "filter_handler",
+        "file": ".venv/lib/python3.14/site-packages/coverage/htmlfiles/coverage_html.js",
+        "args": []
+      },
+      {
+        "name": "casefold",
+        "file": ".venv/lib/python3.14/site-packages/coverage/htmlfiles/coverage_html.js",
+        "args": []
+      },
+      {
+        "name": "or",
+        "file": ".venv/lib/python3.14/site-packages/coverage/htmlfiles/coverage_html.js",
+        "args": []
+      },
+      {
+        "name": "header_bottom",
+        "file": ".venv/lib/python3.14/site-packages/coverage/htmlfiles/coverage_html.js",
+        "args": []
+      },
+      {
+        "name": "updateHeader",
+        "file": ".venv/lib/python3.14/site-packages/coverage/htmlfiles/coverage_html.js",
+        "args": []
+      }
+    ],
+    "endpoints": []
+  }
+}
