@@ -23,6 +23,8 @@ from .business import (
 )
 
 from .ai_recovery import AIRecoveryStrategy
+from .ai_health_checker import AIHealthChecker
+from .prompt_generator import PromptGenerator
 
 __all__ = [
     # 核心层
@@ -38,6 +40,8 @@ __all__ = [
     'BusinessLogicLayer',
     # 整合层
     'AIGuardian',
-    # AI 恢复
-    'AIRecoveryStrategy'
+    # AI 组件
+    'AIRecoveryStrategy',
+    'AIHealthChecker',
+    'PromptGenerator'
 ]

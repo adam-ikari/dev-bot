@@ -22,6 +22,10 @@ from dev_bot.ipc_realtime import IPCServer, IPCMessage, IPCMessageType
 from dev_bot.guardian import AIGuardian
 from dev_bot.guardian.core import DefaultHealthChecker, DefaultRecoveryStrategy
 from dev_bot.guardian.ai_recovery import AIRecoveryStrategy
+from dev_bot.guardian.ai_health_checker import AIHealthChecker
+from dev_bot.guardian.prompt_generator import PromptGenerator
+from dev_bot.guardian.ai_health_checker import AIHealthChecker
+from dev_bot.guardian.prompt_generator import PromptGenerator
 from dev_bot.iflow_manager import get_iflow_manager
 
 
@@ -63,6 +67,18 @@ class GuardianProcess:
         # 设置 AI 恢复策略
         self.ai_guardian.core_guardian.recovery_strategy = ai_recovery_strategy
         
+
+        # 创建 AI 健康检查器
+        ai_health_checker = AIHealthChecker(
+            iflow_manager=self.iflow_manager,
+            project_root=Path.cwd()
+        )
+        
+        # 创建提示词生成器
+        self.prompt_generator = PromptGenerator(Path.cwd())
+        
+        # 设置 AI 健康检查器
+        self.ai_guardian.core_guardian.health_checker = ai_health_checker
         # 注册信号处理
         import signal
         signal.signal(signal.SIGTERM, self._handle_sigterm)
