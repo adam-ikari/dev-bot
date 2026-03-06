@@ -10,6 +10,7 @@ Dev-Bot 交互层
 """
 
 import asyncio
+import json
 from abc import ABC, abstractmethod
 from enum import Enum
 from pathlib import Path
@@ -77,26 +78,21 @@ class TUILayer(InteractionLayer):
         # 保存未显示的消息
         self._pending_messages = []
         
-        # 后台系统
-        self.background_system = None
+        # AI 守护进程状态（从 IPC 读取）
+        self.guardian_status = None
 
     async def start(self):
         """启动 TUI"""
         self.is_running = True
         print(f"[TUI] 启动 REPL 模式终端用户界面...")
         
-        # 启动后台系统（AI 守护和多 AI 实例）
-        try:
-            from dev_bot.background_system import get_background_system
-            self.background_system = get_background_system(self.project_root)
-            await self.background_system.start()
-            
-            # 启动后台进程监控
-            monitor_task = asyncio.create_task(self.background_system.monitor_processes())
-            
-        except Exception as e:
-            print(f"[TUI] 警告: 后台系统启动失败: {e}")
-            print(f"[TUI] 继续运行，但可能缺少 AI 守护和 AI 实例功能")
+        # 从 IPC 读取 AI 守护状态
+        self._read_guardian_status()
+        
+        if self.guardian_status:
+            print(f"[TUI] AI 守护运行中: {self.guardian_status.get('status', 'unknown')}")
+        else:
+            print(f"[TUI] 警告: 未检测到 AI 守护进程，后台 AI 实例可能不可用")
 
         # 启动 REPL 核心
         await self.repl.start()
@@ -165,45 +161,35 @@ class TUILayer(InteractionLayer):
                             )
                     continue
 
-                # 后台系统命令
-                if cmd.startswith("bg "):
-                    bg_cmd = cmd.replace("bg ", "")
+                # AI 守护命令
+                if cmd.startswith("guardian ") or cmd.startswith("gd "):
+                    gd_cmd = cmd.replace("guardian ", "").replace("gd ", "")
                     
-                    if bg_cmd == "status":
-                        # 显示后台系统状态
-                        if self.background_system:
-                            bg_status = self.background_system.get_status()
-                            print(f"\n[后台系统状态]")
-                            print(f"  运行中: {bg_status['is_running']}")
-                            print(f"  进程数: {bg_status['process_count']}")
+                    if gd_cmd == "status":
+                        # 显示 AI 守护状态
+                        self._read_guardian_status()
+                        
+                        if self.guardian_status:
+                            print(f"\n[AI 守护状态]")
+                            print(f"  运行状态: {self.guardian_status.get('status', 'unknown')}")
+                            print(f"  检查间隔: {self.guardian_status.get('check_interval', 'N/A')}秒")
+                            print(f"  最后检查: {self.guardian_status.get('last_check', 'N/A')}")
                             
-                            if bg_status['processes']:
-                                print(f"\n[后台进程]")
-                                for pid, proc_info in bg_status['processes'].items():
-                                    print(f"  {pid}:")
-                                    print(f"    PID: {proc_info['pid']}")
-                                    print(f"    状态: {proc_info['status']}")
-                                    print(f"    描述: {proc_info['description']}")
+                            monitored_processes = self.guardian_status.get('monitored_processes', {})
+                            if monitored_processes:
+                                print(f"\n[监控的进程]")
+                                for proc_id, proc_info in monitored_processes.items():
+                                    print(f"  {proc_id}:")
+                                    print(f"    PID: {proc_info.get('pid', 'N/A')}")
+                                    print(f"    状态: {proc_info.get('status', 'unknown')}")
+                                    print(f"    重启次数: {proc_info.get('restart_count', 0)}")
+                                    
+                                    if proc_info.get('last_error'):
+                                        print(f"    最后错误: {proc_info.get('last_error')}")
                         else:
-                            print("[TUI] 后台系统未运行")
+                            print("[TUI] AI 守护未运行")
+                            print("[TUI] 提示: 由 AI 守护管理后台 AI 实例，请单独启动守护进程")
                         continue
-                    
-                    if bg_cmd.startswith("restart "):
-                        # 重启后台进程
-                        parts = bg_cmd.split()
-                        if len(parts) >= 1:
-                            process_id = parts[0]
-                            if self.background_system:
-                                await self.background_system.restart_process(process_id)
-                            else:
-                                print("[TUI] 后台系统未运行")
-                        else:
-                            print("[TUI] 用法: bg restart <process_id>")
-                        continue
-                    
-                    if bg_cmd.startswith("stop "):
-                        # 停止后台进程
-                        parts = bg_cmd.split()
                         if len(parts) >= 1:
                             process_id = parts[0]
                             if self.background_system:
@@ -324,13 +310,6 @@ class TUILayer(InteractionLayer):
         """停止 TUI"""
         self.is_running = False
         
-        # 停止后台系统
-        if self.background_system:
-            try:
-                await self.background_system.stop()
-            except Exception as e:
-                print(f"[TUI] 警告: 停止后台系统时出错: {e}")
-        
         # 停止 REPL
         await self.repl.stop()
         print(f"[TUI] 停止 REPL 模式终端用户界面")
@@ -354,6 +333,20 @@ class TUILayer(InteractionLayer):
             "core_status": self.core.get_status(),
             "repl_running": self.repl._running if self.repl else False
         }
+    
+    def _read_guardian_status(self):
+        """读取 AI 守护进程状态"""
+        try:
+            guardian_status_file = self.project_root / ".guardian-status.json"
+            
+            if guardian_status_file.exists():
+                with open(guardian_status_file, 'r', encoding='utf-8') as f:
+                    self.guardian_status = json.load(f)
+            else:
+                self.guardian_status = None
+        
+        except Exception as e:
+            self.guardian_status = None
 
     async def _display_queue_status(self):
         """显示队列状态"""
@@ -392,22 +385,25 @@ class TUILayer(InteractionLayer):
         print(f"  核心状态: {self.core.get_status()}")
         print(f"  REPL 运行中: {self.repl._running}")
 
-        # 后台系统状态
-        if self.background_system:
-            bg_status = self.background_system.get_status()
-            print(f"\n[后台系统]")
-            print(f"  运行中: {bg_status['is_running']}")
-            print(f"  进程数: {bg_status['process_count']}")
+        # AI 守护和后台进程状态
+        self._read_guardian_status()
+        
+        if self.guardian_status:
+            print(f"\n[AI 守护]")
+            print(f"  状态: {self.guardian_status.get('status', 'unknown')}")
+            print(f"  检查间隔: {self.guardian_status.get('check_interval', 'N/A')}秒")
             
-            if bg_status['processes']:
-                print(f"\n[后台进程]")
-                for pid, proc_info in bg_status['processes'].items():
-                    print(f"  {pid}:")
-                    print(f"    PID: {proc_info['pid']}")
-                    print(f"    状态: {proc_info['status']}")
-                    print(f"    描述: {proc_info['description']}")
+            monitored_processes = self.guardian_status.get('monitored_processes', {})
+            if monitored_processes:
+                print(f"\n[监控的进程]")
+                for proc_id, proc_info in monitored_processes.items():
+                    print(f"  {proc_id}:")
+                    print(f"    PID: {proc_info.get('pid', 'N/A')}")
+                    print(f"    状态: {proc_info.get('status', 'unknown')}")
+                    print(f"    重启次数: {proc_info.get('restart_count', 0)}")
+                    print(f"    最后检查: {proc_info.get('last_check', 'N/A')}")
         else:
-            print(f"\n[后台系统] 未运行")
+            print(f"\n[AI 守护] 未运行")
 
         # 问题队列详情
         q_status = status["question_queue"]
@@ -473,10 +469,8 @@ Dev-Bot REPL 模式帮助：
     clear / c             - 清理已完成任务
     input <id> <value>    - 提供输入
 
-  后台系统：
-    bg status             - 查看后台进程状态
-    bg restart <pid>      - 重启指定后台进程
-    bg stop <pid>         - 停止指定后台进程
+  AI 守护：
+    guardian status       - 查看 AI 守护状态（由 AI 守护管理后台进程）
 
   输出显示：
     output / o            - 查看最新输出

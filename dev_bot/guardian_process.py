@@ -67,36 +67,97 @@ class GuardianProcess:
             self._save_status({"status": "stopped"})
     
     async def _init_monitored_processes(self):
-        """初始化要监控的进程"""
+        """初始化要监控的进程
+        
+        这里注册 TUI 进程，AI 实例由守护进程启动和管理
+        """
         project_root = Path.cwd()
         
-        # 注册 AI 循环进程
-        ai_loop_cmd = [
-            sys.executable,
-            str(project_root / "dev_bot" / "ai_loop_process.py"),
-            str(project_root),
-            "config.json"
-        ]
-        self.ai_guardian.register_process(
-            "ai_loop",
-            None,  # 初始没有 PID
-            ai_loop_cmd,
-            max_restarts=10
-        )
-        
-        # 注册 TUI 进程
+        # 注册 TUI 进程（用户界面）
         tui_cmd = [
             sys.executable,
-            str(project_root / "dev_bot" / "process_coordinator.py")
+            "-m", "dev_bot"
         ]
         self.ai_guardian.register_process(
             "tui",
             None,  # 初始没有 PID
             tui_cmd,
-            max_restarts=10
+            max_restarts=5
         )
         
-        print(f"[守护进程] 已初始化监控进程：ai_loop, tui")
+        print(f"[守护进程] 已注册 TUI 进程（用户界面）")
+        
+        # 启动后台 AI 实例（由守护进程直接管理）
+        await self._start_ai_instances(project_root)
+    
+    async def _start_ai_instances(self, project_root: Path):
+        """启动后台 AI 实例"""
+        from dev_bot.process_manager import ProcessManager
+        
+        process_manager = ProcessManager()
+        
+        # 定义 AI 实例配置
+        ai_instances = {
+            "ai_analyzer": {
+                "script": project_root / "dev_bot" / "ai_loop_process.py",
+                "args": ["--role", "analyzer"],
+                "description": "AI 分析实例"
+            },
+            "ai_developer": {
+                "script": project_root / "dev_bot" / "ai_loop_process.py",
+                "args": ["--role", "developer"],
+                "description": "AI 开发实例"
+            },
+            "ai_tester": {
+                "script": project_root / "dev_bot" / "ai_loop_process.py",
+                "args": ["--role", "tester"],
+                "description": "AI 测试实例"
+            },
+            "ai_reviewer": {
+                "script": project_root / "dev_bot" / "ai_loop_process.py",
+                "args": ["--role", "reviewer"],
+                "description": "AI 评审实例"
+            }
+        }
+        
+        print(f"[守护进程] 启动后台 AI 实例...")
+        
+        for instance_id, config in ai_instances.items():
+            try:
+                if not config["script"].exists():
+                    print(f"[守护进程] 警告: 脚本不存在: {config['script']}")
+                    continue
+                
+                process = await process_manager.create_process(
+                    process_id=instance_id,
+                    script_path=config["script"],
+                    args=config["args"],
+                    cwd=project_root,
+                    use_new_session=False  # 不创建新会话，以便守护进程管理
+                )
+                
+                if process:
+                    # 注册到守护进程管理
+                    restart_cmd = [
+                        sys.executable,
+                        str(config["script"])
+                    ] + config["args"]
+                    
+                    self.ai_guardian.register_process(
+                        instance_id,
+                        process.pid,
+                        restart_cmd,
+                        max_restarts=10
+                    )
+                    
+                    print(f"[守护进程] ✓ {config['description']} (PID: {process.pid})")
+                else:
+                    print(f"[守护进程] ✗ {config['description']} 启动失败")
+            
+            except Exception as e:
+                print(f"[守护进程] ✗ 启动 {instance_id} 失败: {e}")
+        
+        print(f"[守护进程] 后台 AI 实例启动完成")
     
     def register_process(self, process_type: str, pid: int, startup_command: List[str]):
         """注册进程（由进程启动后调用）"""
