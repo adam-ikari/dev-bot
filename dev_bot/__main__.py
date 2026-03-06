@@ -174,6 +174,40 @@ async def handle_ui(args):
     print(f"模式: {args.mode}")
     print()
     
+    # 启动 AI 守护进程（如果是 TUI 模式）
+    guardian_process = None
+    process_manager = None
+    if args.mode == "tui":
+        try:
+            from dev_bot.process_manager import ProcessManager
+            from pathlib import Path
+            
+            process_manager = ProcessManager()
+            guardian_script = Path.cwd() / "dev_bot" / "guardian_process.py"
+            
+            if guardian_script.exists():
+                print(f"[系统] 启动 AI 守护进程...")
+                guardian_process = await process_manager.create_process(
+                    process_id="ai_guardian",
+                    script_path=guardian_script,
+                    args=[],
+                    cwd=Path.cwd(),
+                    use_new_session=True  # AI 守护在新的会话中运行
+                )
+                
+                if guardian_process:
+                    print(f"[系统] ✓ AI 守护已启动 (PID: {guardian_process.pid})")
+                    
+                    # 等待 AI 守护初始化
+                    await asyncio.sleep(2)
+                else:
+                    print(f"[系统] ✗ AI 守护启动失败，继续运行但后台功能不可用")
+            else:
+                print(f"[系统] 警告: AI 守护脚本不存在: {guardian_script}")
+        except Exception as e:
+            print(f"[系统] 警告: 启动 AI 守护失败: {e}")
+            print(f"[系统] 继续运行，但后台 AI 实例可能不可用")
+    
     try:
         if args.mode == "tui":
             await manager.start_tui()
@@ -184,6 +218,14 @@ async def handle_ui(args):
     except KeyboardInterrupt:
         print("\nDev-Bot 已停止")
     finally:
+        # 停止 AI 守护进程
+        if guardian_process and process_manager:
+            try:
+                await process_manager.terminate_process("ai_guardian")
+                print(f"[系统] AI 守护已停止")
+            except Exception as e:
+                print(f"[系统] 警告: 停止 AI 守护时出错: {e}")
+        
         await manager.stop()
 
 
