@@ -35,6 +35,10 @@ class GuardianProcess:
         self.ipc_server = None
         self.ipc_socket_path = Path.cwd() / ".ipc" / "guardian.sock"
         
+        # 任务分发跟踪
+        self.dispatched_tasks = set()  # 已分发的任务ID
+        self.last_dispatched_time = 0  # 最后分发时间
+        
         # 创建分层守护实例
         self.ai_guardian = AIGuardian(
             check_interval=check_interval,
@@ -70,6 +74,8 @@ class GuardianProcess:
                 self._save_status()
                 # 定期广播心跳
                 await self._broadcast_status()
+                # 监控队列并广播任务
+                await self._monitor_and_broadcast_tasks()
         except asyncio.CancelledError:
             pass
         finally:
@@ -115,6 +121,79 @@ class GuardianProcess:
         
         # 广播给所有客户端
         await self.ipc_server.broadcast(message)
+    
+    async def _monitor_and_broadcast_tasks(self):
+        """监控队列并将任务分发给AI实例"""
+        try:
+            # 读取队列状态文件
+            queue_status_file = Path.cwd() / ".ipc" / "ai-loop-status.json"
+            
+            if not queue_status_file.exists():
+                return
+            
+            with open(queue_status_file, 'r', encoding='utf-8') as f:
+                queue_status = json.load(f)
+            
+            # 检查是否有待处理的问题
+            question_queue = queue_status.get("question_queue", {})
+            pending_count = question_queue.get("pending", 0)
+            pending_questions = question_queue.get("pending_questions", [])
+            
+            if pending_count > 0 and pending_questions:
+                # 获取第一个待处理问题
+                first_question = pending_questions[0]
+                question_id = first_question.get("id")
+                question_text = first_question.get("question")
+                
+                # 检查是否已经分发过这个任务
+                if question_id not in self.dispatched_tasks:
+                    # 检查是否已经处理或失败（从队列状态中移除）
+                    processing = question_queue.get("processing", 0)
+                    completed = question_queue.get("completed", 0)
+                    failed = question_queue.get("failed", 0)
+                    
+                    # 如果任务不在处理中，才分发
+                    if processing == 0:
+                        # 写入AI循环命令文件
+                        command_file = Path.cwd() / ".ipc" / "ai_loop_command.json"
+                        command = {
+                            "action": "process_question",
+                            "question_id": question_id,
+                            "question": question_text,
+                            "timestamp": asyncio.get_event_loop().time()
+                        }
+                        
+                        with open(command_file, 'w', encoding='utf-8') as f:
+                            json.dump(command, f, indent=2, ensure_ascii=False)
+                        
+                        # 标记为已分发
+                        self.dispatched_tasks.add(question_id)
+                        self.last_dispatched_time = asyncio.get_event_loop().time()
+                        
+                        print(f"[守护进程] 已分发任务: {question_id[:8]}...")
+                        
+                        # 同时通过IPC广播（给实时连接的客户端）
+                        if self.ipc_server:
+                            task_msg = IPCMessage(
+                                message_type=IPCMessageType.TASK_SUBMIT,
+                                data={
+                                    "question_id": question_id,
+                                    "question": question_text
+                                },
+                                source="guardian"
+                            )
+                            await self.ipc_server.broadcast(task_msg)
+                
+                # 清理已完成的任务ID（从dispatched_tasks中移除）
+                # 这里简化处理：如果pending队列中的任务ID不在队列中，说明已处理完成
+                current_pending_ids = {q.get("id") for q in pending_questions}
+                completed_ids = self.dispatched_tasks - current_pending_ids
+                if completed_ids:
+                    self.dispatched_tasks -= completed_ids
+                
+        except Exception as e:
+            # 静默失败，避免日志刷屏
+            pass
     
     async def _handle_process_register(self, client_id: str, message: IPCMessage):
         """处理进程注册消息"""
