@@ -26,7 +26,7 @@ class AutoProjectDevelopment:
     def __init__(self, project_path: Path, ai_tool: str = "iflow", mode: str = "auto", auto_fix: bool = True, auto_restart: bool = True, auto_git: bool = True):
         """
         初始化自动化开发流程
-        
+
         Args:
             project_path: 项目路径
             ai_tool: AI 工具命令
@@ -457,22 +457,27 @@ class AutoProjectDevelopment:
 
     def _start_ai_development_loop(self, suggestions: Dict[str, Any]):
         """启动 AI 开发循环"""
-        # 检查是否有配置文件
-        config_file = self.project_path / "config.json"
-        if not config_file.exists():
-            print("  ! 未找到 config.json，创建默认配置...")
-            self._create_default_config()
-
         try:
             # 导入并运行开发循环
-            # 切换到项目目录
             import os
 
             from dev_bot.main import main
             original_cwd = os.getcwd()
+
+            # 切换到项目目录
             os.chdir(self.project_path)
 
             try:
+                # 检查是否有配置文件（在切换目录后）
+                config_file = Path("config.json")
+                if not config_file.exists():
+                    print("  ! 未找到 config.json，创建默认配置...")
+                    self._create_default_config()
+
+                # 验证配置文件确实存在
+                if not config_file.exists():
+                    raise FileNotFoundError(f"配置文件创建失败: {config_file}")
+
                 # 使用 TUI 模式运行
                 print("\n  🖥️  启动 TUI 模式...")
                 sys.argv = ['dev-bot', 'run', '--tui']
@@ -483,6 +488,8 @@ class AutoProjectDevelopment:
                 os.chdir(original_cwd)
         except Exception as e:
             print(f"  ! AI 开发循环出错: {e}")
+            # 确保恢复原始工作目录
+            os.chdir(original_cwd)
 
     def _create_default_config(self):
         """创建默认配置文件"""
@@ -567,28 +574,28 @@ def main():
 示例:
   # 全自动模式（默认）
   python -m dev_bot.auto_project_dev
-  
+
   # 仅分析项目
   python -m dev_bot.auto_project_dev --mode analyze
-  
+
   # 仅生成 spec
   python -m dev_bot.auto_project_dev --mode generate
-  
+
   # 仅验证 spec
   python -m dev_bot.auto_project_dev --mode validate
-  
+
   # 仅增强 spec
   python -m dev_bot.auto_project_dev --mode enhance
-  
+
   # 仅生成建议
   python -m dev_bot.auto_project_dev --mode suggest
-  
+
   # 指定项目路径
   python -m dev_bot.auto_project_dev --project-path /path/to/project
-  
+
   # 指定 AI 工具
   python -m dev_bot.auto_project_dev --ai-tool claude
-  
+
   # 禁用自动 Git
   python -m dev_bot.auto_project_dev --no-auto-git
         """

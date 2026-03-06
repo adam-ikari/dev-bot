@@ -36,7 +36,7 @@ def test_config_load(temp_config):
 def test_config_get_default():
     """测试获取配置默认值"""
     with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
-        json.dump({"ai_command": "test"}, f)
+        json.dump({"ai_command": "test", "prompt_file": "PROMPT.md"}, f)
         temp_path = f.name
 
     try:

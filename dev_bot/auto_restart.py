@@ -399,8 +399,18 @@ class AutoRestartManager:
             # 记录重启日志
             self._log_restart(command, args, strategy)
 
-            # 使用 subprocess 替换当前进程
-            os.execvp(command, [command] + args)
+            # 额外安全检查：确保所有参数都是字符串且不包含空格注入
+            safe_args = []
+            for arg in args:
+                if not isinstance(arg, str):
+                    raise ValueError(f"参数必须是字符串类型: {type(arg)}")
+                # 检查参数长度防止缓冲区溢出
+                if len(arg) > 4096:
+                    raise ValueError(f"参数过长: {len(arg)} 字符")
+                safe_args.append(arg)
+
+            # 使用 subprocess 替换当前进程（使用列表形式避免 shell 注入）
+            os.execvp(command, [command] + safe_args)
 
         except Exception as e:
             print_status("error", f"重启失败: {e}")

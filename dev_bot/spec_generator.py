@@ -6,9 +6,11 @@ Spec 生成器 - 从已有工程代码生成 spec
 
 import json
 import subprocess
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict
 
+from dev_bot.ai_prompts import get_spec_generation_prompt
 from dev_bot.project_scanner import scan_project
 
 
@@ -54,179 +56,40 @@ class SpecGenerator:
             return self._generate_fallback_spec(spec_name, spec_type)
 
     def _generate_prompt(self, spec_type: str, spec_name: str) -> str:
-        """生成 AI prompt"""
+        """生成 AI prompt（使用新的提示词模板）"""
         structure = self.project_info.get("structure", {})
         code = self.project_info.get("code", {})
 
+        # 提取技术栈信息
+        languages = structure.get("languages", {})
+        frameworks = structure.get("frameworks", [])
+        dependencies = structure.get("dependencies", [])
+
+        tech_stack_parts = []
+        if languages:
+            tech_stack_parts.append(f"语言: {', '.join(languages.keys())}")
+        if frameworks:
+            tech_stack_parts.append(f"框架: {', '.join(frameworks)}")
+        if dependencies:
+            tech_stack_parts.append(f"主要依赖: {', '.join(dependencies[:5])}")
+        tech_stack = "\n".join(tech_stack_parts) if tech_stack_parts else "未知"
+
+        # 格式化结构信息
         structure_str = json.dumps(structure, indent=2, ensure_ascii=False)
+
+        # 格式化代码分析信息
         code_str = json.dumps(code, indent=2, ensure_ascii=False)
 
-        prompt = f"""请基于以下工程信息，生成一个 {spec_type} 类型的规格说明（spec）：
-
-工程名称: {spec_name}
-工程路径: {self.project_path}
-
-工程结构：
-```json
-{structure_str}
-```
-
-代码分析：
-```json
-{code_str}
-```
-
-请按照以下 JSON 格式生成 spec，只返回 JSON，不要有任何其他文字：
-
-{{
-  "spec_version": "1.0",
-  "metadata": {{
-    "name": "{spec_name}",
-    "type": "{spec_type}",
-    "version": "1.0.0",
-    "author": "",
-    "created": "",
-    "updated": ""
-  }},
-  "description": "基于代码分析生成的规格说明",
-"""
-
-        if spec_type == "feature":
-            prompt += """
-  "requirements": [
-    {
-      "id": "REQ-001",
-      "title": "需求标题",
-      "description": "基于代码实现的需求描述",
-      "priority": "high",
-      "status": "implemented"
-    }
-  ],
-  "user_stories": [
-    {
-      "id": "US-001",
-      "as_a": "用户角色",
-      "i_want_to": "想要做什么",
-      "so_that": "为了什么目的"
-    }
-  ],
-  "acceptance_criteria": [
-    {
-      "requirement_id": "REQ-001",
-      "criteria": [
-        "验收条件1",
-        "验收条件2"
-      ]
-    }
-  ]
-"""
-        elif spec_type == "api":
-            prompt += """
-  "base_path": "/api",
-  "endpoints": [
-    {
-      "path": "/endpoint",
-      "method": "GET",
-      "summary": "接口摘要",
-      "description": "基于代码实现的接口描述",
-      "parameters": [],
-      "responses": {
-        "200": {
-          "description": "成功",
-          "schema": {}
-        }
-      }
-    }
-  ],
-  "models": [
-    {
-      "name": "ModelName",
-      "properties": [
-        {
-          "name": "fieldName",
-          "type": "string",
-          "description": "字段描述"
-        }
-      ]
-    }
-  ],
-  "authentication": {
-    "type": "none",
-    "description": "认证方式描述"
-  }
-"""
-        elif spec_type == "component":
-            prompt += """
-  "props": [
-    {
-      "name": "propName",
-      "type": "string",
-      "required": false,
-      "default": "",
-      "description": "基于代码分析的属性描述"
-    }
-  ],
-  "events": [
-    {
-      "name": "eventName",
-      "description": "事件描述",
-      "payload": {}
-    }
-  ],
-  "slots": [
-    {
-      "name": "slotName",
-      "description": "插槽描述"
-    }
-  ],
-  "methods": [
-    {
-      "name": "methodName",
-      "description": "基于代码分析的方法描述",
-      "returns": "void"
-    }
-  ],
-  "examples": [
-    {
-      "description": "使用示例",
-      "code": "示例代码"
-    }
-  ]
-"""
-        elif spec_type == "service":
-            prompt += """
-  "interfaces": [
-    {
-      "name": "InterfaceName",
-      "methods": [
-        {
-          "name": "methodName",
-          "description": "基于代码分析的方法描述",
-          "parameters": [],
-          "returns": {}
-        }
-      ]
-    }
-  ],
-  "dependencies": [
-    {
-      "name": "dependencyName",
-      "version": ">=1.0.0",
-      "type": "external"
-    }
-  ],
-  "configuration": {
-    "configKey": {
-      "type": "string",
-      "required": true,
-      "description": "配置描述"
-    }
-  }
-"""
-
-        prompt += "\n}"
-
-        return prompt
+        # 使用新的提示词模板
+        return get_spec_generation_prompt(
+            project_name=spec_name,
+            project_path=str(self.project_path),
+            spec_type=spec_type,
+            tech_stack=tech_stack,
+            structure=structure_str,
+            code_analysis=code_str,
+            timestamp=datetime.now().isoformat()
+        )
 
     def _parse_ai_response(self, response: str, name: str, spec_type: str) -> Dict[str, Any]:
         """解析 AI 返回的内容"""

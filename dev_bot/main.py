@@ -7,6 +7,7 @@
 ################################################################################
 
 import datetime
+import fcntl
 import json
 import os
 import signal
@@ -17,6 +18,13 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+# 导入配置验证器
+try:
+    from dev_bot.config_validator import ConfigValidator
+    HAS_CONFIG_VALIDATOR = True
+except ImportError:
+    HAS_CONFIG_VALIDATOR = False
+
 ################################################################################
 # 配置管理
 ################################################################################
@@ -24,10 +32,10 @@ from typing import Any, Dict, List, Optional
 class Config:
     """配置管理类"""
 
-    def __init__(self, config_path: str = "config.json"):
+    def __init__(self, config_path: str = "config.json", use_validator: bool = True):
         self.config_path = Path(config_path)
         self.config = self._load_config()
-        self._validate_config()
+        self._validate_config(use_validator)
 
     def _load_config(self) -> Dict[str, Any]:
         """加载配置文件"""
@@ -42,11 +50,61 @@ class Config:
             print(f"错误: 配置文件格式错误: {e}")
             sys.exit(1)
 
-    def _validate_config(self) -> None:
+    def _validate_config(self, use_validator: bool = True) -> None:
         """验证配置"""
-        if 'ai_command' not in self.config:
-            print("错误: 缺少必需的配置项: ai_command")
+        # 如果可用且启用，使用 ConfigValidator 进行详细验证
+        if use_validator and HAS_CONFIG_VALIDATOR:
+            try:
+                validator = ConfigValidator()
+                result = validator.validate(self.config_path)
+
+                if not result.is_valid:
+                    print("错误: 配置验证失败")
+                    for error in result.errors:
+                        print(f"  - {validator.format_error(error)}")
+                    sys.exit(1)
+                else:
+                    # 验证通过，但可能缺少某些可选字段，设置默认值
+                    self._set_defaults()
+            except Exception as e:
+                # 如果验证器失败，回退到基本验证
+                print(f"警告: 配置验证器出错 ({e})，使用基本验证")
+                self._basic_validate()
+                self._set_defaults()
+        else:
+            # 使用基本验证
+            self._basic_validate()
+            self._set_defaults()
+
+    def _basic_validate(self) -> None:
+        """基本配置验证（回退方案）"""
+        required_fields = ['ai_command', 'prompt_file']
+        missing_fields = [field for field in required_fields if field not in self.config]
+
+        if missing_fields:
+            print(f"错误: 缺少必需的配置项: {', '.join(missing_fields)}")
             sys.exit(1)
+
+        # 验证超时时间
+        if 'timeout_seconds' in self.config:
+            timeout = self.config['timeout_seconds']
+            if not isinstance(timeout, (int, float)) or timeout <= 0:
+                print(f"错误: timeout_seconds 必须是正数，当前值: {timeout}")
+                sys.exit(1)
+
+    def _set_defaults(self) -> None:
+        """设置默认值"""
+        defaults = {
+            'ai_command_args': ['-y'],
+            'timeout_seconds': 300,
+            'wait_interval': 0.5,
+            'auto_commit': True,
+            'git_commit_template': 'chore: record AI session #{session_num} ({status})',
+        }
+
+        for key, default_value in defaults.items():
+            if key not in self.config:
+                self.config[key] = default_value
 
     def get(self, key: str, default: Any = None) -> Any:
         """获取配置项"""
@@ -90,9 +148,37 @@ class Config:
         """是否自动提交"""
         return True
 
+    def get_auto_restart_enabled(self) -> bool:
+        """是否启用自动重启"""
+        auto_restart = self.get('auto_restart', {})
+        return auto_restart.get('enabled', False)
+
+    def get_max_restart_count(self) -> int:
+        """获取最大重启次数"""
+        auto_restart = self.get('auto_restart', {})
+        return auto_restart.get('max_restart_count', 3)
+
+    def get_restart_delay(self) -> int:
+        """获取重启延迟（秒）"""
+        auto_restart = self.get('auto_restart', {})
+        return auto_restart.get('restart_delay', 5)
+
+    def get_auto_restart_ai_analysis(self) -> bool:
+        """是否使用 AI 分析重启"""
+        auto_restart = self.get('auto_restart', {})
+        return auto_restart.get('ai_analysis', True)
+
     def get_git_commit_template(self) -> str:
         """获取 Git 提交模板"""
         return 'chore: record AI session #{session_num} ({status})'
+
+    def get_ai_logs_dir(self) -> Path:
+        """获取 AI 日志目录"""
+        return Path('.ai-logs')
+
+    def get_project_path(self) -> Path:
+        """获取项目路径"""
+        return self.config_path.parent.resolve()
 
 
 ################################################################################
@@ -194,23 +280,49 @@ def get_session_num(config: Config) -> int:
     return 0
 
 def update_session_num(config: Config, session_num: int) -> None:
-    """更新会话编号（原子性）"""
+    """更新会话编号（使用文件锁确保原子性）"""
     counter_file = config.get_session_counter_file()
-    temp_file = counter_file.with_suffix('.tmp')
-    start_time = datetime.datetime.now().isoformat()
+    counter_file.parent.mkdir(parents=True, exist_ok=True)
 
-    data = {
-        "current_session": session_num,  # 保存当前会话编号
-        "last_updated": start_time,
-        "total_sessions": session_num   # 总会话数等于当前会话编号
-    }
-
+    # 使用文件锁确保原子性的读取-修改-写入操作
     try:
-        with open(temp_file, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
-        temp_file.replace(counter_file)
-    except OSError:
-        pass
+        # 打开文件（不存在则创建）
+        with open(counter_file, 'a+', encoding='utf-8') as f:
+            # 获取独占锁（非阻塞模式，如果无法获取锁则跳过）
+            try:
+                fcntl.flock(f.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError:
+                # 无法获取锁，说明其他进程正在更新，跳过此次更新
+                print("[⚠️] 无法获取文件锁，跳过会话编号更新")
+                return
+
+            try:
+                # 读取现有数据
+                f.seek(0)
+                try:
+                    existing_data = json.load(f)
+                except (json.JSONDecodeError, ValueError):
+                    existing_data = {}
+
+                # 更新数据
+                start_time = datetime.datetime.now().isoformat()
+                data = {
+                    "current_session": session_num,
+                    "last_updated": start_time,
+                    "total_sessions": max(session_num, existing_data.get('total_sessions', 0))
+                }
+
+                # 写入数据
+                f.seek(0)
+                f.truncate()
+                json.dump(data, f, indent=2, ensure_ascii=False)
+                f.flush()
+                os.fsync(f.fileno())  # 确保数据写入磁盘
+            finally:
+                # 释放锁
+                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+    except OSError as e:
+        print(f"[!] 更新会话编号失败: {e}")
 
 def init_stats(config: Config) -> None:
     """初始化统计文件"""
@@ -228,6 +340,8 @@ def init_stats(config: Config) -> None:
         try:
             with open(stats_file, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
+            # 设置文件权限为仅所有者可读写
+            os.chmod(stats_file, 0o600)
         except OSError:
             pass
 
@@ -556,11 +670,12 @@ def interruptible_sleep(seconds: float) -> None:
 
 
 ################################################################################
-# 全局变量
+# 全局变量（线程安全）
 ################################################################################
 
-shutdown_requested = False
+shutdown_requested = threading.Event()
 last_signal_time = 0
+last_signal_lock = threading.Lock()
 
 
 ################################################################################
@@ -569,20 +684,24 @@ last_signal_time = 0
 
 def signal_handler(signum: int, frame) -> None:
     """信号处理函数"""
-    global shutdown_requested, last_signal_time
+    global last_signal_time
 
     current_time = time.time()
 
-    if current_time - last_signal_time < 1.0:
-        print()
-        print_separator()
-        print_status("error", "收到连续中断信号，立即强制退出！")
-        print_separator()
-        print()
-        sys.exit(130)
+    # 使用锁保护 last_signal_time
+    with last_signal_lock:
+        if current_time - last_signal_time < 1.0:
+            print()
+            print_separator()
+            print_status("error", "收到连续中断信号，立即强制退出！")
+            print_separator()
+            print()
+            sys.exit(130)
 
-    last_signal_time = current_time
-    shutdown_requested = True
+        last_signal_time = current_time
+
+    # 使用 Event 替代布尔标志
+    shutdown_requested.set()
 
     print()
     print_separator()
@@ -604,8 +723,6 @@ def ignore_signal_handler(signum: int, frame) -> None:
 
 def main() -> None:
     """主程序"""
-    global shutdown_requested
-
     # 初始化自动重启管理器（在加载配置之前）
     from dev_bot.auto_restart import AutoRestartManager, setup_crash_handlers
     restart_manager = AutoRestartManager()
@@ -635,6 +752,7 @@ def main() -> None:
     from dev_bot.repl_mode import get_user_input_manager
     user_input_manager = get_user_input_manager()
     user_input_manager.start()
+    print_status("info", "REPL 模式已启动（可直接输入指令，按 Enter 发送）")
 
     # 显示启动信息
     print_banner(config)
@@ -658,9 +776,16 @@ def main() -> None:
 
     ai_command = config.get_ai_command()
     try:
-        subprocess.run(['which', ai_command], check=True, capture_output=True)
-    except (subprocess.CalledProcessError, FileNotFoundError):
+        from dev_bot.core import validate_ai_tool
+        validate_ai_tool(ai_command)
+    except ValueError as e:
+        print_status("error", str(e))
+        sys.exit(1)
+    except FileNotFoundError:
         print_status("error", f"AI 工具命令不可用: {ai_command}")
+        sys.exit(1)
+    except Exception as e:
+        print_status("error", f"AI 工具验证失败: {e}")
         sys.exit(1)
 
     print_status("success", "环境检查通过")
@@ -674,7 +799,7 @@ def main() -> None:
     print()
 
     # 主循环
-    while not shutdown_requested:
+    while not shutdown_requested.is_set():
         session_num += 1
         session_start_time = time.time()
         session_output = log_dir / f"session_{session_num}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
@@ -817,7 +942,9 @@ def main() -> None:
 
         # AI 分析和决策
         print_status("system", "正在分析本轮 AI 输出...")
-        decision = analyze_and_decide(config, session_output, session_num, ai_logs_dir)
+        decision = analyze_and_decide(
+            config, session_output, session_num, ai_logs_dir, user_input_manager
+        )
 
         if decision.get('action_required'):
             print_status("warning", f"AI 建议: {decision.get('action_description', '')}")
@@ -838,7 +965,7 @@ def main() -> None:
         print()
 
         # 检查是否收到退出信号
-        if shutdown_requested:
+        if shutdown_requested.is_set():
             print_separator()
             print_status("warning", "收到退出信号，当前AI调用循环已完成")
             print_status("info", "正在保存状态...")
@@ -858,7 +985,7 @@ def main() -> None:
         interruptible_sleep(2)
         print()
 
-    if shutdown_requested:
+    if shutdown_requested.is_set():
         print_separator()
         print_status("warning", "Dev-Bot 已停止")
 
@@ -886,31 +1013,39 @@ if __name__ == "__main__":
 # AI 分析和决策
 ################################################################################
 
-def analyze_and_decide(config: Config, session_output: Path, session_num: int, ai_logs_dir: Path) -> Dict[str, Any]:
+def analyze_and_decide(
+    config: Config,
+    session_output: Path,
+    session_num: int,
+    ai_logs_dir: Path,
+    user_input_manager
+) -> Dict[str, Any]:
     """
     使用 AI 分析输出并决策下一步动作
-    
+
     Args:
         config: 配置对象
         session_output: 会话输出文件
         session_num: 会话编号
         ai_logs_dir: AI 日志目录
-        
+        user_input_manager: 用户输入管理器
+
     Returns:
         决策字典，包含 action_required, action, action_description 等
     """
-    default_decision = {
-        'action_required': False,
-        'action': None,
-        'action_description': '',
-        'should_stop': False,
-        'should_rerun': False
-    }
+
+    ai_output = ""  # 初始化变量，确保在异常处理中可以访问
 
     try:
-        # 读取 AI 输出
-        with open(session_output, encoding='utf-8') as f:
-            ai_output = f.read()
+        # 读取 AI 输出，添加错误处理和备用编码
+        try:
+            with open(session_output, encoding='utf-8') as f:
+                ai_output = f.read()
+        except UnicodeDecodeError:
+            # 如果 UTF-8 解码失败，尝试使用 latin-1 编码（可以处理任意字节）
+            with open(session_output, encoding='latin-1') as f:
+                ai_output = f.read()
+            print_status("warning", "AI 输出文件包含非 UTF-8 字符，已使用备用编码读取")
 
         # 检查代码质量
         code_quality = _check_code_quality()
@@ -1007,10 +1142,10 @@ def analyze_and_decide(config: Config, session_output: Path, session_num: int, a
 def _check_critical_errors(ai_output: str) -> Optional[str]:
     """
     使用传统方法检测关键错误
-    
+
     Args:
         ai_output: AI 输出内容
-        
+
     Returns:
         错误描述，如果没有检测到错误返回 None
     """
@@ -1040,10 +1175,10 @@ def _check_critical_errors(ai_output: str) -> Optional[str]:
 def _check_ai_tool_error(stderr: str) -> bool:
     """
     检查是否是 AI 工具本身的错误
-    
+
     Args:
         stderr: 标准错误输出
-        
+
     Returns:
         是否是 AI 工具错误
     """
@@ -1063,10 +1198,10 @@ def _check_ai_tool_error(stderr: str) -> bool:
 def _traditional_fallback_analysis(ai_output: str) -> Dict[str, Any]:
     """
     传统方法后备分析（仅在 AI 调用失败时使用）
-    
+
     Args:
         ai_output: AI 输出内容
-        
+
     Returns:
         决策字典
     """
@@ -1113,11 +1248,11 @@ def _traditional_fallback_analysis(ai_output: str) -> Dict[str, Any]:
 def execute_decision_action(config: Config, decision: Dict[str, Any]) -> bool:
     """
     执行 AI 建议的动作
-    
+
     Args:
         config: 配置对象
         decision: 决策字典
-        
+
     Returns:
         是否成功执行
     """
@@ -1314,7 +1449,7 @@ def execute_decision_action(config: Config, decision: Dict[str, Any]) -> bool:
 def _check_code_quality() -> Dict[str, Any]:
     """
     检查代码质量
-    
+
     Returns:
         包含代码质量信息的字典
     """
@@ -1376,7 +1511,7 @@ def _check_code_quality() -> Dict[str, Any]:
 def _validate_spec_files() -> Dict[str, Any]:
     """
     验证 spec 文件
-    
+
     Returns:
         包含 spec 验证信息的字典
     """
@@ -1453,7 +1588,7 @@ def _validate_spec_files() -> Dict[str, Any]:
 def _check_test_results() -> Dict[str, Any]:
     """
     检查测试结果
-    
+
     Returns:
         包含测试结果信息的字典
     """
@@ -1513,12 +1648,12 @@ def _build_quality_report(code_quality: Dict[str, Any],
                           test_results: Dict[str, Any]) -> str:
     """
     构建质量评估报告
-    
+
     Args:
         code_quality: 代码质量信息
         spec_validation: spec 验证信息
         test_results: 测试结果信息
-        
+
     Returns:
         格式化的质量报告字符串
     """

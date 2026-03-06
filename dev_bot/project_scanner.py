@@ -240,10 +240,11 @@ class CodeAnalyzer:
     def _analyze_python_files(self):
         """分析 Python 文件"""
         py_files = list(self.project_path.rglob('*.py'))
+        print(f"[DEBUG] Found Python files: {py_files}")
 
         for py_file in py_files:
-            # 跳过虚拟环境和缓存
-            if 'venv' in str(py_file) or '__pycache__' in str(py_file):
+            # 跳过虚拟环境和缓存（检查完整的目录名）
+            if '/venv/' in str(py_file) or '/__pycache__/' in str(py_file) or str(py_file).endswith('/venv') or str(py_file).endswith('/__pycache__'):
                 continue
 
             try:

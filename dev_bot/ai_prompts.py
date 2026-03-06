@@ -542,3 +542,258 @@ def get_spec_code_consistency_prompt(
         code_summary=code_summary,
         tech_stack=tech_stack
     )
+
+
+# ============================================================================
+# Spec 生成提示词
+# ============================================================================
+
+SPEC_GENERATION_PROMPT = """你是 Dev-Bot 的 Spec 生成助手，负责基于工程代码分析生成高质量的规格说明文档。
+
+## 工程信息
+
+### 基本信息
+- 工程名称: {project_name}
+- 工程路径: {project_path}
+- Spec 类型: {spec_type}
+
+### 技术栈
+{tech_stack}
+
+### 工程结构
+{structure}
+
+### 代码分析
+{code_analysis}
+
+## 任务要求
+
+请基于以上工程信息，生成一个详细的、符合实际的 {spec_type} 规格。
+
+## 生成原则
+
+1. **基于实际代码**：必须基于代码分析的实际情况生成 spec，不要凭空创造功能
+2. **完整性**：确保涵盖代码中实现的所有主要功能
+3. **准确性**：确保描述与实际代码实现一致
+4. **可读性**：使用清晰、简洁的语言描述
+5. **结构化**：遵循 JSON 格式规范
+
+## JSON 格式要求
+
+请严格按照以下 JSON 格式返回，不要包含任何其他文字或说明：
+
+```json
+{{
+  "spec_version": "1.0",
+  "metadata": {{
+    "name": "{project_name}",
+    "type": "{spec_type}",
+    "version": "1.0.0",
+    "author": "Dev-Bot",
+    "created": "{timestamp}",
+    "updated": "{timestamp}"
+  }},
+  "description": "基于代码分析生成的 {spec_type} 规格",
+  {spec_fields}
+}}
+```
+
+## 不同类型的 Spec 字段要求
+
+### Feature Spec
+```json
+"requirements": [
+  {{
+    "id": "REQ-001",
+    "title": "需求标题",
+    "description": "基于代码实现的需求描述",
+    "priority": "high|medium|low",
+    "status": "implemented",
+    "source_file": "实现该需求的文件路径"
+  }}
+],
+"user_stories": [
+  {{
+    "id": "US-001",
+    "as_a": "用户角色",
+    "i_want_to": "想要做什么",
+    "so_that": "为了什么目的"
+  }}
+],
+"acceptance_criteria": [
+  {{
+    "requirement_id": "REQ-001",
+    "criteria": ["验收条件1", "验收条件2"]
+  }}
+]
+```
+
+### API Spec
+```json
+"base_path": "/api",
+"endpoints": [
+  {{
+    "path": "/endpoint",
+    "method": "GET",
+    "summary": "接口摘要",
+    "description": "基于代码实现的接口描述",
+    "parameters": [
+      {{
+        "name": "paramName",
+        "type": "string",
+        "required": true,
+        "description": "参数描述"
+      }}
+    ],
+    "responses": {{
+      "200": {{
+        "description": "成功",
+        "schema": {{"type": "object"}}
+      }}
+    }},
+    "source_file": "实现该接口的文件路径"
+  }}
+],
+"models": [
+  {{
+    "name": "ModelName",
+    "properties": [
+      {{
+        "name": "fieldName",
+        "type": "string",
+        "description": "字段描述"
+      }}
+    ]
+  }}
+],
+"authentication": {{
+  "type": "none|bearer|api_key",
+  "description": "认证方式描述"
+}}
+```
+
+### Component Spec
+```json
+"props": [
+  {{
+    "name": "propName",
+    "type": "string",
+    "required": false,
+    "default": "",
+    "description": "基于代码分析的属性描述"
+  }}
+],
+"events": [
+  {{
+    "name": "eventName",
+    "description": "事件描述",
+    "payload": {{"type": "object"}}
+  }}
+],
+"slots": [
+  {{
+    "name": "slotName",
+    "description": "插槽描述"
+  }}
+],
+"methods": [
+  {{
+    "name": "methodName",
+    "description": "基于代码分析的方法描述",
+    "returns": "void",
+    "source_file": "实现该方法的文件路径"
+  }}
+],
+"examples": [
+  {{
+    "description": "使用示例",
+    "code": "示例代码"
+  }}
+]
+```
+
+### Service Spec
+```json
+"interfaces": [
+  {{
+    "name": "InterfaceName",
+    "methods": [
+      {{
+        "name": "methodName",
+        "parameters": [
+          {{
+            "name": "paramName",
+            "type": "string",
+            "description": "参数描述"
+          }}
+        ],
+        "returns": "void",
+        "description": "方法描述",
+        "source_file": "实现该方法的文件路径"
+      }}
+    ]
+  }}
+],
+"dependencies": [
+  {{
+    "name": "DependencyName",
+    "type": "internal|external",
+    "description": "依赖描述"
+  }}
+]
+```
+
+## 注意事项
+
+1. 只返回 JSON，不要包含任何其他文字
+2. 确保所有字段都有值，即使是空数组
+3. 尽可能从代码分析中提取准确的信息
+4. 如果某些信息无法从代码中获取，使用合理的默认值
+5. 保持 JSON 格式的有效性
+"""
+
+
+def get_spec_generation_prompt(
+    project_name: str,
+    project_path: str,
+    spec_type: str,
+    tech_stack: str,
+    structure: str,
+    code_analysis: str,
+    timestamp: str
+) -> str:
+    """获取 Spec 生成提示词"""
+
+    # 根据不同的 spec 类型生成对应的字段
+    spec_fields_map = {
+        "feature": '''"requirements": [],
+  "user_stories": [],
+  "acceptance_criteria": []''',
+        "api": '''"base_path": "/api",
+  "endpoints": [],
+  "models": [],
+  "authentication": {
+    "type": "none",
+    "description": ""
+  }''',
+        "component": '''"props": [],
+  "events": [],
+  "slots": [],
+  "methods": [],
+  "examples": []''',
+        "service": '''"interfaces": [],
+  "dependencies": []'''
+    }
+
+    spec_fields = spec_fields_map.get(spec_type, '')
+
+    return SPEC_GENERATION_PROMPT.format(
+        project_name=project_name,
+        project_path=project_path,
+        spec_type=spec_type,
+        tech_stack=tech_stack,
+        structure=structure,
+        code_analysis=code_analysis,
+        timestamp=timestamp,
+        spec_fields=spec_fields
+    )

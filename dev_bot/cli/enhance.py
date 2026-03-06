@@ -44,8 +44,6 @@ class EnhanceSpecCommand:
             self._print_error("spec 文件格式不正确，缺少 metadata.type")
             sys.exit(1)
 
-        spec_type = spec['metadata']['type']
-
         # 生成增强 prompt
         prompt = self._generate_enhance_prompt(spec, aspect)
 

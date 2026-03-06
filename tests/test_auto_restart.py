@@ -106,10 +106,14 @@ def test_get_restart_manager():
 
         # 测试 2: 使用默认路径
         print("  测试 2: 使用默认路径...")
+        original_cwd = os.getcwd()
         os.chdir(temp_dir)
-        manager = get_restart_manager()
-        assert manager.project_root == Path.cwd()
-        print("    ✓ 默认路径实例创建成功")
+        try:
+            manager = get_restart_manager()
+            assert manager.project_root == Path.cwd()
+            print("    ✓ 默认路径实例创建成功")
+        finally:
+            os.chdir(original_cwd)
 
         print("\n✅ 所有测试通过!")
 

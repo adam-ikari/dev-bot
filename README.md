@@ -4,7 +4,7 @@ Dev-Bot - AI 驱动开发工具集，包含 Spec Driven Development (SDD) 工具
 
 ## 功能特性
 
-Dev-Bot 提供三大核心功能模块：
+Dev-Bot 提供五大核心功能模块：
 
 ### 1. AI 驱动开发循环
 - 自动循环调用 AI 工具完成开发任务
@@ -28,6 +28,32 @@ Dev-Bot 提供三大核心功能模块：
 - **REPL 模式**: 非阻塞用户交互
 - **自动修复**: AI 驱动的错误修复
 - **自动重启**: 智能崩溃恢复和重启策略
+
+### 4. 统一日志系统 🆕
+- **多级别日志**: 支持 DEBUG, INFO, WARNING, ERROR, CRITICAL
+- **灵活输出**: 控制台和文件输出双模式
+- **日志轮转**: 自动日志文件轮转，避免单个文件过大
+- **格式自定义**: 支持自定义日志格式和日期格式
+- **性能优化**: 高性能日志记录，支持高并发场景
+
+### 5. 技术栈检测 🆕
+- **自动识别**: 自动检测项目使用的编程语言、框架和工具
+- **详细报告**: 生成完整的技术栈报告，包括：
+  - 编程语言和版本
+  - 主要框架和库
+  - 数据库类型
+  - 测试框架
+  - 构建工具
+  - 依赖管理工具
+  - 代码规范工具
+  - CI/CD 和其他工具
+- **多语言支持**: 支持 Python、JavaScript、TypeScript、Java、Go、Rust 等
+
+### 6. 配置验证增强 🆕
+- **完整验证**: 使用 ConfigValidator 进行全面的配置验证
+- **友好错误**: 提供清晰的错误消息和修复建议
+- **类型检查**: 验证字段类型和值范围
+- **自定义规则**: 支持自定义验证规则和 schema
 
 ## 安装
 
@@ -177,6 +203,94 @@ dev-bot sdd init <name>           # 初始化项目
 dev-bot sdd new-spec <name>       # 创建 spec
 dev-bot sdd ai-spec <name>        # AI 创建 spec
 dev-bot sdd validate <file>       # 验证 spec
+```
+
+## 新功能使用指南
+
+### 统一日志系统
+
+在代码中使用日志系统：
+
+```python
+from dev_bot import setup_logging, get_logger, info, error
+
+# 配置日志系统
+setup_logging(
+    log_level="INFO",
+    log_dir="./logs",
+    enable_file=True,
+    enable_console=True
+)
+
+# 获取日志记录器
+logger = get_logger(__name__)
+logger.info("Application started")
+logger.error("An error occurred")
+
+# 使用便捷函数
+info("Info message")
+error("Error message")
+```
+
+日志级别：
+- **DEBUG**: 详细的调试信息
+- **INFO**: 一般信息消息
+- **WARNING**: 警告消息
+- **ERROR**: 错误消息
+- **CRITICAL**: 严重错误消息
+
+### 技术栈检测
+
+在代码中检测项目技术栈：
+
+```python
+from dev_bot import detect_tech_stack, generate_tech_stack_report
+
+# 检测技术栈
+tech_stack = detect_tech_stack()
+
+# 生成报告
+report = generate_tech_stack_report()
+print(report)
+```
+
+输出示例：
+```
+技术栈识别报告：
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+编程语言: Python 3.13.3
+主要框架: FastAPI, SQLAlchemy
+数据库: PostgreSQL
+测试框架: pytest
+构建工具: Hatchling
+依赖管理: uv (基于 pyproject.toml)
+代码规范: ruff, pytest
+其他工具: GitHub Actions, Docker
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### 配置验证
+
+在代码中验证配置：
+
+```python
+from dev_bot import ConfigValidator
+from pathlib import Path
+
+# 创建验证器
+validator = ConfigValidator()
+
+# 验证配置文件
+result = validator.validate(Path("config.json"))
+
+if result.is_valid:
+    print("配置验证通过")
+else:
+    print("配置验证失败：")
+    for error in result.errors:
+        print(f"  - {validator.format_error(error)}")
 ```
 
 ## 工作流程

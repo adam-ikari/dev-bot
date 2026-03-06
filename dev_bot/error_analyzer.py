@@ -180,11 +180,17 @@ class ErrorAnalyzer:
         filename = f"error_{timestamp}.json"
         log_file = self.error_log_dir / filename
 
+        import os
+        import stat
+
         with open(log_file, 'w', encoding='utf-8') as f:
             json.dump({
                 "error_info": error_info,
                 "analysis": analysis
             }, f, indent=2, ensure_ascii=False)
+
+        # 设置文件权限为仅所有者可读写
+        os.chmod(log_file, stat.S_IRUSR | stat.S_IWUSR)
 
     def _get_timestamp(self) -> str:
         """获取时间戳"""
@@ -291,7 +297,8 @@ class ErrorAnalyzer:
             try:
                 # 读取文件
                 with open(full_path, encoding='utf-8') as f:
-                    content = f.read()
+                    # Read file (content not used)
+                    f.read()
 
                 # 应用代码修改
                 code_change = fix.get('code_change', '')

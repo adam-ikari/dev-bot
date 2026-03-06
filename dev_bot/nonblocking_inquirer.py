@@ -238,7 +238,7 @@ class NonBlockingSpecInquirer:
 
             if has_duplicate:
                 return
-        except:
+        except Exception:
             pass
 
         # 添加新问题

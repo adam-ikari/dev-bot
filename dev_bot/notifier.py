@@ -20,7 +20,7 @@ class Notifier:
     def __init__(self, config_path: Optional[Path] = None):
         """
         初始化通知管理器
-        
+
         Args:
             config_path: 配置文件路径（默认：项目目录下的 .notifyrc）
         """
@@ -75,7 +75,7 @@ class Notifier:
     def notify(self, title: str, message: str, level: str = "info"):
         """
         发送通知
-        
+
         Args:
             title: 通知标题
             message: 通知内容
@@ -248,10 +248,10 @@ class Notifier:
     def check_critical_patterns(self, output: str) -> bool:
         """
         检查输出中是否包含关键错误模式
-        
+
         Args:
             output: 输出文本
-            
+
         Returns:
             如果发现关键错误返回 True
         """
