@@ -61,6 +61,9 @@ class TUILayer(InteractionLayer):
         from dev_bot.core import get_core
         from dev_bot.repl_core import REPLCore
         from dev_bot.output_router import get_output_router, OutputSource, LogLevel
+        from pathlib import Path
+        
+        self.project_root = Path.cwd()
         self.core = get_core()
         self.repl = REPLCore()
         self.output_router = get_output_router()
@@ -73,11 +76,27 @@ class TUILayer(InteractionLayer):
 
         # 保存未显示的消息
         self._pending_messages = []
+        
+        # 后台系统
+        self.background_system = None
 
     async def start(self):
         """启动 TUI"""
         self.is_running = True
         print(f"[TUI] 启动 REPL 模式终端用户界面...")
+        
+        # 启动后台系统（AI 守护和多 AI 实例）
+        try:
+            from dev_bot.background_system import get_background_system
+            self.background_system = get_background_system(self.project_root)
+            await self.background_system.start()
+            
+            # 启动后台进程监控
+            monitor_task = asyncio.create_task(self.background_system.monitor_processes())
+            
+        except Exception as e:
+            print(f"[TUI] 警告: 后台系统启动失败: {e}")
+            print(f"[TUI] 继续运行，但可能缺少 AI 守护和 AI 实例功能")
 
         # 启动 REPL 核心
         await self.repl.start()
@@ -145,6 +164,55 @@ class TUILayer(InteractionLayer):
                                 count=20
                             )
                     continue
+
+                # 后台系统命令
+                if cmd.startswith("bg "):
+                    bg_cmd = cmd.replace("bg ", "")
+                    
+                    if bg_cmd == "status":
+                        # 显示后台系统状态
+                        if self.background_system:
+                            bg_status = self.background_system.get_status()
+                            print(f"\n[后台系统状态]")
+                            print(f"  运行中: {bg_status['is_running']}")
+                            print(f"  进程数: {bg_status['process_count']}")
+                            
+                            if bg_status['processes']:
+                                print(f"\n[后台进程]")
+                                for pid, proc_info in bg_status['processes'].items():
+                                    print(f"  {pid}:")
+                                    print(f"    PID: {proc_info['pid']}")
+                                    print(f"    状态: {proc_info['status']}")
+                                    print(f"    描述: {proc_info['description']}")
+                        else:
+                            print("[TUI] 后台系统未运行")
+                        continue
+                    
+                    if bg_cmd.startswith("restart "):
+                        # 重启后台进程
+                        parts = bg_cmd.split()
+                        if len(parts) >= 1:
+                            process_id = parts[0]
+                            if self.background_system:
+                                await self.background_system.restart_process(process_id)
+                            else:
+                                print("[TUI] 后台系统未运行")
+                        else:
+                            print("[TUI] 用法: bg restart <process_id>")
+                        continue
+                    
+                    if bg_cmd.startswith("stop "):
+                        # 停止后台进程
+                        parts = bg_cmd.split()
+                        if len(parts) >= 1:
+                            process_id = parts[0]
+                            if self.background_system:
+                                await self.background_system._stop_process(process_id)
+                            else:
+                                print("[TUI] 后台系统未运行")
+                        else:
+                            print("[TUI] 用法: bg stop <process_id>")
+                        continue
 
                 # 对话命令
                 if cmd.startswith("dialogue ") or cmd.startswith("dlg "):
@@ -255,6 +323,15 @@ class TUILayer(InteractionLayer):
     async def stop(self):
         """停止 TUI"""
         self.is_running = False
+        
+        # 停止后台系统
+        if self.background_system:
+            try:
+                await self.background_system.stop()
+            except Exception as e:
+                print(f"[TUI] 警告: 停止后台系统时出错: {e}")
+        
+        # 停止 REPL
         await self.repl.stop()
         print(f"[TUI] 停止 REPL 模式终端用户界面")
 
@@ -314,6 +391,23 @@ class TUILayer(InteractionLayer):
         print(f"\n[详细状态]")
         print(f"  核心状态: {self.core.get_status()}")
         print(f"  REPL 运行中: {self.repl._running}")
+
+        # 后台系统状态
+        if self.background_system:
+            bg_status = self.background_system.get_status()
+            print(f"\n[后台系统]")
+            print(f"  运行中: {bg_status['is_running']}")
+            print(f"  进程数: {bg_status['process_count']}")
+            
+            if bg_status['processes']:
+                print(f"\n[后台进程]")
+                for pid, proc_info in bg_status['processes'].items():
+                    print(f"  {pid}:")
+                    print(f"    PID: {proc_info['pid']}")
+                    print(f"    状态: {proc_info['status']}")
+                    print(f"    描述: {proc_info['description']}")
+        else:
+            print(f"\n[后台系统] 未运行")
 
         # 问题队列详情
         q_status = status["question_queue"]
@@ -378,6 +472,11 @@ Dev-Bot REPL 模式帮助：
     queue / q             - 查看队列状态
     clear / c             - 清理已完成任务
     input <id> <value>    - 提供输入
+
+  后台系统：
+    bg status             - 查看后台进程状态
+    bg restart <pid>      - 重启指定后台进程
+    bg stop <pid>         - 停止指定后台进程
 
   输出显示：
     output / o            - 查看最新输出
