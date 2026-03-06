@@ -80,17 +80,27 @@ class TUILayer(InteractionLayer):
         
         # AI 守护进程状态（从 IPC 读取）
         self.guardian_status = None
+        
+        # IPC Client（连接到守护进程）
+        self.ipc_client = None
+        self.ipc_socket_path = self.project_root / ".ipc" / "guardian.sock"
 
     async def start(self):
         """启动 TUI"""
         self.is_running = True
         print(f"[TUI] 启动 REPL 模式终端用户界面...")
         
+        # 连接到 IPC Server
+        await self._connect_to_ipc_server()
+        
         # 从 IPC 读取 AI 守护状态
         self._read_guardian_status()
         
         if self.guardian_status:
             print(f"[TUI] AI 守护运行中: {self.guardian_status.get('status', 'unknown')}")
+            # 显示 IPC 连接状态
+            if self.ipc_client and self.ipc_client.is_connected:
+                print(f"[TUI] ✓ 已连接到 IPC Server (实时通讯)")
         else:
             print(f"[TUI] 警告: 未检测到 AI 守护进程，后台 AI 实例可能不可用")
 
@@ -310,6 +320,9 @@ class TUILayer(InteractionLayer):
         """停止 TUI"""
         self.is_running = False
         
+        # 断开 IPC 连接
+        await self._disconnect_from_ipc_server()
+        
         # 停止 REPL
         await self.repl.stop()
         print(f"[TUI] 停止 REPL 模式终端用户界面")
@@ -347,6 +360,78 @@ class TUILayer(InteractionLayer):
         
         except Exception as e:
             self.guardian_status = None
+    
+    async def _connect_to_ipc_server(self):
+        """连接到 IPC Server"""
+        try:
+            from dev_bot.ipc_realtime import IPCClient, IPCMessageType
+            
+            self.ipc_client = IPCClient(self.ipc_socket_path, client_id="tui")
+            
+            # 注册消息处理器
+            self.ipc_client.on(IPCMessageType.SYSTEM_STATUS, self._on_system_status)
+            self.ipc_client.on(IPCMessageType.PROCESS_STATUS, self._on_process_status)
+            self.ipc_client.on(IPCMessageType.PROCESS_EXIT, self._on_process_exit)
+            
+            # 连接到服务器
+            if await self.ipc_client.connect():
+                # 发送注册消息
+                from dev_bot.ipc_realtime import IPCMessage
+                register_msg = IPCMessage(
+                    message_type=IPCMessageType.PROCESS_REGISTER,
+                    data={
+                        "process_id": "tui",
+                        "type": "tui",
+                        "pid": self.repl.pid if hasattr(self.repl, 'pid') else None
+                    },
+                    source="tui"
+                )
+                await self.ipc_client.send(register_msg)
+                
+                print(f"[TUI] ✓ 已连接到 IPC Server")
+            else:
+                print(f"[TUI] ⚠ 无法连接到 IPC Server，使用文件模式")
+        
+        except Exception as e:
+            print(f"[TUI] 连接 IPC Server 失败: {e}")
+            self.ipc_client = None
+    
+    async def _disconnect_from_ipc_server(self):
+        """断开 IPC 连接"""
+        if self.ipc_client:
+            await self.ipc_client.disconnect()
+            self.ipc_client = None
+    
+    async def _on_system_status(self, message):
+        """处理系统状态消息"""
+        try:
+            status_data = message.data
+            self.guardian_status = status_data
+            
+            # 可以在这里实时更新状态显示
+            # 但为了不影响 TUI 响应，只保存状态
+        except Exception as e:
+            print(f"[TUI] 处理系统状态消息失败: {e}")
+    
+    async def _on_process_status(self, message):
+        """处理进程状态消息"""
+        try:
+            process_id = message.data.get("process_id")
+            status = message.data.get("status")
+            
+            print(f"[TUI] 进程状态更新: {process_id} -> {status}")
+        except Exception as e:
+            print(f"[TUI] 处理进程状态消息失败: {e}")
+    
+    async def _on_process_exit(self, message):
+        """处理进程退出消息"""
+        try:
+            process_id = message.data.get("process_id")
+            exit_code = message.data.get("exit_code")
+            
+            print(f"[TUI] 进程退出: {process_id} (退出码: {exit_code})")
+        except Exception as e:
+            print(f"[TUI] 处理进程退出消息失败: {e}")
 
     async def _display_queue_status(self):
         """显示队列状态"""

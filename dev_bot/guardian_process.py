@@ -5,6 +5,7 @@ AI 守护进程 - 独立进程运行（分层架构版本）
 使用分层架构实现 AI 守护进程：
 - 底层守护层（不可变）：核心监控和恢复功能
 - 上层业务逻辑层（可变）：业务规则和策略
+- 集成 IPC Server 进行实时通讯
 """
 
 import asyncio
@@ -18,18 +19,23 @@ from typing import Dict, Any, Optional, List
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from dev_bot.ipc import IPCManager
+from dev_bot.ipc_realtime import IPCServer, IPCMessage, IPCMessageType
 from dev_bot.guardian import AIGuardian
 from dev_bot.guardian.core import DefaultHealthChecker, DefaultRecoveryStrategy
 
 
 class GuardianProcess:
-    """AI 守护进程（使用分层架构）"""
+    """AI 守护进程（使用分层架构 + IPC）"""
     
     def __init__(self, check_interval: int = 30, config_file: Optional[Path] = None):
         self.check_interval = check_interval
         self.status_file = Path(".guardian-status.json")
         self.ipc = IPCManager(Path.cwd())
         self.config_file = config_file
+        
+        # IPC Server
+        self.ipc_server = None
+        self.ipc_socket_path = Path.cwd() / ".ipc" / "guardian.sock"
         
         # 创建分层守护实例
         self.ai_guardian = AIGuardian(
@@ -47,6 +53,10 @@ class GuardianProcess:
         print(f"[守护进程] 启动守护进程（PID: {os.getpid()}）")
         print(f"[守护进程] 检查间隔: {self.check_interval}秒")
         print(f"[守护进程] 架构: 分层架构（核心层 + 业务层）")
+        print(f"[守护进程] IPC: Unix Socket 实时通讯")
+        
+        # 启动 IPC Server
+        await self._start_ipc_server()
         
         # 初始化要监控的进程
         await self._init_monitored_processes()
@@ -60,11 +70,142 @@ class GuardianProcess:
                 await asyncio.sleep(1)
                 # 定期保存状态
                 self._save_status()
+                # 定期广播心跳
+                await self._broadcast_status()
         except asyncio.CancelledError:
             pass
         finally:
             await self.ai_guardian.stop()
+            await self._stop_ipc_server()
             self._save_status({"status": "stopped"})
+    
+    async def _start_ipc_server(self):
+        """启动 IPC Server"""
+        try:
+            self.ipc_server = IPCServer(self.ipc_socket_path)
+            await self.ipc_server.start()
+            
+            # 注册消息处理器
+            self.ipc_server.on(IPCMessageType.PROCESS_REGISTER, self._handle_process_register)
+            self.ipc_server.on(IPCMessageType.PROCESS_STATUS, self._handle_process_status)
+            self.ipc_server.on(IPCMessageType.PROCESS_EXIT, self._handle_process_exit)
+            self.ipc_server.on(IPCMessageType.SYSTEM_COMMAND, self._handle_system_command)
+            
+            print(f"[守护进程] IPC Server 已启动")
+        except Exception as e:
+            print(f"[守护进程] 启动 IPC Server 失败: {e}")
+    
+    async def _stop_ipc_server(self):
+        """停止 IPC Server"""
+        if self.ipc_server:
+            await self.ipc_server.stop()
+    
+    async def _broadcast_status(self):
+        """广播状态给所有连接的客户端"""
+        if not self.ipc_server:
+            return
+        
+        # 获取守护进程状态
+        status = self._get_status()
+        
+        # 创建状态消息
+        message = IPCMessage(
+            message_type=IPCMessageType.SYSTEM_STATUS,
+            data=status,
+            source="guardian"
+        )
+        
+        # 广播给所有客户端
+        await self.ipc_server.broadcast(message)
+    
+    async def _handle_process_register(self, client_id: str, message: IPCMessage):
+        """处理进程注册消息"""
+        process_id = message.data.get("process_id")
+        process_type = message.data.get("type")
+        
+        print(f"[守护进程] 进程注册: {process_id} ({process_type})")
+        
+        # 可以在这里注册到守护进程管理
+        # 目前暂时只记录
+        self.ipc.write_log("guardian", "info", f"进程注册: {process_id} ({process_type}) from {client_id}")
+    
+    async def _handle_process_status(self, client_id: str, message: IPCMessage):
+        """处理进程状态更新消息"""
+        process_id = message.data.get("process_id")
+        status = message.data.get("status")
+        
+        print(f"[守护进程] 进程状态更新: {process_id} -> {status}")
+        
+        # 可以在这里更新进程状态
+        self.ipc.write_log("guardian", "info", f"进程状态: {process_id} -> {status}")
+    
+    async def _handle_process_exit(self, client_id: str, message: IPCMessage):
+        """处理进程退出消息"""
+        process_id = message.data.get("process_id")
+        exit_code = message.data.get("exit_code")
+        
+        print(f"[守护进程] 进程退出: {process_id} (退出码: {exit_code})")
+        
+        # 可以在这里触发重启逻辑
+        self.ipc.write_log("guardian", "warning", f"进程退出: {process_id} (退出码: {exit_code})")
+    
+    async def _handle_system_command(self, client_id: str, message: IPCMessage):
+        """处理系统命令"""
+        command = message.data.get("command")
+        params = message.data.get("params", {})
+        
+        print(f"[守护进程] 收到系统命令: {command} from {client_id}")
+        
+        # 处理命令
+        if command == "get_status":
+            status = self._get_status()
+            response = IPCMessage(
+                message_type="system_response",
+                data={"command": command, "result": status},
+                source="guardian"
+            )
+            await self.ipc_server.send_to(client_id, response)
+        
+        elif command == "restart_process":
+            process_id = params.get("process_id")
+            # 实现重启逻辑
+            await self._restart_process(process_id)
+    
+    async def _restart_process(self, process_id: str):
+        """重启进程"""
+        print(f"[守护进程] 重启进程: {process_id}")
+        
+        # 获取进程重启命令
+        restart_info = self.ai_guardian.monitored_processes.get(process_id)
+        
+        if restart_info:
+            # 停止旧进程
+            if restart_info.get("pid"):
+                try:
+                    os.kill(restart_info["pid"], signal.SIGTERM)
+                except Exception as e:
+                    print(f"[守护进程] 停止进程失败: {e}")
+            
+            # 启动新进程
+            process_manager = None
+            try:
+                from dev_bot.process_manager import ProcessManager
+                process_manager = ProcessManager()
+                
+                process = await process_manager.create_process(
+                    process_id=process_id,
+                    script_path=Path(restart_info["restart_cmd"][0]),
+                    args=restart_info["restart_cmd"][1:],
+                    cwd=Path.cwd()
+                )
+                
+                if process:
+                    # 更新 PID
+                    self.ai_guardian.monitored_processes[process_id]["pid"] = process.pid
+                    print(f"[守护进程] ✓ 进程已重启: {process_id} (PID: {process.pid})")
+            
+            except Exception as e:
+                print(f"[守护进程] 重启进程失败: {e}")
     
     async def _init_monitored_processes(self):
         """初始化要监控的进程
@@ -171,8 +312,7 @@ class GuardianProcess:
     
     def _save_status(self, custom_status: Dict = None):
         """保存守护进程状态"""
-        status = custom_status or self.ai_guardian.get_status()
-        status["pid"] = os.getpid()
+        status = custom_status or self._get_status()
         
         try:
             with open(self.status_file, 'w', encoding='utf-8') as f:
@@ -180,21 +320,41 @@ class GuardianProcess:
         except Exception as e:
             print(f"[守护进程] 保存状态失败: {e}")
     
-    def get_status(self) -> Dict[str, Any]:
+    def _get_status(self) -> Dict[str, Any]:
         """获取状态"""
-        return self.ai_guardian.get_status()
+        status = self.ai_guardian.get_status()
+        status["pid"] = os.getpid()
+        status["ipc_server"] = {
+            "running": self.ipc_server is not None and self.ipc_server.is_running,
+            "socket_path": str(self.ipc_socket_path),
+            "clients_count": len(self.ipc_server.clients) if self.ipc_server else 0
+        }
+        return status
+    
+    def get_status(self) -> Dict[str, Any]:
+        """获取状态（公开接口）"""
+        return self._get_status()
     
     def _handle_sigterm(self, signum, frame):
         """处理 SIGTERM 信号"""
         print(f"[守护进程] 收到 SIGTERM 信号，准备退出...")
         # 创建异步任务来停止守护
-        asyncio.create_task(self.ai_guardian.stop())
+        asyncio.create_task(self._cleanup_and_stop())
     
     def _handle_sigint(self, signum, frame):
         """处理 SIGINT 信号"""
         print(f"[守护进程] 收到 SIGINT 信号，准备退出...")
         # 创建异步任务来停止守护
-        asyncio.create_task(self.ai_guardian.stop())
+        asyncio.create_task(self._cleanup_and_stop())
+    
+    async def _cleanup_and_stop(self):
+        """清理并停止"""
+        try:
+            await self.ai_guardian.stop()
+            await self._stop_ipc_server()
+            self._save_status({"status": "stopped"})
+        except Exception as e:
+            print(f"[守护进程] 清理失败: {e}")
 
 
 async def main():
