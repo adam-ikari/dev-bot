@@ -11,7 +11,7 @@ import os
 import signal
 import sys
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 # 添加项目路径
 sys.path.insert(0, str(Path(__file__).parent.parent))
