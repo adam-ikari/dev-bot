@@ -17,6 +17,7 @@ from typing import Dict, Any
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from dev_bot.ipc import IPCManager
+from dev_bot.ipc_realtime import IPCClient, IPCMessage, IPCMessageType
 from dev_bot.main import Config
 from dev_bot.ai_evolution_system import AIEvolutionSystem
 from dev_bot.iflow_manager import get_iflow_manager, IFlowMode
@@ -38,9 +39,10 @@ class AILoopProcess:
         self.memory_file = project_root / ".dev-bot-memory" / "context.json"
         self.memory_file.parent.mkdir(parents=True, exist_ok=True)
         
-        # 命令和响应文件
-        self.command_file = project_root / ".ipc" / "ai_loop_command.json"
-        self.response_file = project_root / ".ipc" / "ai_loop_response.json"
+        # 实时 IPC Client
+        self.ipc_client = None
+        self.ipc_socket_path = project_root / ".ipc" / "guardian.sock"
+        self.pending_tasks = []  # 待处理任务队列
         
         # 长期记忆配置
         self.MAX_HISTORY_ENTRIES = 100
@@ -76,6 +78,9 @@ class AILoopProcess:
         
         print(f"[AI 循环] 启动 AI 循环进程（PID: {os.getpid()}）")
         
+        # 连接到 Guardian IPC Server
+        await self._connect_to_ipc_server()
+        
         # 更新状态
         self._update_status({"status": "running", "session": 0})
         
@@ -91,6 +96,7 @@ class AILoopProcess:
         finally:
             print(f"[AI 循环] AI 循环进程退出")
             self._update_status({"status": "stopped"})
+            await self._disconnect_from_ipc_server()
     
     async def _run_session(self):
         """运行一次会话"""
@@ -99,11 +105,7 @@ class AILoopProcess:
             await asyncio.sleep(2)
             return
         
-        # 检查命令
-        command = await self._check_command()
-        if command:
-            await self._handle_command(command)
-        
+        # 检查 IPC 任务        ipc_task = await self._check_ipc_tasks()        if ipc_task:            # 处理 IPC 任务            await self._handle_ipc_task(ipc_task)                # 检查文件命令（保留兼容性）        command = await self._check_command()        if command:            await self._handle_command(command)        
         self._log("info", f">>> AI 循环 #{self.session_num} <<<")
         
         # 判断是否执行进化循环
@@ -326,12 +328,6 @@ Spec 内容：
             self._log("error", f"[阶段 2: AI 执行] 出错: {e}")
             return ""
 
-        output = output.decode()
-            if error:
-                self._log("warning", f"[阶段 2: AI 执行] stderr: {error.decode()[:200]}")
-            
-            self._log("ai_output", output[:500])
-            
         except asyncio.TimeoutError:
             self._log("error", "[阶段 2: AI 执行] 超时")
         except Exception as e:
@@ -455,3 +451,141 @@ if __name__ == '__main__':
         asyncio.run(main())
     except KeyboardInterrupt:
         print("\n[AI 循环] AI 循环进程已停止")
+
+    async def _connect_to_ipc_server(self):
+        """连接到 Guardian IPC Server"""
+        try:
+            self.ipc_client = IPCClient(self.ipc_socket_path, client_id=f"ai_loop_{os.getpid()}")
+            
+            # 注册消息处理器
+            self.ipc_client.on(IPCMessageType.TASK_SUBMIT, self._on_task_submit)
+            self.ipc_client.on(IPCMessageType.PROCESS_STATUS, self._on_process_status)
+            
+            # 重试连接
+            max_retries = 10
+            for attempt in range(max_retries):
+                try:
+                    if self.ipc_socket_path.exists():
+                        if await self.ipc_client.connect():
+                            # 发送注册消息
+                            register_msg = IPCMessage(
+                                message_type=IPCMessageType.PROCESS_REGISTER,
+                                data={
+                                    "process_id": f"ai_loop_{os.getpid()}",
+                                    "type": "ai_loop",
+                                    "pid": os.getpid()
+                                },
+                                source="ai_loop"
+                            )
+                            await self.ipc_client.send(register_msg)
+                            print(f"[AI 循环] ✓ 已连接到 Guardian IPC Server")
+                            return
+                    
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(1)
+                except Exception as e:
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(1)
+            
+            print(f"[AI 循环] ⚠ 无法连接到 Guardian IPC Server")
+        except Exception as e:
+            print(f"[AI 循环] 连接 IPC Server 失败: {e}")
+    
+    async def _disconnect_from_ipc_server(self):
+        """断开 IPC 连接"""
+        if self.ipc_client:
+            await self.ipc_client.disconnect()
+            self.ipc_client = None
+    
+    async def _on_task_submit(self, message: IPCMessage):
+        """处理任务提交消息"""
+        try:
+            question_id = message.data.get("question_id")
+            question_text = message.data.get("question")
+            
+            if question_id and question_text:
+                # 添加到待处理任务队列
+                self.pending_tasks.append({
+                    "question_id": question_id,
+                    "question": question_text
+                })
+                print(f"[AI 循环] 收到任务: {question_id[:8]}...")
+        except Exception as e:
+            print(f"[AI 循环] 处理任务消息失败: {e}")
+    
+    async def _on_process_status(self, message: IPCMessage):
+        """处理进程状态消息"""
+        # 可以在这里处理状态更新
+        pass
+    
+    async def _check_ipc_tasks(self) -> Optional[Dict]:
+        """检查 IPC 任务队列"""
+        if self.pending_tasks:
+            return self.pending_tasks.pop(0)
+        return None
+
+    async def _handle_ipc_task(self, task: Dict):
+        """处理 IPC 任务"""
+        try:
+            question_id = task.get("question_id")
+            question_text = task.get("question")
+            
+            if question_id and question_text:
+                print(f"[AI 循环] 处理任务: {question_id[:8]}...")
+                
+                # 更新状态
+                self._update_status({
+                    "status": "processing",
+                    "current_task": question_id
+                })
+                
+                # 调用 iflow 处理问题
+                result = await self._call_iflow(question_text)
+                
+                # 更新状态
+                self._update_status({
+                    "status": "running",
+                    "last_result": result.get("success", False)
+                })
+                
+                # 发送任务完成消息
+                if self.ipc_client:
+                    complete_msg = IPCMessage(
+                        message_type=IPCMessageType.TASK_COMPLETE,
+                        data={
+                            "question_id": question_id,
+                            "result": result
+                        },
+                        source="ai_loop"
+                    )
+                    await self.ipc_client.send(complete_msg)
+                
+                print(f"[AI 循环] 任务完成: {question_id[:8]}...")
+        except Exception as e:
+            print(f"[AI 循环] 处理任务失败: {e}")
+            
+            # 发送任务失败消息
+            if self.ipc_client:
+                fail_msg = IPCMessage(
+                    message_type=IPCMessageType.TASK_COMPLETE,
+                    data={
+                        "question_id": task.get("question_id"),
+                        "result": {"success": False, "error": str(e)}
+                    },
+                    source="ai_loop"
+                )
+                await self.ipc_client.send(fail_msg)
+    
+    async def _call_iflow(self, prompt: str) -> Dict[str, Any]:
+        """调用 iflow"""
+        try:
+            response = await self.iflow_manager.call_iflow(prompt)
+            return {
+                "success": True,
+                "response": response
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e)
+            }

@@ -154,25 +154,13 @@ class GuardianProcess:
                     
                     # 如果任务不在处理中，才分发
                     if processing == 0:
-                        # 写入AI循环命令文件
-                        command_file = Path.cwd() / ".ipc" / "ai_loop_command.json"
-                        command = {
-                            "action": "process_question",
-                            "question_id": question_id,
-                            "question": question_text,
-                            "timestamp": asyncio.get_event_loop().time()
-                        }
-                        
-                        with open(command_file, 'w', encoding='utf-8') as f:
-                            json.dump(command, f, indent=2, ensure_ascii=False)
-                        
                         # 标记为已分发
                         self.dispatched_tasks.add(question_id)
                         self.last_dispatched_time = asyncio.get_event_loop().time()
                         
                         print(f"[守护进程] 已分发任务: {question_id[:8]}...")
                         
-                        # 同时通过IPC广播（给实时连接的客户端）
+                        # 通过IPC广播任务给AI实例
                         if self.ipc_server:
                             task_msg = IPCMessage(
                                 message_type=IPCMessageType.TASK_SUBMIT,
