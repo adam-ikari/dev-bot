@@ -198,8 +198,9 @@ async def handle_ui(args):
                 if guardian_process:
                     print(f"[系统] ✓ AI 守护已启动 (PID: {guardian_process.pid})")
                     
-                    # 等待 AI 守护初始化
-                    await asyncio.sleep(2)
+                    # 等待 AI 守护初始化（启动 AI 实例需要时间）
+                    print(f"[系统] 等待 AI 守护初始化后台进程...")
+                    await asyncio.sleep(5)
                 else:
                     print(f"[系统] ✗ AI 守护启动失败，继续运行但后台功能不可用")
             else:
