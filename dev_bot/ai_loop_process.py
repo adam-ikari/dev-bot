@@ -433,24 +433,6 @@ Spec 内容：
         self.is_running = False
 
 
-async def main():
-    """主函数"""
-    if len(sys.argv) < 2:
-        print("用法: python ai_loop_process.py <项目根目录> [配置文件]")
-        sys.exit(1)
-    
-    project_root = Path(sys.argv[1])
-    config_file = sys.argv[2] if len(sys.argv) > 2 else "config.json"
-    
-    ai_loop = AILoopProcess(project_root, config_file)
-    await ai_loop.run()
-
-
-if __name__ == '__main__':
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        print("\n[AI 循环] AI 循环进程已停止")
 
     async def _connect_to_ipc_server(self):
         """连接到 Guardian IPC Server"""
@@ -523,7 +505,7 @@ if __name__ == '__main__':
         if self.pending_tasks:
             return self.pending_tasks.pop(0)
         return None
-
+    
     async def _handle_ipc_task(self, task: Dict):
         """处理 IPC 任务"""
         try:
@@ -589,3 +571,22 @@ if __name__ == '__main__':
                 "success": False,
                 "error": str(e)
             }
+
+async def main():
+    """主函数"""
+    if len(sys.argv) < 2:
+        print("用法: python ai_loop_process.py <项目根目录> [配置文件]")
+        sys.exit(1)
+    
+    project_root = Path(sys.argv[1])
+    config_file = sys.argv[2] if len(sys.argv) > 2 else "config.json"
+    
+    ai_loop = AILoopProcess(project_root, config_file)
+    await ai_loop.run()
+
+
+if __name__ == '__main__':
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("\n[AI 循环] AI 循环进程已停止")

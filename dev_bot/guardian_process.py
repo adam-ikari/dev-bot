@@ -332,22 +332,22 @@ class GuardianProcess:
         ai_instances = {
             "ai_analyzer": {
                 "script": project_root / "dev_bot" / "ai_loop_process.py",
-                "args": ["--role", "analyzer"],
+                "args": [str(project_root), "config.json"],
                 "description": "AI 分析实例"
             },
             "ai_developer": {
                 "script": project_root / "dev_bot" / "ai_loop_process.py",
-                "args": ["--role", "developer"],
+                "args": [str(project_root), "config.json"],
                 "description": "AI 开发实例"
             },
             "ai_tester": {
                 "script": project_root / "dev_bot" / "ai_loop_process.py",
-                "args": ["--role", "tester"],
+                "args": [str(project_root), "config.json"],
                 "description": "AI 测试实例"
             },
             "ai_reviewer": {
                 "script": project_root / "dev_bot" / "ai_loop_process.py",
-                "args": ["--role", "reviewer"],
+                "args": [str(project_root), "config.json"],
                 "description": "AI 评审实例"
             }
         }
