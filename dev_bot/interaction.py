@@ -784,12 +784,12 @@ class InteractionManager:
         
         print(f"[交互管理器] 初始化完成")
     
-    def start_tui(self):
+    async def start_tui(self):
         """启动 TUI"""
         layer = TUILayer()
         self.layers[InteractionMode.TUI] = layer
         self.active_layer = layer
-        return asyncio.run(layer.start())
+        await layer.start()
     
     async def start_web(self, host: str = "127.0.0.1", port: int = 8080):
         """启动 Web"""

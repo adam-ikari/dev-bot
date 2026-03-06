@@ -176,7 +176,7 @@ async def handle_ui(args):
     
     try:
         if args.mode == "tui":
-            manager.start_tui()
+            await manager.start_tui()
         elif args.mode == "web":
             await manager.start_web(args.host, args.port)
         elif args.mode == "api":
