@@ -348,7 +348,7 @@ toml = [
 [[package]]
 name = "dev-bot"
 version = "2.0.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "pyyaml" },
     { name = "textual", version = "0.73.0", source = { registry = "https://mirrors.huaweicloud.com/repository/pypi/simple" }, marker = "python_full_version < '3.8.1'" },

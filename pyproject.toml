@@ -4,7 +4,7 @@ version = "2.0.0"
 description = "Dev-Bot - AI 驱动开发工具集（包含 Spec Driven Development 工具）"
 readme = "README.md"
 requires-python = ">=3.8"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "Adam Ikari"}
 ]
@@ -12,7 +12,6 @@ keywords = ["ai", "automation", "development", "agent", "sdd", "spec-driven"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
@@ -34,7 +33,10 @@ dev = [
 ]
 
 [project.scripts]
-dev-bot = "dev_bot.__main__:main"
+dev-bot = "dev_bot.__main__:cli"
+
+[tool.setuptools]
+packages = ["dev_bot"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["dev_bot"]
@@ -45,6 +47,9 @@ dev = [
     "pytest-cov>=4.1.0,<6.0",
     "ruff>=0.1.0,<1.0",
 ]
+
+[tool.uv]
+package = true
 
 [tool.ruff]
 line-length = 100
