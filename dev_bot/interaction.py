@@ -362,7 +362,7 @@ class TUILayer(InteractionLayer):
             self.guardian_status = None
     
     async def _connect_to_ipc_server(self):
-        """连接到 IPC Server"""
+        """连接到 IPC Server（带重试机制）"""
         try:
             from dev_bot.ipc_realtime import IPCClient, IPCMessageType
             
@@ -373,24 +373,39 @@ class TUILayer(InteractionLayer):
             self.ipc_client.on(IPCMessageType.PROCESS_STATUS, self._on_process_status)
             self.ipc_client.on(IPCMessageType.PROCESS_EXIT, self._on_process_exit)
             
-            # 连接到服务器
-            if await self.ipc_client.connect():
-                # 发送注册消息
-                from dev_bot.ipc_realtime import IPCMessage
-                register_msg = IPCMessage(
-                    message_type=IPCMessageType.PROCESS_REGISTER,
-                    data={
-                        "process_id": "tui",
-                        "type": "tui",
-                        "pid": self.repl.pid if hasattr(self.repl, 'pid') else None
-                    },
-                    source="tui"
-                )
-                await self.ipc_client.send(register_msg)
-                
-                print(f"[TUI] ✓ 已连接到 IPC Server")
-            else:
-                print(f"[TUI] ⚠ 无法连接到 IPC Server，使用文件模式")
+            # 重试连接（最多 5 次，每次间隔 1 秒）
+            max_retries = 5
+            for attempt in range(max_retries):
+                try:
+                    # 检查 socket 文件是否存在
+                    if self.ipc_socket_path.exists():
+                        if await self.ipc_client.connect():
+                            # 发送注册消息
+                            from dev_bot.ipc_realtime import IPCMessage
+                            register_msg = IPCMessage(
+                                message_type=IPCMessageType.PROCESS_REGISTER,
+                                data={
+                                    "process_id": "tui",
+                                    "type": "tui",
+                                    "pid": self.repl.pid if hasattr(self.repl, 'pid') else None
+                                },
+                                source="tui"
+                            )
+                            await self.ipc_client.send(register_msg)
+                            
+                            print(f"[TUI] ✓ 已连接到 IPC Server")
+                            return
+                    
+                    # 如果连接失败，等待 1 秒后重试
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(1)
+                except Exception as e:
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(1)
+            
+            # 所有重试都失败
+            print(f"[TUI] ⚠ 无法连接到 IPC Server，使用文件模式")
+            self.ipc_client = None
         
         except Exception as e:
             print(f"[TUI] 连接 IPC Server 失败: {e}")

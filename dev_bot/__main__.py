@@ -198,9 +198,9 @@ async def handle_ui(args):
                 if guardian_process:
                     print(f"[系统] ✓ AI 守护已启动 (PID: {guardian_process.pid})")
                     
-                    # 等待 AI 守护初始化（启动 AI 实例需要时间）
+                    # 等待 AI 守护初始化（启动 IPC Server 和 AI 实例需要时间）
                     print(f"[系统] 等待 AI 守护初始化后台进程...")
-                    await asyncio.sleep(5)
+                    await asyncio.sleep(8)  # 增加到 8 秒，确保 IPC Server 已启动
                 else:
                     print(f"[系统] ✗ AI 守护启动失败，继续运行但后台功能不可用")
             else:
@@ -222,7 +222,7 @@ async def handle_ui(args):
         # 停止 AI 守护进程
         if guardian_process and process_manager:
             try:
-                await process_manager.terminate_process("ai_guardian")
+                await process_manager.stop_process("ai_guardian")
                 print(f"[系统] AI 守护已停止")
             except Exception as e:
                 print(f"[系统] 警告: 停止 AI 守护时出错: {e}")
