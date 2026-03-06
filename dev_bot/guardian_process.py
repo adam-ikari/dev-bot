@@ -21,6 +21,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from dev_bot.ipc_realtime import IPCServer, IPCMessage, IPCMessageType
 from dev_bot.guardian import AIGuardian
 from dev_bot.guardian.core import DefaultHealthChecker, DefaultRecoveryStrategy
+from dev_bot.guardian.ai_recovery import AIRecoveryStrategy
+from dev_bot.iflow_manager import get_iflow_manager
 
 
 class GuardianProcess:
@@ -39,11 +41,27 @@ class GuardianProcess:
         self.dispatched_tasks = set()  # 已分发的任务ID
         self.last_dispatched_time = 0  # 最后分发时间
         
-        # 创建分层守护实例
+        # 初始化 iflow 管理器
+        self.iflow_manager = get_iflow_manager(
+            iflow_command="iflow",
+            default_timeout=300,
+            max_retries=3
+        )
+        
+        # 创建 AI 驱动的恢复策略
+        ai_recovery_strategy = AIRecoveryStrategy(
+            iflow_manager=self.iflow_manager,
+            project_root=Path.cwd()
+        )
+        
+        # 创建分层守护实例（使用 AI 恢复策略）
         self.ai_guardian = AIGuardian(
             check_interval=check_interval,
             config_file=config_file
         )
+        
+        # 设置 AI 恢复策略
+        self.ai_guardian.core_guardian.recovery_strategy = ai_recovery_strategy
         
         # 注册信号处理
         import signal

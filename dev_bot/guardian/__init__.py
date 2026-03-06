@@ -22,6 +22,8 @@ from .business import (
     AIGuardian
 )
 
+from .ai_recovery import AIRecoveryStrategy
+
 __all__ = [
     # 核心层
     'CoreGuardian',
@@ -35,5 +37,7 @@ __all__ = [
     'IdleTimeRule',
     'BusinessLogicLayer',
     # 整合层
-    'AIGuardian'
+    'AIGuardian',
+    # AI 恢复
+    'AIRecoveryStrategy'
 ]
