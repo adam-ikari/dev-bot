@@ -18,22 +18,20 @@ from typing import Dict, Any, Optional, List
 # 添加项目路径
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from dev_bot.ipc import IPCManager
 from dev_bot.ipc_realtime import IPCServer, IPCMessage, IPCMessageType
 from dev_bot.guardian import AIGuardian
 from dev_bot.guardian.core import DefaultHealthChecker, DefaultRecoveryStrategy
 
 
 class GuardianProcess:
-    """AI 守护进程（使用分层架构 + IPC）"""
+    """AI 守护进程（使用分层架构 + 实时 IPC）"""
     
     def __init__(self, check_interval: int = 30, config_file: Optional[Path] = None):
         self.check_interval = check_interval
         self.status_file = Path(".guardian-status.json")
-        self.ipc = IPCManager(Path.cwd())
         self.config_file = config_file
         
-        # IPC Server
+        # 实时 IPC Server
         self.ipc_server = None
         self.ipc_socket_path = Path.cwd() / ".ipc" / "guardian.sock"
         
@@ -125,9 +123,17 @@ class GuardianProcess:
         
         print(f"[守护进程] 进程注册: {process_id} ({process_type})")
         
-        # 可以在这里注册到守护进程管理
-        # 目前暂时只记录
-        self.ipc.write_log("guardian", "info", f"进程注册: {process_id} ({process_type}) from {client_id}")
+        # 通过实时IPC广播日志消息
+        if self.ipc_server:
+            log_msg = IPCMessage(
+                message_type=IPCMessageType.LOG_INFO,
+                data={
+                    "source": "guardian",
+                    "message": f"进程注册: {process_id} ({process_type}) from {client_id}"
+                },
+                source="guardian"
+            )
+            await self.ipc_server.broadcast(log_msg)
     
     async def _handle_process_status(self, client_id: str, message: IPCMessage):
         """处理进程状态更新消息"""
@@ -136,8 +142,17 @@ class GuardianProcess:
         
         print(f"[守护进程] 进程状态更新: {process_id} -> {status}")
         
-        # 可以在这里更新进程状态
-        self.ipc.write_log("guardian", "info", f"进程状态: {process_id} -> {status}")
+        # 通过实时IPC广播日志消息
+        if self.ipc_server:
+            log_msg = IPCMessage(
+                message_type=IPCMessageType.LOG_INFO,
+                data={
+                    "source": "guardian",
+                    "message": f"进程状态: {process_id} -> {status}"
+                },
+                source="guardian"
+            )
+            await self.ipc_server.broadcast(log_msg)
     
     async def _handle_process_exit(self, client_id: str, message: IPCMessage):
         """处理进程退出消息"""
@@ -146,8 +161,17 @@ class GuardianProcess:
         
         print(f"[守护进程] 进程退出: {process_id} (退出码: {exit_code})")
         
-        # 可以在这里触发重启逻辑
-        self.ipc.write_log("guardian", "warning", f"进程退出: {process_id} (退出码: {exit_code})")
+        # 通过实时IPC广播日志消息
+        if self.ipc_server:
+            log_msg = IPCMessage(
+                message_type=IPCMessageType.LOG_WARNING,
+                data={
+                    "source": "guardian",
+                    "message": f"进程退出: {process_id} (退出码: {exit_code})"
+                },
+                source="guardian"
+            )
+            await self.ipc_server.broadcast(log_msg)
     
     async def _handle_system_command(self, client_id: str, message: IPCMessage):
         """处理系统命令"""
