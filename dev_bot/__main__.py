@@ -190,7 +190,7 @@ async def handle_ui(args):
                 guardian_process = await process_manager.create_process(
                     process_id="ai_guardian",
                     script_path=guardian_script,
-                    args=[],
+                    args=["standalone", "30"],  # 传递模式和检查间隔
                     cwd=Path.cwd(),
                     use_new_session=True  # AI 守护在新的会话中运行
                 )
