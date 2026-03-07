@@ -402,7 +402,6 @@ class DevBotTUI(App):
                 LogView(id="log-view"),
                 id="log-container"
             ),
-            ContentPanel(id="content-panel"),
             id="main-container"
         )
         yield Horizontal(
@@ -414,13 +413,13 @@ class DevBotTUI(App):
     def on_mount(self) -> None:
         log_view = self.query_one("#log-view", RichLog)
         status_bar = self.query_one("#status-bar", StatusBar)
-        content_panel = self.query_one("#content-panel", ContentPanel)
+        # content_panel = self.query_one("#content-panel", ContentPanel)
 
         status_bar.start_time = self.start_time
         status_bar.set_status("running")
         status_bar.set_message("AI 正在自主工作")
 
-        self.ai_controller.set_content_panel(content_panel)
+        # self.ai_controller.set_content_panel(content_panel)
 
         log_view.write("[bold cyan]╔══════════════════════════════════════════════════════════════╗[/bold cyan]")
         log_view.write("[bold cyan]║  🤖 Dev-Bot v2.0 - AI 驱动的自主开发工具                        ║[/bold cyan]")
@@ -524,6 +523,33 @@ class DevBotTUI(App):
                 self.ai_controller.handle_ai_command(command)
             except json.JSONDecodeError:
                 pass
+
+    def show_popup(self, title: str, content: str) -> None:
+        """显示弹窗"""
+        from textual.widgets import ModalScreen
+        
+        class PopupScreen(ModalScreen):
+            def __init__(self, app, title, content):
+                super().__init__()
+                self.app_instance = app
+                self.title_text = title
+                self.content_text = content
+            
+            def compose(self):
+                from textual.containers import Vertical, Horizontal
+                from textual.widgets import Button, Static
+                
+                with Vertical():
+                    yield Static(self.title_text, id="popup-title")
+                    yield Static(self.content_text, id="popup-content")
+                    with Horizontal():
+                        yield Button("关闭", id="close-btn", variant="primary")
+            
+            def on_button_pressed(self, event: Button.Pressed) -> None:
+                if event.button.id == "close-btn":
+                    self.app_instance.pop_screen()
+        
+        self.push_screen(PopupScreen(self, title, content))
 
     async def _auto_ai_loop(self) -> None:
         """自动 AI 循环 - 独立运行，不依赖用户输入"""
