@@ -283,10 +283,12 @@ class DevBotTUI(App):
         background: $primary;
         color: $text;
         text-style: bold;
+        height: 1;
     }
 
     #main-container {
         height: 1fr;
+        min-height: 10;
     }
 
     #log-container {
@@ -307,9 +309,8 @@ class DevBotTUI(App):
     }
 
     #bottom-panel {
-        height: auto;
+        height: 3;
         border: solid yellow;
-        min-height: 3;
     }
 
     #spec-container {
@@ -392,7 +393,6 @@ class DevBotTUI(App):
             REPLView(on_submit=self._handle_repl_input, id="repl-container"),
             id="bottom-panel"
         )
-        yield Footer()
 
     def on_mount(self) -> None:
         log_view = self.query_one("#log-view", RichLog)
