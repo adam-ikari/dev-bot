@@ -104,15 +104,13 @@ class MonitorPanel(Static):
         elapsed = datetime.now() - self.app.start_time if hasattr(self.app, 'start_time') else timedelta()
         elapsed_str = str(elapsed).split(".")[0]
         
-        content = f"""📊 监控
-━━━━━━━━━━━━
-CPU: {cpu_percent}%
-{"█" * int(cpu_percent // 5)}{" " * (20 - int(cpu_percent // 5))}
+        content = f"""CPU: {cpu_percent}%
+{"█" * int(cpu_percent // 5)}{" " * (15 - int(cpu_percent // 5))}
 
-内存: {memory_mb:.0f} MB / 2048 MB
-{"█" * int((memory_mb / 2048) * 20)}
+MEM: {memory_mb:.0f} MB
+{"█" * int((memory_mb / 2048) * 15)}
 
-⏱️ 运行时间: {elapsed_str}"""
+⏱ {elapsed_str}"""
         
         self.update(content)
 
@@ -298,25 +296,24 @@ class DevBotTUI(App):
     }
 
     #monitor-panel {
-        width: 20;
+        width: 15;
         border: solid blue;
-        padding: 0 1;
+        padding: 0 0;
     }
 
     #content-panel {
-        width: 30;
+        width: 20;
         border: solid cyan;
-        padding: 0 1;
+        padding: 0 0;
     }
 
     #bottom-panel {
-        height: 5;
+        height: 3;
         border: solid yellow;
     }
 
     #spec-container {
         width: 35%;
-        border-right: solid yellow;
     }
 
     #repl-container {
@@ -324,35 +321,35 @@ class DevBotTUI(App):
     }
 
     #spec-content {
-        padding: 0 1;
+        padding: 0 0;
     }
 
     .spec-label {
-        padding: 0 1;
+        padding: 0 0;
         text-style: bold;
     }
 
     .component-title {
-        padding: 0 1;
+        padding: 0 0;
         text-style: bold;
-        margin-bottom: 1;
+        margin-bottom: 0;
     }
 
     .checklist-item {
-        padding: 0 1;
+        padding: 0 0;
     }
 
     .tree-item {
-        padding: 0 1;
+        padding: 0 0;
     }
 
     .card-item {
-        padding: 0 1;
+        padding: 0 0;
     }
 
     .metric-item {
-        padding: 0 1;
-        margin-bottom: 1;
+        padding: 0 0;
+        margin-bottom: 0;
     }
 
     RichLog {
