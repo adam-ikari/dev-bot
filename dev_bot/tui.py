@@ -309,7 +309,7 @@ class DevBotTUI(App):
     #bottom-panel {
         height: auto;
         border: solid yellow;
-        min-height: 8;
+        min-height: 3;
     }
 
     #spec-container {
