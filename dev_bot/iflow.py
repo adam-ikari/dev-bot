@@ -2,6 +2,7 @@
 """iflow 调用器"""
 
 import asyncio
+import os
 import sys
 import signal as signal_module
 import resource
