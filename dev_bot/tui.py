@@ -372,7 +372,6 @@ class DevBotTUI(App):
         self.memory_system = get_memory_system()
         self.memory = self.memory_system.load_context()
         self.iteration_count = 0
-        self.is_running = False
         self.is_paused = False
         self.task = None
         self.start_time = datetime.now()
