@@ -309,7 +309,7 @@ class DevBotTUI(App):
     }
 
     #bottom-panel {
-        height: 3;
+        height: 5;
         border: solid yellow;
     }
 
