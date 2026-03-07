@@ -373,8 +373,7 @@ class DevBotTUI(App):
         self.iteration_count = 0
         self.ai_iteration_count = 0
         self.is_paused = False
-        self.ai_loop_stopped = False  # AI 循环是否因错误停止
-        self.iflow_available = False  # iflow 是否可用
+        self.ai_loop_stopped = False
         self.start_time = datetime.now()
         self.ai_controller = AIContentController(self)
 
@@ -401,116 +400,18 @@ class DevBotTUI(App):
         content_panel = self.query_one("#content-panel", ContentPanel)
 
         status_bar.start_time = self.start_time
+        status_bar.set_status("running")
+        status_bar.set_message("AI 正在自主工作")
+
         self.ai_controller.set_content_panel(content_panel)
 
         log_view.write("[bold cyan]╔══════════════════════════════════════════════════════════════╗[/bold cyan]")
         log_view.write("[bold cyan]║  🤖 Dev-Bot v2.0 - AI 驱动的自主开发工具                        ║[/bold cyan]")
         log_view.write("[bold cyan]╚══════════════════════════════════════════════════════════════╝[/bold cyan]")
         log_view.write("")
-        log_view.write("[yellow]正在检查 iflow 状态...[/yellow]")
 
-        # 测试 iflow 是否可用
-        asyncio.create_task(self._check_iflow_available())
-
-    async def _check_iflow_available(self) -> None:
-        """检查 iflow 是否可用"""
-        log_view = self.query_one("#log-view", RichLog)
-        status_bar = self.query_one("#status-bar", StatusBar)
-
-        try:
-            # 发送一个简单的测试指令
-            result = await self.iflow.call("Hello, test iflow availability.")
-            
-            # 如果成功，iflow 可用
-            self.iflow_available = True
-            status_bar.set_status("running")
-            status_bar.set_message("AI 正在自主工作")
-            
-            log_view.write("[bold green]✓ iflow 可用，AI 功能正常[/bold green]")
-            log_view.write("")
-            log_view.write("[yellow]快捷键:[/yellow]")
-            log_view.write("  [q] 退出    [Space] 暂停/继续    [c] 清空日志    [h] 帮助")
-            log_view.write("")
-            log_view.write("[dim]提示: AI 正在自主工作，您可以随时输入指令[/dim]")
-            log_view.write("")
-            
-            # 启动 AI 自动分析任务
-            self.set_interval(1, self._auto_ai_loop)
-            
-        except IflowMemoryError as e:
-            self.iflow_available = False
-            status_bar.set_status("stopped")
-            status_bar.set_message("iflow 无法启动")
-            
-            log_view.write("[red]❌ iflow 无法启动 - 内存不足[/red]")
-            log_view.write("")
-            log_view.write("[bold]⚠️  AI 功能已禁用[/bold]")
-            log_view.write("[dim]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/dim]")
-            log_view.write("[yellow]当前状态:[/yellow]")
-            log_view.write("  • TUI 界面正常工作")
-            log_view.write("  • AI 决策功能已禁用")
-            log_view.write("  • 所有 AI 相关操作都会失败")
-            log_view.write("")
-            log_view.write("[yellow]解决方案:[/yellow]")
-            log_view.write("  1. 关闭其他应用程序释放内存")
-            log_view.write("  2. 重启 Dev-Bot")
-            log_view.write("  3. 或增加系统内存")
-            log_view.write("")
-            log_view.write("[yellow]错误详情:[/yellow]")
-            log_view.write(f"  {e}")
-            log_view.write("")
-            log_view.write("[dim]提示: 解决内存问题后，按 [q] 退出并重新启动 Dev-Bot[/dim]")
-            log_view.write("")
-            
-            self.ai_loop_stopped = True
-            
-        except IflowTokenExpiredError as e:
-            self.iflow_available = False
-            status_bar.set_status("stopped")
-            status_bar.set_message("iflow 令牌过期")
-            
-            log_view.write("[red]❌ iflow 令牌已过期[/red]")
-            log_view.write("")
-            log_view.write("[bold]⚠️  AI 功能已禁用[/bold]")
-            log_view.write("[dim]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/dim]")
-            log_view.write("[yellow]当前状态:[/yellow]")
-            log_view.write("  • TUI 界面正常工作")
-            log_view.write("  • AI 决策功能已禁用")
-            log_view.write("  • 所有 AI 相关操作都会失败")
-            log_view.write("")
-            log_view.write("[yellow]解决方案:[/yellow]")
-            log_view.write("  1. 在另一个终端执行: iflow auth")
-            log_view.write("  2. 按 [q] 退出并重新启动 Dev-Bot")
-            log_view.write("")
-            log_view.write("[yellow]错误详情:[/yellow]")
-            log_view.write(f"  {e}")
-            log_view.write("")
-            log_view.write("[dim]提示: 重新授权后，按 [q] 退出并重新启动 Dev-Bot[/dim]")
-            log_view.write("")
-            
-            self.ai_loop_stopped = True
-            
-        except Exception as e:
-            self.iflow_available = False
-            status_bar.set_status("stopped")
-            status_bar.set_message("iflow 不可用")
-            
-            log_view.write("[red]❌ iflow 不可用[/red]")
-            log_view.write("")
-            log_view.write("[bold]⚠️  AI 功能已禁用[/bold]")
-            log_view.write("[dim]━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[/dim]")
-            log_view.write("[yellow]当前状态:[/yellow]")
-            log_view.write("  • TUI 界面正常工作")
-            log_view.write("  • AI 决策功能已禁用")
-            log_view.write("  • 所有 AI 相关操作都会失败")
-            log_view.write("")
-            log_view.write("[yellow]错误详情:[/yellow]")
-            log_view.write(f"  {e}")
-            log_view.write("")
-            log_view.write("[dim]提示: 解决问题后，按 [q] 退出并重新启动 Dev-Bot[/dim]")
-            log_view.write("")
-            
-            self.ai_loop_stopped = True
+        # 启动 AI 自动分析任务
+        self.set_interval(1, self._auto_ai_loop)
 
     async def _handle_repl_input(self, prompt: str) -> None:
         """处理 REPL 输入 - 用户指令，不影响 AI 自主工作"""
@@ -518,12 +419,6 @@ class DevBotTUI(App):
         log_view.write(f"[bold cyan]> 用户指令: {prompt}[/bold cyan]")
 
         self.memory_system.add_history_entry("user_input", prompt)
-
-        # 检查 iflow 是否可用
-        if not self.iflow_available:
-            log_view.write("[red]❌ iflow 不可用，无法处理指令[/red]")
-            log_view.write("[dim]提示: 解决问题后按 [q] 退出并重新启动 Dev-Bot[/dim]")
-            return
 
         # 检查是否是 restart 命令
         if prompt.strip().lower() == "restart":
@@ -608,10 +503,6 @@ class DevBotTUI(App):
         
         # 如果 AI 循环因错误停止，不再继续
         if self.ai_loop_stopped:
-            return
-        
-        # 如果 iflow 不可用，不继续执行
-        if not self.iflow_available:
             return
 
         self.ai_iteration_count += 1
