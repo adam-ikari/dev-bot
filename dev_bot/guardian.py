@@ -452,8 +452,8 @@ class Guardian:
             
             logger.info(f"🤖 AI 正在分析错误（超时: {timeout} 秒）...")
             
-            # 调用 AI 分析（已设置超时）
-            result = self.iflow.call(prompt)
+            # 调用 AI 分析（使用 asyncio.run 来运行异步调用）
+            result = asyncio.run(self.iflow.call(prompt))
             logger.info(f"AI 分析结果: {result[:200]}...")
             
             # 检查是否修复成功
