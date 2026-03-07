@@ -398,12 +398,12 @@ class DevBotTUI(App):
         log_view = self.query_one("#log-view", RichLog)
         status_bar = self.query_one("#status-bar", StatusBar)
         content_panel = self.query_one("#content-panel", ContentPanel)
-        
+
         status_bar.start_time = self.start_time
         status_bar.update_display()
-        
+
         self.ai_controller.set_content_panel(content_panel)
-        
+
         log_view.write("[bold cyan]╔══════════════════════════════════════════════════════════════╗[/bold cyan]")
         log_view.write("[bold cyan]║  🤖 Dev-Bot v2.0 - AI 驱动的自主开发工具                        ║[/bold cyan]")
         log_view.write("[bold cyan]╚══════════════════════════════════════════════════════════════╝[/bold cyan]")
@@ -412,8 +412,11 @@ class DevBotTUI(App):
         log_view.write("[yellow]快捷键:[/yellow]")
         log_view.write("  [q] 退出    [Space] 暂停/继续    [c] 清空日志    [h] 帮助")
         log_view.write("")
-        log_view.write("[dim]提示: 输入指令开始使用[/dim]")
+        log_view.write("[dim]提示: 输入指令开始使用，或等待 AI 自动分析[/dim]")
         log_view.write("")
+
+        # 启动 AI 自动分析任务
+        self.set_interval(1, self._auto_ai_loop)
 
     async def _handle_repl_input(self, prompt: str) -> None:
         """处理 REPL 输入"""
@@ -454,6 +457,79 @@ class DevBotTUI(App):
                 self.ai_controller.handle_ai_command(command)
             except json.JSONDecodeError:
                 pass
+
+    async def _auto_ai_loop(self) -> None:
+        """自动 AI 循环 - 定期进行决策分析"""
+        if self.is_paused:
+            return
+
+        # 每 10 次迭代进行一次分析
+        if self.iteration_count % 10 != 0:
+            return
+
+        log_view = self.query_one("#log-view", RichLog)
+        log_view.write("[yellow]🔄 开始 AI 自动分析...[/yellow]")
+
+        # 构建 AI 提示
+        project_path = Path.cwd()
+        memory_summary = self.memory_system.get_context_summary()
+
+        prompt = f"""你是 Dev-Bot，一个 AI 驱动的自主开发代理。
+
+## 项目信息
+- 项目路径: {project_path}
+- 技术栈: Python 3.9+, asyncio
+- 代码风格: PEP 8, 4空格缩进
+
+## 你的使命
+分析当前项目 → 做出决策 → 执行开发 → 验证结果 → 继续改进
+
+## 当前状态
+{memory_summary}
+
+## 工作原则
+1. 先分析，后行动 - 每次修改前先阅读相关代码
+2. 小步快跑，频繁验证 - 每次只修改一个功能点
+3. 遇到错误立即停止 - 分析错误原因，不要盲目重试
+4. 修改代码后必须测试 - 使用 pytest 运行相关测试
+5. 代码审查 - 修改后检查是否引入新问题
+
+## 输出格式
+每次输出必须包含：
+- [分析] 当前状态、问题分析、相关文件
+- [决策] 计划做什么、为什么这样做
+- [执行] 具体操作步骤、修改的文件和行号
+- [验证] 测试方法、测试结果
+- [结论] 成功/失败、影响范围、下一步计划
+
+## 停止条件
+当以下情况时停止：
+- 所有功能已实现且测试通过
+- 连续3次遇到相同错误无法解决
+- 需要用户决策或输入
+- 接收到停止信号
+
+现在开始分析当前项目！
+"""
+
+        try:
+            result = await self.iflow.call(prompt)
+            log_view.write(result)
+
+            # 记录到历史
+            self.memory_system.add_history_entry("ai_analysis", result[:200])
+
+            # 解析展示命令
+            self._parse_ai_display_command(result)
+
+            # 更新迭代计数
+            self.iteration_count += 1
+            status_bar = self.query_one("#status-bar", StatusBar)
+            status_bar.set_iteration(self.iteration_count)
+
+        except Exception as e:
+            log_view.write(f"[red]AI 分析失败: {e}[/red]")
+            self.memory_system.add_history_entry("error", str(e))
 
     def action_toggle_pause(self) -> None:
         """切换暂停状态"""
