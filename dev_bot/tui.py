@@ -460,9 +460,7 @@ class DevBotTUI(App):
             
             self.memory_system.add_history_entry("error", f"令牌过期: {e}")
         except IflowMemoryError as e:
-            log_view.write("[red]内存不足: iflow 进程内存不足[/red]")
-            log_view.write("建议: 关闭其他应用、增加系统内存")
-            log_view.write("修复后输入: restart")
+            log_view.write("[red]内存不足: iflow 进程内存不足[/red] [dim]修复后输入: restart[/dim]")
             
             self.ai_loop_stopped = True
             status_bar = self.query_one("#status-bar", StatusBar)
@@ -575,9 +573,7 @@ class DevBotTUI(App):
             
             self.memory_system.add_history_entry("error", f"令牌过期: {e}")
         except IflowMemoryError as e:
-            log_view.write("[red]内存不足: iflow 进程内存不足[/red]")
-            log_view.write("建议: 关闭其他应用、增加系统内存")
-            log_view.write("修复后输入: restart")
+            log_view.write("[red]内存不足: iflow 进程内存不足[/red] [dim]修复后输入: restart[/dim]")
             
             self.ai_loop_stopped = True
             status_bar = self.query_one("#status-bar", StatusBar)
