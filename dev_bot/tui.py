@@ -31,7 +31,8 @@ from textual.widgets import (
 from textual import events
 from textual.reactive import reactive
 
-from dev_bot import IflowCaller, IflowError, get_memory_system
+from dev_bot import IflowCaller, get_memory_system
+from dev_bot.iflow import IflowError, IflowTokenExpiredError
 
 
 class StatusBar(Static):
@@ -439,6 +440,19 @@ class DevBotTUI(App):
             # 尝试解析 AI 返回中的展示命令
             self._parse_ai_display_command(result)
 
+        except IflowTokenExpiredError as e:
+            log_view.write(f"[red]❌ iflow 令牌过期[/red]")
+            log_view.write("[yellow]请执行以下命令重新授权:[/yellow]")
+            log_view.write("[bold cyan]  iflow auth[/bold cyan]")
+            log_view.write("")
+            log_view.write("[dim]授权后按 [Space] 继续 AI 工作[/dim]")
+            
+            self.is_paused = True
+            status_bar = self.query_one("#status-bar", StatusBar)
+            status_bar.set_status("paused")
+            status_bar.set_message("令牌过期，需要重新授权")
+            
+            self.memory_system.add_history_entry("error", f"令牌过期: {e}")
         except IflowError as e:
             log_view.write(f"[red]错误: {e}[/red]")
             self.memory_system.add_history_entry("error", str(e))
@@ -526,6 +540,19 @@ class DevBotTUI(App):
             status_bar = self.query_one("#status-bar", StatusBar)
             status_bar.set_iteration(self.ai_iteration_count)
 
+        except IflowTokenExpiredError as e:
+            log_view.write(f"[red]❌ iflow 令牌过期[/red]")
+            log_view.write("[yellow]请执行以下命令重新授权:[/yellow]")
+            log_view.write("[bold cyan]  iflow auth[/bold cyan]")
+            log_view.write("")
+            log_view.write("[dim]授权后按 [Space] 继续 AI 工作[/dim]")
+            
+            self.is_paused = True
+            status_bar = self.query_one("#status-bar", StatusBar)
+            status_bar.set_status("paused")
+            status_bar.set_message("令牌过期，需要重新授权")
+            
+            self.memory_system.add_history_entry("error", f"令牌过期: {e}")
         except Exception as e:
             log_view.write(f"[red]AI 分析失败: {e}[/red]")
             self.memory_system.add_history_entry("error", str(e))

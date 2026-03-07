@@ -22,6 +22,10 @@ class IflowProcessError(IflowError):
     """Iflow 进程错误"""
 
 
+class IflowTokenExpiredError(IflowError):
+    """Iflow 令牌过期错误"""
+
+
 class IflowCaller:
     """iflow 命令行工具的异步调用器"""
     
@@ -95,6 +99,25 @@ class IflowCaller:
             
             if self.process.returncode != 0:
                 error_msg = stderr.decode('utf-8', errors='replace') if stderr else "Unknown error"
+                
+                # 检测令牌过期错误
+                token_expired_keywords = [
+                    "token expired",
+                    "authentication failed",
+                    "unauthorized",
+                    "401",
+                    "token invalid",
+                    "token refresh",
+                    "access token expired"
+                ]
+                
+                error_msg_lower = error_msg.lower()
+                if any(keyword in error_msg_lower for keyword in token_expired_keywords):
+                    raise IflowTokenExpiredError(
+                        f"iflow token expired: {error_msg}. "
+                        f"Please re-run 'iflow auth' to refresh your token."
+                    )
+                
                 raise IflowProcessError(f"iflow exited with code {self.process.returncode}: {error_msg}")
             
             return stdout.decode('utf-8', errors='replace')

@@ -243,7 +243,12 @@ class Guardian:
     async def run_ai_loop(self) -> None:
         """运行 AI 循环（统一的 AI 循环进程管理）"""
         from dev_bot import IflowCaller, get_memory_system
-        from dev_bot.iflow import IflowError, IflowTimeoutError, IflowProcessError
+        from dev_bot.iflow import (
+            IflowError,
+            IflowTimeoutError,
+            IflowProcessError,
+            IflowTokenExpiredError
+        )
         from pathlib import Path
         import os
         
@@ -348,6 +353,25 @@ class Guardian:
                 except IflowProcessError as e:
                     logger.error(f"AI 进程错误: {e}")
                     memory_system.add_history_entry("error", f"AI 进程错误: {e}")
+                except IflowTokenExpiredError as e:
+                    logger.error(f"❌ iflow 令牌过期: {e}")
+                    logger.error("=" * 50)
+                    logger.error("请执行以下命令重新授权:")
+                    logger.error("  iflow auth")
+                    logger.error("=" * 50)
+                    memory_system.add_history_entry("error", f"令牌过期: {e}")
+                    
+                    # 令牌过期后停止循环，等待用户重新授权
+                    print("\n" + "=" * 60)
+                    print("⚠️  iflow 令牌已过期")
+                    print("=" * 60)
+                    print("请执行以下命令重新授权:")
+                    print("  iflow auth")
+                    print("=" * 60)
+                    print("\nAI 循环已暂停，请重新授权后手动重启")
+                    
+                    self.ai_loop_running = False
+                    break
                 except IflowError as e:
                     logger.error(f"AI Iflow 错误: {e}")
                     memory_system.add_history_entry("error", f"AI Iflow 错误: {e}")
