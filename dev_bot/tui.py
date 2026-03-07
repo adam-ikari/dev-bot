@@ -373,6 +373,7 @@ class DevBotTUI(App):
         self.memory_system = get_memory_system()
         self.memory = self.memory_system.load_context()
         self.iteration_count = 0
+        self.ai_iteration_count = 0
         self.is_paused = False
         self.start_time = datetime.now()
         self.ai_controller = AIContentController(self)
@@ -400,7 +401,8 @@ class DevBotTUI(App):
         content_panel = self.query_one("#content-panel", ContentPanel)
 
         status_bar.start_time = self.start_time
-        status_bar.update_display()
+        status_bar.set_status("running")
+        status_bar.set_message("AI 正在自主工作")
 
         self.ai_controller.set_content_panel(content_panel)
 
@@ -412,32 +414,31 @@ class DevBotTUI(App):
         log_view.write("[yellow]快捷键:[/yellow]")
         log_view.write("  [q] 退出    [Space] 暂停/继续    [c] 清空日志    [h] 帮助")
         log_view.write("")
-        log_view.write("[dim]提示: 输入指令开始使用，或等待 AI 自动分析[/dim]")
+        log_view.write("[dim]提示: AI 正在自主工作，您可以随时输入指令[/dim]")
         log_view.write("")
 
         # 启动 AI 自动分析任务
         self.set_interval(1, self._auto_ai_loop)
 
     async def _handle_repl_input(self, prompt: str) -> None:
-        """处理 REPL 输入"""
+        """处理 REPL 输入 - 用户指令，不影响 AI 自主工作"""
         log_view = self.query_one("#log-view", RichLog)
-        log_view.write(f"[bold cyan]> {prompt}[/bold cyan]")
-        
+        log_view.write(f"[bold cyan]> 用户指令: {prompt}[/bold cyan]")
+
         self.memory_system.add_history_entry("user_input", prompt)
-        
+
         try:
             result = await self.iflow.call(prompt)
             log_view.write(result)
-            
+
             self.memory_system.add_history_entry("ai_output", result[:200])
-            
-            self.iteration_count += 1
-            status_bar = self.query_one("#status-bar", StatusBar)
-            status_bar.set_iteration(self.iteration_count)
-            
+
+            # 用户输入不影响 AI 迭代计数
+            # AI 继续自主工作
+
             # 尝试解析 AI 返回中的展示命令
             self._parse_ai_display_command(result)
-            
+
         except IflowError as e:
             log_view.write(f"[red]错误: {e}[/red]")
             self.memory_system.add_history_entry("error", str(e))
@@ -459,16 +460,13 @@ class DevBotTUI(App):
                 pass
 
     async def _auto_ai_loop(self) -> None:
-        """自动 AI 循环 - 定期进行决策分析"""
+        """自动 AI 循环 - 独立运行，不依赖用户输入"""
         if self.is_paused:
             return
 
-        # 每 10 次迭代进行一次分析
-        if self.iteration_count % 10 != 0:
-            return
-
+        self.ai_iteration_count += 1
         log_view = self.query_one("#log-view", RichLog)
-        log_view.write("[yellow]🔄 开始 AI 自动分析...[/yellow]")
+        log_view.write(f"[yellow]🔄 AI 分析 #{self.ai_iteration_count}[/yellow]")
 
         # 构建 AI 提示
         project_path = Path.cwd()
@@ -480,6 +478,7 @@ class DevBotTUI(App):
 - 项目路径: {project_path}
 - 技术栈: Python 3.9+, asyncio
 - 代码风格: PEP 8, 4空格缩进
+- 当前迭代: #{self.ai_iteration_count}
 
 ## 你的使命
 分析当前项目 → 做出决策 → 执行开发 → 验证结果 → 继续改进
@@ -493,6 +492,7 @@ class DevBotTUI(App):
 3. 遇到错误立即停止 - 分析错误原因，不要盲目重试
 4. 修改代码后必须测试 - 使用 pytest 运行相关测试
 5. 代码审查 - 修改后检查是否引入新问题
+6. 完全自主工作 - 不需要用户干预，自己决策、自己执行
 
 ## 输出格式
 每次输出必须包含：
@@ -509,7 +509,7 @@ class DevBotTUI(App):
 - 需要用户决策或输入
 - 接收到停止信号
 
-现在开始分析当前项目！
+现在开始自主分析和工作！
 """
 
         try:
@@ -522,10 +522,9 @@ class DevBotTUI(App):
             # 解析展示命令
             self._parse_ai_display_command(result)
 
-            # 更新迭代计数
-            self.iteration_count += 1
+            # 更新迭代计数显示
             status_bar = self.query_one("#status-bar", StatusBar)
-            status_bar.set_iteration(self.iteration_count)
+            status_bar.set_iteration(self.ai_iteration_count)
 
         except Exception as e:
             log_view.write(f"[red]AI 分析失败: {e}[/red]")
@@ -534,15 +533,18 @@ class DevBotTUI(App):
     def action_toggle_pause(self) -> None:
         """切换暂停状态"""
         self.is_paused = not self.is_paused
-        
+
         status_bar = self.query_one("#status-bar", StatusBar)
+        log_view = self.query_one("#log-view", RichLog)
+
         if self.is_paused:
             status_bar.set_status("paused")
-            log_view = self.query_one("#log-view", RichLog)
-            log_view.write("[yellow]⏸️ 已暂停[/yellow]")
+            status_bar.set_message("已暂停")
+            log_view.write("[yellow]⏸️ AI 已暂停[/yellow]")
         else:
             status_bar.set_status("running")
-            log_view.write("[green]▶️ 继续运行[/green]")
+            status_bar.set_message("AI 正在自主工作")
+            log_view.write("[green]▶️ AI 继续工作[/green]")
 
     def action_clear_log(self) -> None:
         """清空日志"""
