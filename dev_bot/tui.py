@@ -104,11 +104,15 @@ class MonitorPanel(Static):
         elapsed = datetime.now() - self.app.start_time if hasattr(self.app, 'start_time') else timedelta()
         elapsed_str = str(elapsed).split(".")[0]
         
-        content = f"""CPU: {cpu_percent}%
-{"█" * int(cpu_percent // 5)}{" " * (15 - int(cpu_percent // 5))}
+        # 限制进度条长度，避免溢出
+        cpu_bar_length = min(15, int(cpu_percent // 5))
+        memory_bar_length = min(15, int((memory_mb / 2048) * 15))
+        
+        content = f"""CPU: {cpu_percent:5.1f}%
+{"█" * cpu_bar_length}{" " * (15 - cpu_bar_length)}
 
-MEM: {memory_mb:.0f} MB
-{"█" * int((memory_mb / 2048) * 15)}
+MEM: {memory_mb:6.0f} MB
+{"█" * memory_bar_length}{" " * (15 - memory_bar_length)}
 
 ⏱ {elapsed_str}"""
         
@@ -285,26 +289,30 @@ class DevBotTUI(App):
         height: 1;
     }
 
+    #monitor-panel {
+        width: 20;
+        min-width: 18;
+
+        border: solid blue;
+        padding: 0 1;
+    }
+
     #main-container {
         height: 1fr;
-        min-height: 10;
     }
+
 
     #log-container {
         height: 1fr;
         border: solid green;
-    }
-
-    #monitor-panel {
-        width: 15;
-        border: solid blue;
-        padding: 0 0;
+        padding: 0 1;
     }
 
     #content-panel {
-        width: 20;
+        width: 30;
+        min-width: 30;
         border: solid cyan;
-        padding: 0 0;
+        padding: 0 1;
     }
 
     #bottom-panel {
