@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 class Guardian:
-    """守护系统 - 进程管理、健康监控和 AI 智能修复"""
+    """守护系统 - 统一管理所有 AI 循环进程"""
     
     def __init__(
         self,
@@ -30,7 +30,8 @@ class Guardian:
         cpu_threshold: int = 90,  # 90%
         disk_threshold: int = 90,  # 90%
         max_restarts: int = 5,
-        restart_delay: int = 10
+        restart_delay: int = 10,
+        ai_loop_interval: int = 1  # AI 循环间隔（秒）
     ):
         self.check_interval = check_interval
         self.memory_threshold = memory_threshold
@@ -38,8 +39,18 @@ class Guardian:
         self.disk_threshold = disk_threshold
         self.max_restarts = max_restarts
         self.restart_delay = restart_delay
+        self.ai_loop_interval = ai_loop_interval
+        
+        # 进程管理
         self.running = False
         self.restart_count = 0
+        
+        # AI 循环管理
+        self.ai_loop_running = False
+        self.ai_loop_task = None
+        self.ai_loop_iteration = 0
+        
+        # AI 修复
         self.iflow = None  # AI 呼叫器
     
     def run_process(self, command: list[str]) -> None:
@@ -211,6 +222,181 @@ class Guardian:
         
         except Exception as e:
             logger.error(f"健康检查失败: {e}")
+    
+    def stop(self) -> None:
+        """停止守护"""
+        self.running = False
+        logger.info("守护系统停止信号已发送")
+    
+    async def run_ai_loop(self) -> None:
+        """运行 AI 循环（统一的 AI 循环进程管理）"""
+        from dev_bot import IflowCaller, get_memory_system
+        from dev_bot.iflow import IflowError, IflowTimeoutError, IflowProcessError
+        from pathlib import Path
+        import os
+        
+        self.ai_loop_running = True
+        self.ai_loop_iteration = 0
+        
+        # 初始化记忆系统
+        memory_system = get_memory_system()
+        memory = memory_system.load_context()
+        
+        # 初始化 IflowCaller
+        if self.iflow is None:
+            self.iflow = IflowCaller()
+        
+        # 构建提示词
+        project_path = Path.cwd()
+        memory_summary = memory_system.get_context_summary()
+        
+        prompt = f"""你是 Dev-Bot，一个 AI 驱动的自主开发代理。
+
+## 项目信息
+- 项目路径: {project_path}
+- 技术栈: Python 3.9+, asyncio
+- 代码风格: PEP 8, 4空格缩进
+
+## 你的使命
+分析当前项目 → 做出决策 → 执行开发 → 验证结果 → 继续改进
+
+## 工作原则
+1. 先分析，后行动 - 每次修改前先阅读相关代码
+2. 小步快跑，频繁验证 - 每次只修改一个功能点
+3. 遇到错误立即停止 - 分析错误原因，不要盲目重试
+4. 修改代码后必须测试 - 使用 pytest 运行相关测试
+5. 代码审查 - 修改后检查是否引入新问题
+
+## 输出格式
+每次输出必须包含：
+- [分析] 当前状态、问题分析、相关文件
+- [决策] 计划做什么、为什么这样做
+- [执行] 具体操作步骤、修改的文件和行号
+- [验证] 测试方法、测试结果
+- [结论] 成功/失败、影响范围、下一步计划
+
+## 停止条件
+当以下情况时停止：
+- 所有功能已实现且测试通过
+- 连续3次遇到相同错误无法解决
+- 需要用户决策或输入
+- 接收到停止信号
+
+## 安全规则
+- 不要删除重要文件（如 .git/、venv/ 等）
+- 不要提交未经测试的代码
+- 不要修改配置文件（除非明确需要且有备份）
+- 不要运行危险的系统命令
+- 修改代码前先备份或使用 git commit
+
+## 错误处理
+- 遇到错误时，先阅读错误信息，分析原因
+- 检查相关代码和测试用例
+- 如果错误持续出现，记录错误并暂停
+- 不要无限重试相同的操作
+
+现在开始分析当前项目！
+
+{memory_summary}
+"""
+        
+        logger.info("=" * 50)
+        logger.info("AI 循环进程启动")
+        logger.info(f"循环间隔: {self.ai_loop_interval} 秒")
+        logger.info("=" * 50)
+        
+        # 记录启动到历史
+        memory_system.add_history_entry("ai_loop_start", "AI 循环启动")
+        
+        try:
+            while self.ai_loop_running:
+                self.ai_loop_iteration += 1
+                logger.info(f"=== AI 迭代 {self.ai_loop_iteration} ===")
+                
+                try:
+                    result = await self.iflow.call(prompt)
+                    print(result)
+                    logger.info(f"AI 迭代 {self.ai_loop_iteration} 完成")
+                    
+                    # 记录迭代到历史
+                    memory_system.add_history_entry(
+                        "ai_iteration",
+                        f"迭代 {self.ai_loop_iteration}",
+                        result[:200] if result else ""
+                    )
+                    
+                    # 定期保存记忆（每10次迭代）
+                    if self.ai_loop_iteration % 10 == 0:
+                        memory_system.save_context(memory)
+                        logger.info("记忆已保存")
+                        
+                except IflowTimeoutError as e:
+                    logger.error(f"AI 超时错误: {e}")
+                    memory_system.add_history_entry("error", f"AI 超时错误: {e}")
+                except IflowProcessError as e:
+                    logger.error(f"AI 进程错误: {e}")
+                    memory_system.add_history_entry("error", f"AI 进程错误: {e}")
+                except IflowError as e:
+                    logger.error(f"AI Iflow 错误: {e}")
+                    memory_system.add_history_entry("error", f"AI Iflow 错误: {e}")
+                except Exception as e:
+                    logger.error(f"AI 未知错误: {e}", exc_info=True)
+                    memory_system.add_history_entry("error", f"AI 未知错误: {e}")
+                
+                await asyncio.sleep(self.ai_loop_interval)
+                
+        except asyncio.CancelledError:
+            logger.info("AI 循环接收到停止信号")
+        except Exception as e:
+            logger.error(f"AI 循环错误: {e}", exc_info=True)
+        finally:
+            logger.info("AI 循环停止")
+            self.ai_loop_running = False
+            
+            # 保存记忆和记录停止事件
+            try:
+                memory_system.save_context(memory)
+                memory_system.add_history_entry("ai_loop_stop", "AI 循环停止")
+                logger.info("记忆已保存")
+            except Exception as e:
+                logger.error(f"保存记忆失败: {e}")
+            
+            self.iflow.stop()
+    
+    async def start_ai_loop(self) -> None:
+        """启动 AI 循环（外部调用接口）"""
+        if self.ai_loop_running:
+            logger.warning("AI 循环已在运行")
+            return
+        
+        logger.info("启动 AI 循环进程...")
+        self.ai_loop_task = asyncio.create_task(self.run_ai_loop())
+    
+    async def stop_ai_loop(self) -> None:
+        """停止 AI 循环（外部调用接口）"""
+        if not self.ai_loop_running:
+            logger.warning("AI 循环未在运行")
+            return
+        
+        logger.info("停止 AI 循环进程...")
+        self.ai_loop_running = False
+        
+        if self.ai_loop_task:
+            self.ai_loop_task.cancel()
+            try:
+                await self.ai_loop_task
+            except asyncio.CancelledError:
+                pass
+            self.ai_loop_task = None
+    
+    def get_ai_loop_status(self) -> dict:
+        """获取 AI 循环状态"""
+        return {
+            "running": self.ai_loop_running,
+            "iteration": self.ai_loop_iteration,
+            "interval": self.ai_loop_interval,
+            "task_id": id(self.ai_loop_task) if self.ai_loop_task else None
+        }
     
     def stop(self) -> None:
         """停止守护"""

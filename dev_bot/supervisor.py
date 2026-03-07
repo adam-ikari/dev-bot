@@ -2,6 +2,19 @@
 """Dev-Bot 监督器 - Guardian 的入口点"""
 
 import sys
+import asyncio
+import logging
+
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('supervisor.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 
 def main():
@@ -15,10 +28,10 @@ def main():
     # 模式选择
     parser.add_argument(
         "mode",
-        choices=["tui", "headless"],
+        choices=["tui", "headless", "ai-loop"],
         nargs="?",
         default="tui",
-        help="运行模式：tui（终端界面，默认）或 headless（无头模式）"
+        help="运行模式：tui（终端界面，默认）、headless（无头模式）或 ai-loop（AI 循环模式）"
     )
     
     parser.add_argument(
@@ -33,6 +46,12 @@ def main():
         default=10,
         help="重启延迟秒数 (默认: 10)"
     )
+    parser.add_argument(
+        "--ai-loop-interval",
+        type=int,
+        default=1,
+        help="AI 循环间隔秒数 (默认: 1)"
+    )
     
     args = parser.parse_args()
     
@@ -43,18 +62,29 @@ def main():
         # 创建 Guardian 实例
         guardian = Guardian(
             max_restarts=args.max_restarts,
-            restart_delay=args.restart_delay
+            restart_delay=args.restart_delay,
+            ai_loop_interval=args.ai_loop_interval
         )
         
         # 根据模式启动
         if args.mode == "tui":
             command = ["python", "-m", "dev_bot.tui"]
-        else:  # headless
+            logger.info("启动 TUI 模式")
+            # 运行 Guardian（所有逻辑都在这里）
+            guardian.run_process(command)
+        elif args.mode == "headless":
             command = ["python", "-m", "dev_bot.__main__"]
+            logger.info("启动无头模式")
+            # 运行 Guardian（所有逻辑都在这里）
+            guardian.run_process(command)
+        elif args.mode == "ai-loop":
+            logger.info("启动 AI 循环模式")
+            # 运行 AI 循环（由 Guardian 统一管理）
+            asyncio.run(guardian.run_ai_loop())
         
-        # 运行 Guardian（所有逻辑都在这里）
-        guardian.run_process(command)
-        
+    except ImportError as e:
+        logger.error(f"导入模块失败: {e}")
+        sys.exit(1)
     except KeyboardInterrupt:
         print("\n已停止")
         sys.exit(0)
