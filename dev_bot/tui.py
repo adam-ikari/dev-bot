@@ -440,6 +440,7 @@ class DevBotTUI(App):
 
         # 启动 AI 自动分析任务
         self.set_interval(1, self._auto_ai_loop)
+        self.set_interval(30, self._monitor_ai_loop_status)
 
     async def _handle_repl_input(self, prompt: str) -> None:
         """处理 REPL 输入 - 用户指令，不影响 AI 自主工作"""
@@ -659,6 +660,31 @@ class DevBotTUI(App):
         except Exception as e:
             log_view.write(f"[red]AI 分析失败: {e}[/red]")
             self.memory_system.add_history_entry("error", str(e))
+
+    def _monitor_ai_loop_status(self) -> None:
+        """监控AI循环状态，如果停止且iflow可用，尝试自动重启"""
+        if not self.ai_loop_stopped:
+            return  # AI循环正在运行，无需处理
+        
+        # 检查是否需要重启的条件
+        if not self.iflow_available:
+            return  # iflow不可用，无法重启
+        
+        if self.is_paused:
+            return  # 用户主动暂停，不应自动重启
+        
+        # 尝试自动重启AI循环
+        log_view = self.query_one("#log-view", RichLog)
+        status_bar = self.query_one("#status-bar", StatusBar)
+        
+        log_view.write("[yellow]🔄 检测到AI循环已停止，尝试自动重启...[/yellow]")
+        
+        self.ai_loop_stopped = False
+        status_bar.set_status("running")
+        status_bar.set_message("AI 正在自主工作")
+        
+        self.memory_system.add_history_entry("info", "AI循环自动重启")
+        log_view.write("[green]✅ AI 循环已自动重启[/green]")
 
     def action_toggle_pause(self) -> None:
         """切换暂停状态"""
