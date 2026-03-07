@@ -437,14 +437,16 @@ class DevBotTUI(App):
                     
                     # 格式化日志消息（简化格式）
                     msg = record.getMessage()
+                    # 格式化日志消息（简化格式）
+                    msg = record.getMessage()
                     
-                    # 根据日志级别设置颜色
+                    # 根据日志级别设置前缀
                     if record.levelno >= logging.ERROR:
-                        log_view.write(f"[red]{msg}[/red]")
+                        log_view.write(f"ERROR: {msg}")
                     elif record.levelno >= logging.WARNING:
-                        log_view.write(f"[yellow]{msg}[/yellow]")
+                        log_view.write(f"WARNING: {msg}")
                     elif record.levelno >= logging.INFO:
-                        log_view.write(f"[cyan]{msg}[/cyan]")
+                        log_view.write(f"INFO: {msg}")
                     else:
                         log_view.write(f"[dim]{msg}[/dim]")
                 except Exception:
