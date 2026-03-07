@@ -386,6 +386,9 @@ class DevBotTUI(App):
         
         self.iflow = IflowCaller() if self.iflow_available else None
         self.memory_system = get_memory_system()
+        
+        # 重定向日志到TUI log_view
+        self._setup_logging_to_tui()
         self.memory = self.memory_system.load_context()
         self.iteration_count = 0
         self.ai_iteration_count = 0
@@ -410,10 +413,60 @@ class DevBotTUI(App):
             id="bottom-panel"
         )
 
+
+    def _setup_logging_to_tui(self) -> None:
+        """设置日志输出到TUI log_view"""
+        import logging
+        
+        class TUILogHandler(logging.Handler):
+            """自定义日志处理器，将日志输出到TUI log_view"""
+            
+            def __init__(self, app):
+                super().__init__()
+                self.app = app
+            
+            def emit(self, record):
+                try:
+                    # 只在组件已挂载时输出日志
+                    if not hasattr(self.app, "_components_mounted"):
+                        return
+                    
+                    log_view = self.app.query_one("#log-view", RichLog)
+                    if log_view is None:
+                        return
+                    
+                    # 格式化日志消息（简化格式）
+                    msg = record.getMessage()
+                    
+                    # 根据日志级别设置颜色
+                    if record.levelno >= logging.ERROR:
+                        log_view.write(f"[red]{msg}[/red]")
+                    elif record.levelno >= logging.WARNING:
+                        log_view.write(f"[yellow]{msg}[/yellow]")
+                    elif record.levelno >= logging.INFO:
+                        log_view.write(f"[cyan]{msg}[/cyan]")
+                    else:
+                        log_view.write(f"[dim]{msg}[/dim]")
+                except Exception:
+                    pass  # 避免日志处理器本身出错
+        
+        # 获取根日志记录器
+        root_logger = logging.getLogger()
+        
+        # 添加TUI日志处理器
+        tui_handler = TUILogHandler(self)
+        tui_handler.setLevel(logging.INFO)
+        root_logger.addHandler(tui_handler)
+        
+        # 设置日志级别
+        root_logger.setLevel(logging.INFO)
     def on_mount(self) -> None:
         log_view = self.query_one("#log-view", RichLog)
         status_bar = self.query_one("#status-bar", StatusBar)
         # # No fixed content panel - AI content shown in log or popups
+        
+        # 标记组件已挂载，允许日志输出到log_view
+        self._components_mounted = True
 
         status_bar.start_time = self.start_time
         status_bar.set_status("running")
