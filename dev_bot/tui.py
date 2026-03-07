@@ -269,6 +269,11 @@ class REPLView(Container):
             self.input_history.append(event.value)
             self.history_index = -1
             self.on_submit(event.value)
+            
+            # 异步调用处理函数
+            import asyncio
+            loop = asyncio.get_event_loop()
+            loop.create_task(self.on_submit(event.value))
             event.input.value = ""
 
 
