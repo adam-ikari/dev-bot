@@ -413,13 +413,13 @@ class DevBotTUI(App):
     def on_mount(self) -> None:
         log_view = self.query_one("#log-view", RichLog)
         status_bar = self.query_one("#status-bar", StatusBar)
-        # content_panel = self.query_one("#content-panel", ContentPanel)
+        # # No fixed content panel - AI content shown in log or popups
 
         status_bar.start_time = self.start_time
         status_bar.set_status("running")
         status_bar.set_message("AI 正在自主工作")
 
-        # self.ai_controller.set_content_panel(content_panel)
+        # # AI controller works without fixed panel
 
         log_view.write("[bold cyan]╔══════════════════════════════════════════════════════════════╗[/bold cyan]")
         log_view.write("[bold cyan]║  🤖 Dev-Bot v2.0 - AI 驱动的自主开发工具                        ║[/bold cyan]")
