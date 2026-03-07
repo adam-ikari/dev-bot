@@ -367,7 +367,16 @@ class DevBotTUI(App):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.iflow = IflowCaller()
+        
+        # 检查 iflow 可用性
+        self.iflow_available, self.iflow_status = IflowCaller.check_availability()
+        
+        if not self.iflow_available:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"❌ iflow 不可用: {self.iflow_status}")
+        
+        self.iflow = IflowCaller() if self.iflow_available else None
         self.memory_system = get_memory_system()
         self.memory = self.memory_system.load_context()
         self.iteration_count = 0
@@ -409,6 +418,18 @@ class DevBotTUI(App):
         log_view.write("[bold cyan]║  🤖 Dev-Bot v2.0 - AI 驱动的自主开发工具                        ║[/bold cyan]")
         log_view.write("[bold cyan]╚══════════════════════════════════════════════════════════════╝[/bold cyan]")
         log_view.write("")
+        
+        # 显示 iflow 状态
+        if self.iflow_available:
+            log_view.write(f"[green]✅ iflow 可用: {self.iflow_status}[/green]")
+        else:
+            log_view.write(f"[red]❌ iflow 不可用: {self.iflow_status}[/red]")
+            log_view.write("[yellow]⚠️  AI 功能将不可用，请先安装并配置 iflow[/yellow]")
+            self.ai_loop_stopped = True
+            status_bar.set_status("stopped")
+            status_bar.set_message("iflow 不可用")
+        
+        log_view.write("")
 
         # 启动 AI 自动分析任务
         self.set_interval(1, self._auto_ai_loop)
@@ -432,6 +453,12 @@ class DevBotTUI(App):
                 self.memory_system.add_history_entry("info", "AI 循环重新启动")
             else:
                 log_view.write("[dim]AI 循环正在运行，无需重新启动[/dim]")
+            return
+
+        # 检查 iflow 是否可用
+        if not self.iflow_available or self.iflow is None:
+            log_view.write("[red]❌ iflow 不可用，无法处理用户指令[/red]")
+            log_view.write(f"[red]状态: {self.iflow_status}[/red]")
             return
 
         try:
@@ -460,7 +487,9 @@ class DevBotTUI(App):
             
             self.memory_system.add_history_entry("error", f"令牌过期: {e}")
         except IflowMemoryError as e:
-            log_view.write("[red]内存不足: iflow 进程内存不足[/red] [dim]修复后输入: restart[/dim]")
+            log_view.write("[red]内存不足: iflow 进程内存不足[/red]")
+            log_view.write("建议: 关闭其他应用、增加系统内存")
+            log_view.write("修复后输入: restart")
             
             self.ai_loop_stopped = True
             status_bar = self.query_one("#status-bar", StatusBar)
@@ -545,6 +574,16 @@ class DevBotTUI(App):
 现在开始自主分析和工作！
 """
 
+        # 检查 iflow 是否可用
+        if not self.iflow_available or self.iflow is None:
+            log_view.write("[red]❌ iflow 不可用，无法进行 AI 分析[/red]")
+            log_view.write(f"[red]状态: {self.iflow_status}[/red]")
+            self.ai_loop_stopped = True
+            status_bar = self.query_one("#status-bar", StatusBar)
+            status_bar.set_status("stopped")
+            status_bar.set_message("iflow 不可用")
+            return
+
         try:
             result = await self.iflow.call(prompt)
             log_view.write(result)
@@ -573,7 +612,9 @@ class DevBotTUI(App):
             
             self.memory_system.add_history_entry("error", f"令牌过期: {e}")
         except IflowMemoryError as e:
-            log_view.write("[red]内存不足: iflow 进程内存不足[/red] [dim]修复后输入: restart[/dim]")
+            log_view.write("[red]内存不足: iflow 进程内存不足[/red]")
+            log_view.write("建议: 关闭其他应用、增加系统内存")
+            log_view.write("修复后输入: restart")
             
             self.ai_loop_stopped = True
             status_bar = self.query_one("#status-bar", StatusBar)
