@@ -30,8 +30,8 @@ def main():
         "mode",
         choices=["tui", "headless", "ai-loop"],
         nargs="?",
-        default="tui",
-        help="运行模式：tui（终端界面，默认）、headless（无头模式）或 ai-loop（AI 循环模式）"
+        default="headless",
+        help="运行模式：tui（终端界面）、headless（无头模式，默认）或 ai-loop（AI 循环模式）"
     )
     
     parser.add_argument(
