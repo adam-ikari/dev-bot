@@ -448,7 +448,7 @@ class DevBotTUI(App):
                     elif record.levelno >= logging.INFO:
                         log_view.write(f"INFO: {msg}")
                     else:
-                        log_view.write(f"[dim]{msg}[/dim]")
+                        log_view.write(f"DEBUG: {msg}")
                 except Exception:
                     pass  # 避免日志处理器本身出错
         
