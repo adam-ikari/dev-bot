@@ -373,7 +373,6 @@ class DevBotTUI(App):
         self.memory = self.memory_system.load_context()
         self.iteration_count = 0
         self.is_paused = False
-        self.task = None
         self.start_time = datetime.now()
         self.ai_controller = AIContentController(self)
 
@@ -493,8 +492,6 @@ class DevBotTUI(App):
         log_view.write("")
 
     def on_unmount(self) -> None:
-        if self.task:
-            self.task.cancel()
         self.iflow.stop()
         
         try:
