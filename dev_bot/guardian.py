@@ -21,21 +21,102 @@ logger = logging.getLogger(__name__)
 
 
 class Guardian:
-    """守护系统 - 监控进程健康和 AI 智能修复"""
+    """守护系统 - 进程管理、健康监控和 AI 智能修复"""
     
     def __init__(
         self,
         check_interval: int = 30,
         memory_threshold: int = 80,  # 80%
         cpu_threshold: int = 90,  # 90%
-        disk_threshold: int = 90  # 90%
+        disk_threshold: int = 90,  # 90%
+        max_restarts: int = 5,
+        restart_delay: int = 10
     ):
         self.check_interval = check_interval
         self.memory_threshold = memory_threshold
         self.cpu_threshold = cpu_threshold
         self.disk_threshold = disk_threshold
+        self.max_restarts = max_restarts
+        self.restart_delay = restart_delay
         self.running = False
+        self.restart_count = 0
         self.iflow = None  # AI 呼叫器
+    
+    def run_process(self, command: list[str]) -> None:
+        """运行并监控进程（完整的进程生命周期管理）"""
+        import subprocess
+        from datetime import datetime
+        
+        logger.info("=" * 50)
+        logger.info("AI 守护系统启动")
+        logger.info(f"最大重启次数: {self.max_restarts}")
+        logger.info(f"重启延迟: {self.restart_delay} 秒")
+        logger.info(f"检查间隔: {self.check_interval} 秒")
+        logger.info("=" * 50)
+        
+        self.restart_count = 0
+        
+        while self.restart_count < self.max_restarts:
+            attempt = self.restart_count + 1
+            logger.info(f"\n启动 Dev-Bot (尝试 {attempt}/{self.max_restarts})")
+            logger.info(f"时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            logger.info(f"命令: {' '.join(command)}")
+            
+            try:
+                # 运行进程
+                result = subprocess.run(
+                    command,
+                    check=True,
+                    capture_output=False
+                )
+                
+                # 正常退出，重置计数器
+                if result.returncode == 0:
+                    logger.info("Dev-Bot 正常退出")
+                    self.restart_count = 0
+                    break
+                else:
+                    logger.error(f"Dev-Bot 异常退出，返回码: {result.returncode}")
+                    self._handle_crash()
+            
+            except subprocess.CalledProcessError as e:
+                logger.error(f"Dev-Bot 崩溃: {e}")
+                self._handle_crash()
+            
+            except KeyboardInterrupt:
+                logger.info("\n接收到中断信号，停止守护")
+                break
+            
+            except Exception as e:
+                logger.error(f"未预期的错误: {e}")
+                self._handle_crash()
+        
+        if self.restart_count >= self.max_restarts:
+            logger.error(f"\n达到最大重启次数 ({self.max_restarts})，停止尝试")
+            logger.error("请检查错误日志并手动解决问题")
+    
+    def _handle_crash(self) -> None:
+        """处理崩溃 - 尝试 AI 智能修复"""
+        import time
+        
+        self.restart_count += 1
+        
+        if self.restart_count < self.max_restarts:
+            logger.info(f"\n🔧 尝试 AI 智能修复...")
+            logger.info(f"当前重启计数: {self.restart_count}/{self.max_restarts}")
+            
+            # 尝试 AI 修复
+            fixed = self.try_auto_fix()
+            
+            if fixed:
+                logger.info("✅ AI 修复成功，准备重启...")
+            else:
+                logger.warning("⚠️ AI 修复失败，将尝试简单重启...")
+            
+            logger.info(f"将在 {self.restart_delay} 秒后重启...")
+            time.sleep(self.restart_delay)
+        else:
+            logger.error("已达到最大重启次数，不再尝试")
     
     async def start(self, monitored_pid: Optional[int] = None) -> None:
         """启动守护"""
