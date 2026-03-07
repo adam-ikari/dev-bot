@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dev-Bot 监督器 - 自动重启和 AI 智能修复"""
+"""Dev-Bot 监督器 - 自动重启和进程管理"""
 
 import subprocess
 import time
@@ -21,14 +21,14 @@ logger = logging.getLogger(__name__)
 
 
 class DevBotSupervisor:
-    """Dev-Bot 监督器 - 带 AI 智能修复"""
+    """Dev-Bot 监督器 - 进程管理和重启"""
     
     def __init__(self, max_restarts: int = 5, restart_delay: int = 10):
         self.max_restarts = max_restarts
         self.restart_delay = restart_delay
         self.restart_count = 0
         self.log_file = Path("supervisor.log")
-        self.iflow = None  # AI 呼叫器
+        self.guardian = None  # 守护系统
     
     def run(self, command: list[str]) -> None:
         """运行并监控 Dev-Bot"""
@@ -36,7 +36,7 @@ class DevBotSupervisor:
         logger.info("Dev-Bot 监督器启动")
         logger.info(f"最大重启次数: {self.max_restarts}")
         logger.info(f"重启延迟: {self.restart_delay} 秒")
-        logger.info("✅ AI 智能修复已启用")
+        logger.info("✅ 守护系统已启用")
         logger.info("=" * 50)
         
         while self.restart_count < self.max_restarts:
@@ -78,101 +78,41 @@ class DevBotSupervisor:
             logger.error("请检查错误日志并手动解决问题")
     
     def _handle_crash(self) -> None:
-        """处理崩溃 - 尝试 AI 智能修复"""
+        """处理崩溃 - 调用守护系统尝试修复"""
         self.restart_count += 1
         
         if self.restart_count < self.max_restarts:
-            logger.info(f"\n🔧 尝试 AI 智能修复...")
+            logger.info(f"\n🔧 调用守护系统尝试修复...")
             logger.info(f"当前重启计数: {self.restart_count}/{self.max_restarts}")
             
-            # 尝试 AI 修复
-            fixed = self._try_ai_fix()
+            # 尝试守护系统修复
+            fixed = self._call_guardian_fix()
             
             if fixed:
-                logger.info("✅ AI 修复成功，准备重启...")
+                logger.info("✅ 守护系统修复成功，准备重启...")
             else:
-                logger.warning("⚠️ AI 修复失败，将尝试简单重启...")
+                logger.warning("⚠️ 守护系统修复失败，将尝试简单重启...")
             
             logger.info(f"将在 {self.restart_delay} 秒后重启...")
             time.sleep(self.restart_delay)
         else:
             logger.error("已达到最大重启次数，不再尝试")
     
-    def _try_ai_fix(self) -> bool:
-        """尝试使用 AI 修复错误"""
+    def _call_guardian_fix(self) -> bool:
+        """调用守护系统尝试修复"""
         try:
-            # 导入 IflowCaller
-            from dev_bot.iflow import IflowCaller
+            # 导入 Guardian
+            from dev_bot.guardian import Guardian
             
-            if self.iflow is None:
-                self.iflow = IflowCaller()
+            if self.guardian is None:
+                self.guardian = Guardian()
             
-            # 读取最近的错误日志
-            error_context = self._get_error_context()
-            
-            if not error_context:
-                logger.warning("无法获取错误上下文，跳过 AI 修复")
-                return False
-            
-            # 构建 AI 提示
-            prompt = f"""Dev-Bot 崩溃了，请分析错误并提供修复方案。
-
-错误信息：
-{error_context}
-
-请执行以下步骤：
-1. 分析错误原因
-2. 识别需要修改的文件
-3. 提供具体的修复代码
-4. 如果可以修复，直接使用文件操作工具修复问题
-
-重要：
-- 只修复代码错误，不要修改其他内容
-- 保持代码风格一致
-- 修复后返回 "FIXED: [修复描述]"
-- 如果无法修复，返回 "CANNOT_FIX: [原因]"
-
-请开始修复。"""
-            
-            logger.info("🤖 AI 正在分析错误...")
-            
-            # 调用 AI 分析
-            result = self.iflow.call(prompt)
-            logger.info(f"AI 分析结果: {result[:200]}...")
-            
-            # 检查是否修复成功
-            if "FIXED:" in result or "修复成功" in result or "已修复" in result:
-                logger.info("✅ AI 修复成功")
-                return True
-            else:
-                logger.warning("⚠️ AI 未能修复错误")
-                return False
+            # 调用守护系统的修复方法
+            return self.guardian.try_auto_fix()
             
         except Exception as e:
-            logger.error(f"AI 修复失败: {e}")
+            logger.error(f"调用守护系统失败: {e}")
             return False
-    
-    def _get_error_context(self) -> str:
-        """获取错误上下文"""
-        try:
-            # 读取 supervisor.log 的最后 50 行
-            if self.log_file.exists():
-                with open(self.log_file, 'r') as f:
-                    lines = f.readlines()
-                    return ''.join(lines[-50:])
-            
-            # 尝试读取 dev-bot.log
-            dev_bot_log = Path("dev-bot.log")
-            if dev_bot_log.exists():
-                with open(dev_bot_log, 'r') as f:
-                    lines = f.readlines()
-                    return ''.join(lines[-50:])
-            
-            return ""
-            
-        except Exception as e:
-            logger.error(f"读取错误日志失败: {e}")
-            return ""
     
     def check_dependencies(self) -> bool:
         """检查依赖"""

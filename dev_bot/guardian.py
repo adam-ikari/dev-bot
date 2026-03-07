@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 class Guardian:
-    """守护系统 - 监控进程健康"""
+    """守护系统 - 监控进程健康和 AI 智能修复"""
     
     def __init__(
         self,
@@ -35,6 +35,7 @@ class Guardian:
         self.cpu_threshold = cpu_threshold
         self.disk_threshold = disk_threshold
         self.running = False
+        self.iflow = None  # AI 呼叫器
     
     async def start(self, monitored_pid: Optional[int] = None) -> None:
         """启动守护"""
@@ -104,6 +105,84 @@ class Guardian:
         """停止守护"""
         self.running = False
         logger.info("守护系统停止信号已发送")
+    
+    def try_auto_fix(self, error_context: Optional[str] = None) -> bool:
+        """尝试 AI 智能修复错误"""
+        try:
+            # 导入 IflowCaller
+            from dev_bot.iflow import IflowCaller
+            
+            if self.iflow is None:
+                self.iflow = IflowCaller()
+            
+            # 如果没有提供错误上下文，尝试从日志读取
+            if not error_context:
+                error_context = self._get_error_context()
+            
+            if not error_context:
+                logger.warning("无法获取错误上下文，跳过 AI 修复")
+                return False
+            
+            # 构建 AI 提示
+            prompt = f"""Dev-Bot 崩溃了，请分析错误并提供修复方案。
+
+错误信息：
+{error_context}
+
+请执行以下步骤：
+1. 分析错误原因
+2. 识别需要修改的文件
+3. 提供具体的修复代码
+4. 如果可以修复，直接使用文件操作工具修复问题
+
+重要：
+- 只修复代码错误，不要修改其他内容
+- 保持代码风格一致
+- 修复后返回 "FIXED: [修复描述]"
+- 如果无法修复，返回 "CANNOT_FIX: [原因]"
+
+请开始修复。"""
+            
+            logger.info("🤖 AI 正在分析错误...")
+            
+            # 调用 AI 分析
+            result = self.iflow.call(prompt)
+            logger.info(f"AI 分析结果: {result[:200]}...")
+            
+            # 检查是否修复成功
+            if "FIXED:" in result or "修复成功" in result or "已修复" in result:
+                logger.info("✅ AI 修复成功")
+                return True
+            else:
+                logger.warning("⚠️ AI 未能修复错误")
+                return False
+            
+        except Exception as e:
+            logger.error(f"AI 修复失败: {e}")
+            return False
+    
+    def _get_error_context(self) -> str:
+        """获取错误上下文"""
+        try:
+            # 读取 supervisor.log 的最后 50 行
+            supervisor_log = Path("supervisor.log")
+            if supervisor_log.exists():
+                with open(supervisor_log, 'r') as f:
+                    lines = f.readlines()
+                    return ''.join(lines[-50:])
+            
+            # 尝试读取 dev-bot.log
+            dev_bot_log = Path("dev-bot.log")
+            if dev_bot_log.exists():
+                with open(dev_bot_log, 'r') as f:
+                    lines = f.readlines()
+                    return ''.join(lines[-50:])
+            
+            return ""
+            
+        except Exception as e:
+            logger.error(f"读取错误日志失败: {e}")
+            return ""
     
     async def monitor_file_changes(self, file_path: str) -> None:
         """监控文件变化"""
