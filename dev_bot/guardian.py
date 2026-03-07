@@ -53,22 +53,28 @@ class Guardian:
         # AI 修复
         self.iflow = None  # AI 呼叫器
     
-    def run_process(self, command: list[str]) -> None:
-        """运行并监控进程（完整的进程生命周期管理）"""
+    def run_process(self, command: list[str], redirect_output: bool = True) -> None:
+        """运行并监控进程（完整的进程生命周期管理）
+
+        Args:
+            command: 要执行的命令列表
+            redirect_output: 是否重定向 stdout/stderr，TUI 模式设为 False 以直接显示界面
+        """
         import subprocess
         import signal
         from datetime import datetime
-        
+
         logger.info("=" * 50)
         logger.info("AI 守护系统启动")
         logger.info(f"最大重启次数: {self.max_restarts}")
         logger.info(f"重启延迟: {self.restart_delay} 秒")
         logger.info(f"检查间隔: {self.check_interval} 秒")
+        logger.info(f"重定向输出: {redirect_output}")
         logger.info("=" * 50)
-        
+
         self.restart_count = 0
         process = None
-        
+
         # 设置信号处理器
         def signal_handler(signum, frame):
             logger.info(f"接收到信号 {signum}")
@@ -81,24 +87,30 @@ class Guardian:
                     logger.warning("子进程未响应，强制终止...")
                     process.kill()
             sys.exit(0)
-        
+
         signal.signal(signal.SIGTERM, signal_handler)
         signal.signal(signal.SIGINT, signal_handler)
-        
+
         while self.restart_count < self.max_restarts:
             attempt = self.restart_count + 1
             logger.info(f"\n启动 Dev-Bot (尝试 {attempt}/{self.max_restarts})")
             logger.info(f"时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
             logger.info(f"命令: {' '.join(command)}")
-            
+
             try:
+                # 准备进程参数
+                popen_kwargs = {"text": True}
+                if redirect_output:
+                    # 重定向输出以便捕获错误信息
+                    popen_kwargs["stdout"] = subprocess.PIPE
+                    popen_kwargs["stderr"] = subprocess.PIPE
+                else:
+                    # 不重定向输出，让进程直接控制终端（用于 TUI）
+                    popen_kwargs["stdout"] = None
+                    popen_kwargs["stderr"] = None
+
                 # 使用 Popen 以便更好地控制进程
-                process = subprocess.Popen(
-                    command,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    text=True
-                )
+                process = subprocess.Popen(command, **popen_kwargs)
                 logger.info(f"子进程 PID: {process.pid}")
                 
                 # 等待进程结束

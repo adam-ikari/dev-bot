@@ -70,13 +70,13 @@ def main():
         if args.mode == "tui":
             command = ["python", "-m", "dev_bot.tui"]
             logger.info("启动 TUI 模式")
-            # 运行 Guardian（所有逻辑都在这里）
-            guardian.run_process(command)
+            # TUI 模式不重定向输出，允许直接显示界面
+            guardian.run_process(command, redirect_output=False)
         elif args.mode == "headless":
             command = ["python", "-m", "dev_bot.__main__"]
             logger.info("启动无头模式")
             # 运行 Guardian（所有逻辑都在这里）
-            guardian.run_process(command)
+            guardian.run_process(command, redirect_output=True)
         elif args.mode == "ai-loop":
             logger.info("启动 AI 循环模式")
             # 运行 AI 循环（由 Guardian 统一管理）
