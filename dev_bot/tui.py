@@ -460,20 +460,14 @@ class DevBotTUI(App):
             
             self.memory_system.add_history_entry("error", f"令牌过期: {e}")
         except IflowMemoryError as e:
-            log_view.write(f"[red]❌ 内存不足错误[/red]")
-            log_view.write("[yellow]系统或 iflow 进程内存不足[/yellow]")
-            log_view.write("[dim]建议:[/dim]")
-            log_view.write("  1. 关闭其他应用程序释放内存")
-            log_view.write("  2. 重启 iflow 进程")
-            log_view.write("  3. 增加系统内存")
-            log_view.write("")
-            log_view.write("[dim]解决内存问题后，输入 'restart' 命令重新启动 AI[/dim]")
+            log_view.write("[red]内存不足: iflow 进程内存不足[/red]")
+            log_view.write("建议: 关闭其他应用、增加系统内存")
+            log_view.write("修复后输入: restart")
             
-            # 停止 AI 循环（不是暂停）
             self.ai_loop_stopped = True
             status_bar = self.query_one("#status-bar", StatusBar)
             status_bar.set_status("stopped")
-            status_bar.set_message("内存不足，AI 已停止")
+            status_bar.set_message("内存不足")
             
             self.memory_system.add_history_entry("error", f"内存错误: {e}")
         except IflowError as e:
@@ -581,20 +575,14 @@ class DevBotTUI(App):
             
             self.memory_system.add_history_entry("error", f"令牌过期: {e}")
         except IflowMemoryError as e:
-            log_view.write(f"[red]❌ 内存不足错误[/red]")
-            log_view.write("[yellow]系统或 iflow 进程内存不足[/yellow]")
-            log_view.write("[dim]建议:[/dim]")
-            log_view.write("  1. 关闭其他应用程序释放内存")
-            log_view.write("  2. 重启 iflow 进程")
-            log_view.write("  3. 增加系统内存")
-            log_view.write("")
-            log_view.write("[dim]解决内存问题后，输入 'restart' 命令重新启动 AI[/dim]")
+            log_view.write("[red]内存不足: iflow 进程内存不足[/red]")
+            log_view.write("建议: 关闭其他应用、增加系统内存")
+            log_view.write("修复后输入: restart")
             
-            # 停止 AI 循环（不是暂停）
             self.ai_loop_stopped = True
             status_bar = self.query_one("#status-bar", StatusBar)
             status_bar.set_status("stopped")
-            status_bar.set_message("内存不足，AI 已停止")
+            status_bar.set_message("内存不足")
             
             self.memory_system.add_history_entry("error", f"内存错误: {e}")
         except Exception as e:

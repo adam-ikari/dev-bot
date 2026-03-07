@@ -34,7 +34,7 @@ class IflowCaller:
     """iflow 命令行工具的异步调用器"""
     
     DEFAULT_TIMEOUT = 600
-    DEFAULT_MEMORY_LIMIT = 2 * 1024 * 1024 * 1024  # 2GB
+    DEFAULT_MEMORY_LIMIT = 4 * 1024 * 1024 * 1024  # 4GB
     DEFAULT_NODE_MEMORY_MB = 4096  # Node.js 堆内存限制（MB）
     ALLOWED_COMMANDS = {"iflow"}  # 只允许 iflow 命令
     
