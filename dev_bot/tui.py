@@ -376,6 +376,7 @@ class DevBotTUI(App):
         self.iteration_count = 0
         self.ai_iteration_count = 0
         self.is_paused = False
+        self.ai_loop_stopped = False  # AI 循环是否因错误停止
         self.start_time = datetime.now()
         self.ai_controller = AIContentController(self)
 
@@ -428,6 +429,20 @@ class DevBotTUI(App):
 
         self.memory_system.add_history_entry("user_input", prompt)
 
+        # 检查是否是 restart 命令
+        if prompt.strip().lower() == "restart":
+            if self.ai_loop_stopped:
+                self.ai_loop_stopped = False
+                self.is_paused = False
+                status_bar = self.query_one("#status-bar", StatusBar)
+                status_bar.set_status("running")
+                status_bar.set_message("AI 正在自主工作")
+                log_view.write("[green]✓ AI 循环已重新启动[/green]")
+                self.memory_system.add_history_entry("info", "AI 循环重新启动")
+            else:
+                log_view.write("[dim]AI 循环正在运行，无需重新启动[/dim]")
+            return
+
         try:
             result = await self.iflow.call(prompt)
             log_view.write(result)
@@ -461,12 +476,13 @@ class DevBotTUI(App):
             log_view.write("  2. 重启 iflow 进程")
             log_view.write("  3. 增加系统内存")
             log_view.write("")
-            log_view.write("[dim]解决内存问题后按 [Space] 继续 AI 工作[/dim]")
+            log_view.write("[dim]解决内存问题后，输入 'restart' 命令重新启动 AI[/dim]")
             
-            self.is_paused = True
+            # 停止 AI 循环（不是暂停）
+            self.ai_loop_stopped = True
             status_bar = self.query_one("#status-bar", StatusBar)
-            status_bar.set_status("paused")
-            status_bar.set_message("内存不足，需要释放内存")
+            status_bar.set_status("stopped")
+            status_bar.set_message("内存不足，AI 已停止")
             
             self.memory_system.add_history_entry("error", f"内存错误: {e}")
         except IflowError as e:
@@ -492,6 +508,10 @@ class DevBotTUI(App):
     async def _auto_ai_loop(self) -> None:
         """自动 AI 循环 - 独立运行，不依赖用户输入"""
         if self.is_paused:
+            return
+        
+        # 如果 AI 循环因错误停止，不再继续
+        if self.ai_loop_stopped:
             return
 
         self.ai_iteration_count += 1
@@ -577,12 +597,13 @@ class DevBotTUI(App):
             log_view.write("  2. 重启 iflow 进程")
             log_view.write("  3. 增加系统内存")
             log_view.write("")
-            log_view.write("[dim]解决内存问题后按 [Space] 继续 AI 工作[/dim]")
+            log_view.write("[dim]解决内存问题后，输入 'restart' 命令重新启动 AI[/dim]")
             
-            self.is_paused = True
+            # 停止 AI 循环（不是暂停）
+            self.ai_loop_stopped = True
             status_bar = self.query_one("#status-bar", StatusBar)
-            status_bar.set_status("paused")
-            status_bar.set_message("内存不足，需要释放内存")
+            status_bar.set_status("stopped")
+            status_bar.set_message("内存不足，AI 已停止")
             
             self.memory_system.add_history_entry("error", f"内存错误: {e}")
         except Exception as e:
