@@ -45,6 +45,7 @@ class Guardian:
     def run_process(self, command: list[str]) -> None:
         """运行并监控进程（完整的进程生命周期管理）"""
         import subprocess
+        import signal
         from datetime import datetime
         
         logger.info("=" * 50)
@@ -55,6 +56,23 @@ class Guardian:
         logger.info("=" * 50)
         
         self.restart_count = 0
+        process = None
+        
+        # 设置信号处理器
+        def signal_handler(signum, frame):
+            logger.info(f"接收到信号 {signum}")
+            if process and process.poll() is None:
+                logger.info("正在停止子进程...")
+                process.terminate()
+                try:
+                    process.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    logger.warning("子进程未响应，强制终止...")
+                    process.kill()
+            sys.exit(0)
+        
+        signal.signal(signal.SIGTERM, signal_handler)
+        signal.signal(signal.SIGINT, signal_handler)
         
         while self.restart_count < self.max_restarts:
             attempt = self.restart_count + 1
@@ -63,32 +81,44 @@ class Guardian:
             logger.info(f"命令: {' '.join(command)}")
             
             try:
-                # 运行进程
-                result = subprocess.run(
+                # 使用 Popen 以便更好地控制进程
+                process = subprocess.Popen(
                     command,
-                    check=True,
-                    capture_output=False
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True
                 )
+                logger.info(f"子进程 PID: {process.pid}")
+                
+                # 等待进程结束
+                returncode = process.wait()
                 
                 # 正常退出，重置计数器
-                if result.returncode == 0:
+                if returncode == 0:
                     logger.info("Dev-Bot 正常退出")
                     self.restart_count = 0
                     break
                 else:
-                    logger.error(f"Dev-Bot 异常退出，返回码: {result.returncode}")
+                    logger.error(f"Dev-Bot 异常退出，返回码: {returncode}")
+                    # 记录错误输出
+                    if process.stdout:
+                        stdout = process.stdout.read()
+                        if stdout:
+                            logger.error(f"stdout: {stdout}")
+                    if process.stderr:
+                        stderr = process.stderr.read()
+                        if stderr:
+                            logger.error(f"stderr: {stderr}")
                     self._handle_crash()
-            
-            except subprocess.CalledProcessError as e:
-                logger.error(f"Dev-Bot 崩溃: {e}")
-                self._handle_crash()
             
             except KeyboardInterrupt:
                 logger.info("\n接收到中断信号，停止守护")
+                if process and process.poll() is None:
+                    process.terminate()
                 break
             
             except Exception as e:
-                logger.error(f"未预期的错误: {e}")
+                logger.error(f"未预期的错误: {e}", exc_info=True)
                 self._handle_crash()
         
         if self.restart_count >= self.max_restarts:
@@ -187,14 +217,23 @@ class Guardian:
         self.running = False
         logger.info("守护系统停止信号已发送")
     
-    def try_auto_fix(self, error_context: Optional[str] = None) -> bool:
-        """尝试 AI 智能修复错误"""
+    def try_auto_fix(self, error_context: Optional[str] = None, timeout: int = 300) -> bool:
+        """尝试 AI 智能修复错误
+        
+        Args:
+            error_context: 错误上下文信息
+            timeout: AI 修复超时时间（秒），默认 300 秒（5 分钟）
+        
+        Returns:
+            bool: 修复成功返回 True，否则返回 False
+        """
         try:
             # 导入 IflowCaller
             from dev_bot.iflow import IflowCaller
             
             if self.iflow is None:
-                self.iflow = IflowCaller()
+                # 设置超时参数
+                self.iflow = IflowCaller(timeout=timeout)
             
             # 如果没有提供错误上下文，尝试从日志读取
             if not error_context:
@@ -221,12 +260,13 @@ class Guardian:
 - 保持代码风格一致
 - 修复后返回 "FIXED: [修复描述]"
 - 如果无法修复，返回 "CANNOT_FIX: [原因]"
+- 修复操作应在 {timeout} 秒内完成
 
 请开始修复。"""
             
-            logger.info("🤖 AI 正在分析错误...")
+            logger.info(f"🤖 AI 正在分析错误（超时: {timeout} 秒）...")
             
-            # 调用 AI 分析
+            # 调用 AI 分析（已设置超时）
             result = self.iflow.call(prompt)
             logger.info(f"AI 分析结果: {result[:200]}...")
             
@@ -238,8 +278,11 @@ class Guardian:
                 logger.warning("⚠️ AI 未能修复错误")
                 return False
             
+        except asyncio.TimeoutError:
+            logger.error(f"AI 修复超时（{timeout} 秒）")
+            return False
         except Exception as e:
-            logger.error(f"AI 修复失败: {e}")
+            logger.error(f"AI 修复失败: {e}", exc_info=True)
             return False
     
     def _get_error_context(self) -> str:
