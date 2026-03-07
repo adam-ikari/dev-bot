@@ -35,11 +35,13 @@ class IflowCaller:
     
     DEFAULT_TIMEOUT = 600
     DEFAULT_MEMORY_LIMIT = 2 * 1024 * 1024 * 1024  # 2GB
+    DEFAULT_NODE_MEMORY_MB = 4096  # Node.js 堆内存限制（MB）
     ALLOWED_COMMANDS = {"iflow"}  # 只允许 iflow 命令
     
-    def __init__(self, command: str = "iflow", timeout: int = DEFAULT_TIMEOUT):
+    def __init__(self, command: str = "iflow", timeout: int = DEFAULT_TIMEOUT, node_memory_mb: int = DEFAULT_NODE_MEMORY_MB):
         self.command = self._validate_command(command)
         self.timeout = timeout
+        self.node_memory_mb = node_memory_mb
         self.process = None
         self._set_resource_limits()
     
@@ -85,11 +87,17 @@ class IflowCaller:
     async def call(self, prompt: str) -> str:
         """调用 iflow"""
         try:
+            # 设置环境变量，增加 Node.js 内存限制
+            env = os.environ.copy()
+            node_options = f"--max-old-space-size={self.node_memory_mb}"
+            env["NODE_OPTIONS"] = node_options
+            
             self.process = await asyncio.create_subprocess_exec(
                 self.command,
                 stdin=asyncio.subprocess.PIPE,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
+                env=env,
                 start_new_session=True if sys.platform != 'win32' else False
             )
             self.process.stdin.write(prompt.encode())
@@ -139,7 +147,8 @@ class IflowCaller:
                     raise IflowMemoryError(
                         f"iflow memory error: {error_msg}. "
                         f"System or iflow process has insufficient memory. "
-                        f"Try: 1) Close other applications, 2) Restart iflow, 3) Increase system memory."
+                        f"Node.js memory limit is set to {self.node_memory_mb}MB. "
+                        f"Try: 1) Close other applications, 2) Increase Node.js memory limit, 3) Increase system memory."
                     )
                 
                 raise IflowProcessError(f"iflow exited with code {self.process.returncode}: {error_msg}")
