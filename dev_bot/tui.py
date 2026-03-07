@@ -1,26 +1,210 @@
 #!/usr/bin/env python3
-
 """
 Dev-Bot TUI 界面 - 终端用户界面
 
-提供响应式分割布局：
-- 上方区域：AI 运行日志
-- 下方区域：REPL 输入
-- 支持手动调整分隔位置
-- 自动响应终端大小变化
+改进布局 + AI 可控制的展示组件：
+- 顶部状态栏：显示运行状态、迭代次数、时间
+- 左侧监控面板：CPU、内存、时间
+- 右侧日志区：AI 运行日志
+- 中间内容区：AI 可控制的展示组件（checklist、table、tree、card）
+- 底部面板：Spec 问题 + REPL 输入
 """
 
 import asyncio
+import psutil
+from datetime import datetime, timedelta
+from pathlib import Path
 
 from textual.app import App, ComposeResult
-from textual.containers import Container, Vertical
+from textual.containers import Container, Vertical, Horizontal
 from textual.widgets import (
     Footer,
     Header,
     Input,
     RichLog,
     Static,
+    ProgressBar,
+    DataTable,
+    Checkbox,
+    Label,
 )
+from textual import events
+from textual.reactive import reactive
+
+from dev_bot import IflowCaller, IflowError, get_memory_system
+
+
+class StatusBar(Static):
+    """状态栏 - 显示运行状态、迭代次数、时间"""
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.status = "stopped"
+        self.iteration_count = 0
+        self.start_time = datetime.now()
+        self.message = "就绪"
+    
+    def set_status(self, status: str):
+        """设置状态"""
+        self.status = status
+        self.update_display()
+    
+    def set_iteration(self, count: int):
+        """设置迭代次数"""
+        self.iteration_count = count
+        self.update_display()
+    
+    def set_message(self, message: str):
+        """设置消息"""
+        self.message = message
+        self.update_display()
+    
+    def update_display(self):
+        """更新显示"""
+        status_emoji = {
+            "running": "🟢",
+            "paused": "🟡",
+            "stopped": "🔴"
+        }.get(self.status, "⚪")
+        
+        elapsed = datetime.now() - self.start_time
+        elapsed_str = str(elapsed).split(".")[0]
+        
+        self.update(
+            f"🤖 Dev-Bot v2.0    [{status_emoji} {self.status.upper()}] "
+            f"迭代: {self.iteration_count}    ⏱️ {elapsed_str}    "
+            f"💬 {self.message}"
+        )
+
+
+class MonitorPanel(Static):
+    """监控面板 - 显示 CPU、内存、时间"""
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.update_task = None
+    
+    def on_mount(self):
+        """挂载时启动更新任务"""
+        self.update_task = asyncio.create_task(self.update_loop())
+    
+    async def update_loop(self):
+        """更新循环"""
+        while True:
+            self.update_display()
+            await asyncio.sleep(2)
+    
+    def update_display(self):
+        """更新显示"""
+        cpu_percent = psutil.cpu_percent()
+        memory = psutil.Process().memory_info()
+        memory_mb = memory.rss / 1024 / 1024
+        
+        elapsed = datetime.now() - self.app.start_time if hasattr(self.app, 'start_time') else timedelta()
+        elapsed_str = str(elapsed).split(".")[0]
+        
+        content = f"""📊 监控
+━━━━━━━━━━━━
+CPU: {cpu_percent}%
+{"█" * int(cpu_percent // 5)}{" " * (20 - int(cpu_percent // 5))}
+
+内存: {memory_mb:.0f} MB / 2048 MB
+{"█" * int((memory_mb / 2048) * 20)}
+
+⏱️ 运行时间: {elapsed_str}"""
+        
+        self.update(content)
+
+
+class ContentPanel(Container):
+    """内容面板 - AI 可控制的展示组件区域"""
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.current_component = None
+        self.components = {}
+    
+    def show_checklist(self, title: str, items: list):
+        """显示检查清单"""
+        self.clear()
+        
+        self.mount(Label(f"✅ {title}", classes="component-title"))
+        
+        for item in items:
+            label = item.get("text", item)
+            checked = item.get("checked", False)
+            self.mount(Checkbox(label, value=checked, classes="checklist-item"))
+        
+        self.current_component = "checklist"
+    
+    def show_table(self, title: str, columns: list, rows: list):
+        """显示表格"""
+        self.clear()
+        
+        self.mount(Label(f"📊 {title}", classes="component-title"))
+        
+        table = DataTable()
+        table.add_column(*columns)
+        
+        for row in rows:
+            table.add_row(*row)
+        
+        self.mount(table)
+        self.current_component = "table"
+    
+    def show_tree(self, title: str, items: list):
+        """显示树形结构"""
+        self.clear()
+        
+        self.mount(Label(f"🌳 {title}", classes="component-title"))
+        
+        for item in items:
+            indent = "  " * item.get("level", 0)
+            prefix = "├─" if item.get("has_children") else "└─"
+            label = f"{indent}{prefix} {item.get('text', '')}"
+            self.mount(Label(label, classes="tree-item"))
+        
+        self.current_component = "tree"
+    
+    def show_cards(self, title: str, cards: list):
+        """显示卡片"""
+        self.clear()
+        
+        self.mount(Label(f"📋 {title}", classes="component-title"))
+        
+        for card in cards:
+            card_content = f"""
+┌─────────────────────┐
+│ {card.get('title', '')}
+│ {card.get('description', '')}
+└─────────────────────┘"""
+            self.mount(Static(card_content, classes="card-item"))
+        
+        self.current_component = "cards"
+    
+    def show_metrics(self, title: str, metrics: list):
+        """显示指标"""
+        self.clear()
+        
+        self.mount(Label(f"📈 {title}", classes="component-title"))
+        
+        for metric in metrics:
+            value = metric.get("value", 0)
+            max_val = metric.get("max", 100)
+            label = metric.get("label", "")
+            percentage = min((value / max_val) * 100, 100)
+            
+            bar = "█" * int(percentage // 5)
+            empty = " " * (20 - int(percentage // 5))
+            
+            content = f"{label}\n{bar}{empty} {value}/{max_val}"
+            self.mount(Static(content, classes="metric-item"))
+        
+        self.current_component = "metrics"
+    
+    def clear(self):
+        """清空面板"""
+        self.children.clear()
 
 
 class LogView(RichLog):
@@ -36,26 +220,22 @@ class LogView(RichLog):
 
 
 class SpecQuestionView(Container):
-    """Spec 问题视图 - 显示待处理的 Spec 问题"""
+    """Spec 问题视图"""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.questions = []
-        self.selected_index = -1
-
+    
     def update_questions(self, questions):
         """更新问题列表"""
         self.questions = questions
-        self.selected_index = -1
         self.update_view()
-
+    
     def compose(self) -> ComposeResult:
-        """构建 Spec 问题组件"""
-        yield Static("📋 Spec 问题 (非阻塞)", classes="spec-label")
-        yield Static("暂无问题", id="spec-content", classes="spec-content")
-
+        yield Static("📋 Spec 问题", classes="spec-label")
+        yield Static("[dim]✓ 没有待处理的 Spec 问题[/dim]", id="spec-content", classes="spec-content")
+    
     def update_view(self):
-        """刷新问题显示"""
         try:
             content = self.query_one("#spec-content", Static)
             if not self.questions:
@@ -63,81 +243,30 @@ class SpecQuestionView(Container):
             else:
                 lines = []
                 for i, q in enumerate(self.questions, 1):
-                    priority_emoji = "🔴" if q.priority >= 4 else "🟡" if q.priority >= 2 else "🟢"
-                    lines.append(f"{priority_emoji} [{i}] {q.question}")
-                    lines.append(f"    ID: {q.question_id}")
-                    lines.append("")
+                    lines.append(f"  [{i}] {q}")
                 content.update("\n".join(lines))
         except Exception:
             pass
 
 
 class REPLView(Container):
-    """REPL 视图 - 用户输入区域"""
+    """REPL 视图"""
 
     def __init__(self, on_submit, **kwargs):
         super().__init__(**kwargs)
         self.on_submit = on_submit
-        self.input_history = []  # 输入历史
-        self.history_index = -1  # 当前历史索引
-        self.current_input = ""  # 当前输入（在浏览历史时保存）
-
+        self.input_history = []
+        self.history_index = -1
+    
     def compose(self) -> ComposeResult:
-        """构建 REPL 组件"""
-        yield Static("REPL 输入 (按 Enter 发送, ↑/↓ 滚动历史):", classes="repl-label")
-        yield Input(placeholder="输入你的指令...", id="repl-input", classes="repl-input")
-
+        yield Input(placeholder="输入你的指令 (Enter 发送, ↑/↓ 历史)...", id="repl-input")
+    
     def on_input_submitted(self, event: Input.Submitted) -> None:
-        """处理输入提交"""
         if event.value.strip():
-            # 保存到历史
             self.input_history.append(event.value)
             self.history_index = -1
-            self.current_input = ""
-
-            # 调用回调
             self.on_submit(event.value)
             event.input.value = ""
-
-    def on_key(self, event) -> None:
-        """处理按键事件"""
-        input_widget = self.query_one("#repl-input", Input)
-
-        # 只在输入框有焦点时处理上下键
-        if input_widget.has_focus:
-            if event.key == "up":
-                self._navigate_history(-1)
-            elif event.key == "down":
-                self._navigate_history(1)
-
-    def _navigate_history(self, direction: int) -> None:
-        """导航历史输入"""
-        if not self.input_history:
-            return
-
-        input_widget = self.query_one("#repl-input", Input)
-
-        # 保存当前输入（如果是第一次按上下键）
-        if self.history_index == -1 and direction == -1:
-            self.current_input = input_widget.value
-
-        # 更新索引
-        new_index = self.history_index + direction
-
-        if new_index < -len(self.input_history):
-            # 已经到达最旧的历史，不再向前
-            return
-        elif new_index >= 0:
-            # 超出最新历史，恢复当前输入
-            input_widget.value = self.current_input
-            self.history_index = -1
-            self.current_input = ""
-        else:
-            # 显示历史输入
-            self.history_index = new_index
-            input_widget.value = self.input_history[self.history_index]
-            # 将光标移动到末尾
-            input_widget.cursor_position = len(input_widget.value)
 
 
 class DevBotTUI(App):
@@ -146,6 +275,14 @@ class DevBotTUI(App):
     CSS = """
     Screen {
         layout: vertical;
+    }
+
+    #status-bar {
+        dock: top;
+        padding: 0 1;
+        background: $primary;
+        color: $text;
+        text-style: bold;
     }
 
     #main-container {
@@ -157,27 +294,35 @@ class DevBotTUI(App):
         border: solid green;
     }
 
-    #spec-container {
+    #monitor-panel {
+        width: 20;
+        border: solid blue;
+        padding: 0 1;
+    }
+
+    #content-panel {
+        width: 30;
+        border: solid cyan;
+        padding: 0 1;
+    }
+
+    #bottom-panel {
         height: auto;
         border: solid yellow;
-        min-height: 5;
-        max-height: 20;
+        min-height: 8;
+    }
+
+    #spec-container {
+        width: 35%;
+        border-right: solid yellow;
     }
 
     #repl-container {
-        height: auto;
-        border: solid blue;
-
-        min-height: 5;
+        width: 65%;
     }
 
-    .repl-label {
+    #spec-content {
         padding: 0 1;
-        text-style: bold;
-    }
-
-    .repl-input {
-        margin: 1 0 0 0;
     }
 
     .spec-label {
@@ -185,8 +330,27 @@ class DevBotTUI(App):
         text-style: bold;
     }
 
-    .spec-content {
+    .component-title {
         padding: 0 1;
+        text-style: bold;
+        margin-bottom: 1;
+    }
+
+    .checklist-item {
+        padding: 0 1;
+    }
+
+    .tree-item {
+        padding: 0 1;
+    }
+
+    .card-item {
+        padding: 0 1;
+    }
+
+    .metric-item {
+        padding: 0 1;
+        margin-bottom: 1;
     }
 
     RichLog {
@@ -195,314 +359,226 @@ class DevBotTUI(App):
     """
 
     BINDINGS = [
+        ("q", "quit", "退出"),
+        ("space", "toggle_pause", "暂停/继续"),
+        ("c", "clear_log", "清空日志"),
+        ("h", "show_help", "帮助"),
         ("ctrl+c", "quit", "退出"),
-        ("ctrl+q", "quit", "退出"),
-        ("f1", "toggle_full_log", "全屏日志"),
-        ("f2", "toggle_full_repl", "全屏 REPL"),
-        ("f3", "toggle_spec_questions", "显示/隐藏 Spec 问题"),
     ]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.full_screen_mode = None  # 全屏模式: 'log' | 'repl' | None
-        self.spec_questions_visible = True  # Spec 问题面板是否可见
+        self.iflow = IflowCaller()
+        self.memory_system = get_memory_system()
+        self.memory = self.memory_system.load_context()
+        self.iteration_count = 0
+        self.is_running = False
+        self.is_paused = False
+        self.task = None
+        self.start_time = datetime.now()
+        self.ai_controller = AIContentController(self)
 
     def compose(self) -> ComposeResult:
-        """构建 TUI 界面"""
-        yield Header()
-        yield Vertical(
+        yield StatusBar(id="status-bar")
+        yield Horizontal(
+            MonitorPanel(id="monitor-panel"),
             Container(
                 LogView(id="log-view"),
                 id="log-container"
             ),
-            SpecQuestionView(
-                id="spec-container"
-            ),
-            REPLView(
-                on_submit=self._handle_repl_input,
-                id="repl-container"
-            ),
+            ContentPanel(id="content-panel"),
             id="main-container"
+        )
+        yield Horizontal(
+            SpecQuestionView(id="spec-container"),
+            REPLView(on_submit=self._handle_repl_input, id="repl-container"),
+            id="bottom-panel"
         )
         yield Footer()
 
     def on_mount(self) -> None:
-        """界面挂载时的初始化"""
         log_view = self.query_one("#log-view", RichLog)
+        status_bar = self.query_one("#status-bar", StatusBar)
+        content_panel = self.query_one("#content-panel", ContentPanel)
+        
+        status_bar.start_time = self.start_time
+        status_bar.update_display()
+        
+        self.ai_controller.set_content_panel(content_panel)
+        
+        log_view.write("[bold cyan]╔══════════════════════════════════════════════════════════════╗[/bold cyan]")
+        log_view.write("[bold cyan]║  🤖 Dev-Bot v2.0 - AI 驱动的自主开发工具                        ║[/bold cyan]")
+        log_view.write("[bold cyan]╚══════════════════════════════════════════════════════════════╝[/bold cyan]")
+        log_view.write("")
+        log_view.write("[bold green]✓ TUI 模式已启动[/bold green]")
+        log_view.write("[yellow]快捷键:[/yellow]")
+        log_view.write("  [q] 退出    [Space] 暂停/继续    [c] 清空日志    [h] 帮助")
+        log_view.write("")
+        log_view.write("[dim]提示: 输入指令开始使用[/dim]")
+        log_view.write("")
 
-        # 显示 ASCII Logo - 精美的 DEV-BOT
-        logo = """
-██╗  ██╗ █████╗ ███████╗██╗     ██╗███╗   ██╗ ██████╗
-██║  ██║██╔══██╗██╔════╝██║     ██║████╗  ██║██╔═══██╗
-███████║███████║███████╗██║     ██║██╔██╗ ██║██║   ██║
-██╔══██║██╔══██║╚════██║██║     ██║██║╚██╗██║██║   ██║
-██║  ██║██║  ██║███████║███████╗██║██║ ╚████║╚██████╔╝
-╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝
-    ╔╗ ┬ ┬┌─┐┌─┐┌─┐┬┌┐┌┐┬  ┌─┐┌┬┐┌─┐  ╦ ╦┌─┐┌┐┌┌─┐
-    ╠╩╗│ │├┤ │ ┬├─┤│││││└┐├─┤ ││├┤  ╠═╣├┤ │││└─┐
-    ╚═╝└─┘└─┘└─┘┴ ┴┴┘└┘└─┘┴ ┴┴ ┴ ┴ ┴└─┘ ╩ ╩└─┘┘└┘└─┘
-            AI 驱动的 Spec 开发系统
-"""
-
-        log_view.write(f"[bold cyan]{logo}[/bold cyan]")
-        log_view.write("[bold green]TUI 模式已启动[/bold green]\n")
-        log_view.write("[yellow]↑ 方向: AI 运行日志[/yellow]\n")
-        log_view.write("[yellow]↓ 方向: REPL 输入[/yellow]\n")
-        log_view.write("[dim]快捷键:[/dim]\n")
-        log_view.write("[dim]  Ctrl+C/Q: 退出[/dim]\n")
-        log_view.write("[dim]  F1: 全屏日志[/dim]\n")
-        log_view.write("[dim]  F2: 全屏 REPL[/dim]\n")
-        log_view.write("[dim]  F3: 显示/隐藏 Spec 问题[/dim]\n")
-        log_view.write("[dim]  ↑/↓: 滚动历史输入[/dim]\n")
-        log_view.write("-" * 50 + "\n")
-
-        # 应用初始布局
-        self._update_layout()
-
-        # 延迟启动主循环（如果有），确保 TUI 完全初始化后再启动
-        if self.main_loop_func:
-            self.call_later(self._start_main_loop, 0.5)
-
-    def _start_main_loop(self, *args, **kwargs) -> None:
-        """启动主循环（Textual 回调，无参数）"""
-        if self.main_loop_func:
-            asyncio.create_task(self.main_loop_func(), name="main-loop")
-
-    def on_resize(self, event) -> None:
-        """屏幕大小变化时自动调整布局"""
-        if not self.full_screen_mode:
-            self._auto_adjust_heights()
-
-    def _update_layout(self) -> None:
-        """更新布局"""
-        log_container = self.query_one("#log-container", Container)
-        spec_container = self.query_one("#spec-container", SpecQuestionView)
-        repl_container = self.query_one("#repl-container", Container)
-
-        if self.full_screen_mode == 'log':
-            # 全屏日志模式
-            log_container.styles.height = "100%"
-            log_container.styles.display = "block"
-            spec_container.styles.display = "none"
-            repl_container.styles.display = "none"
-        elif self.full_screen_mode == 'repl':
-            # 全屏 REPL 模式
-            log_container.styles.height = "0"
-            log_container.styles.display = "none"
-            spec_container.styles.display = "none"
-            repl_container.styles.height = "100%"
-            repl_container.styles.display = "block"
-        else:
-            # 正常分割模式
-            self._auto_adjust_heights()
-
-    def _auto_adjust_heights(self) -> None:
-        """自动调整各区域高度"""
-
-        log_container = self.query_one("#log-container", Container)
-        spec_container = self.query_one("#spec-container", SpecQuestionView)
-        repl_container = self.query_one("#repl-container", Container)
-
-        # 根据 Spec 问题面板是否可见调整布局
-        if self.spec_questions_visible:
-            # 三列布局
-            log_height_percent = 60
-            spec_height_percent = 15
-            repl_height_percent = 25
-        else:
-            # 两列布局
-            log_height_percent = 75
-            spec_height_percent = 0
-            repl_height_percent = 25
-
-        # 确保最小高度
-        min_log_percent = 40
-        min_repl_percent = 10
-        min_spec_percent = 5 if self.spec_questions_visible else 0
-
-        if log_height_percent < min_log_percent:
-            log_height_percent = min_log_percent
-        if repl_height_percent < min_repl_percent:
-            repl_height_percent = min_repl_percent
-        if spec_height_percent < min_spec_percent:
-            spec_height_percent = min_spec_percent
-
-        # 应用布局
-        log_container.styles.height = f"{log_height_percent}%"
-        repl_container.styles.height = f"{repl_height_percent}%"
-
-        if self.spec_questions_visible:
-            spec_container.styles.height = f"{spec_height_percent}%"
-            spec_container.styles.display = "block"
-        else:
-            spec_container.styles.height = "0"
-            spec_container.styles.display = "none"
-
-        log_container.styles.display = "block"
-        repl_container.styles.display = "block"
-
-    def action_toggle_full_log(self) -> None:
-        """切换全屏日志模式"""
-        if self.full_screen_mode == 'log':
-            self.full_screen_mode = None
-            self.write_log("[info]退出全屏日志模式")
-        else:
-            self.full_screen_mode = 'log'
-            self.write_log("[info]进入全屏日志模式")
-        self._update_layout()
-
-    def action_toggle_full_repl(self) -> None:
-        """切换全屏 REPL 模式"""
-        if self.full_screen_mode == 'repl':
-            self.full_screen_mode = None
-            self.write_log("[info]退出全屏 REPL 模式")
-        else:
-            self.full_screen_mode = 'repl'
-            self.write_log("[info]进入全屏 REPL 模式")
-        self._update_layout()
-
-    def action_toggle_spec_questions(self) -> None:
-        """切换 Spec 问题面板显示"""
-        self.spec_questions_visible = not self.spec_questions_visible
-        self._update_layout()
-        status = "显示" if self.spec_questions_visible else "隐藏"
-        self.write_log(f"[info]Spec 问题面板已{status}")
-
-    def update_spec_questions(self, questions) -> None:
-        """更新 Spec 问题列表"""
-        try:
-            spec_view = self.query_one("#spec-container", SpecQuestionView)
-            spec_view.update_questions(questions)
-        except Exception:
-            pass
-
-    def _handle_repl_input(self, text: str) -> None:
+    async def _handle_repl_input(self, prompt: str) -> None:
         """处理 REPL 输入"""
         log_view = self.query_one("#log-view", RichLog)
-
-        # 记录用户输入
-        log_view.write(f"[bold green]用户:[/bold green] {text}")
-
-    def write_log(self, message: str, level: str = "info") -> None:
-        """添加日志消息"""
+        log_view.write(f"[bold cyan]> {prompt}[/bold cyan]")
+        
+        self.memory_system.add_history_entry("user_input", prompt)
+        
         try:
+            result = await self.iflow.call(prompt)
+            log_view.write(result)
+            
+            self.memory_system.add_history_entry("ai_output", result[:200])
+            
+            self.iteration_count += 1
+            status_bar = self.query_one("#status-bar", StatusBar)
+            status_bar.set_iteration(self.iteration_count)
+            
+            # 尝试解析 AI 返回中的展示命令
+            self._parse_ai_display_command(result)
+            
+        except IflowError as e:
+            log_view.write(f"[red]错误: {e}[/red]")
+            self.memory_system.add_history_entry("error", str(e))
+    
+    def _parse_ai_display_command(self, result: str):
+        """解析 AI 返回中的展示命令"""
+        import json
+        import re
+        
+        # 查找 JSON 格式的展示命令
+        pattern = r'\{"action":\s*"[^"]+",\s*"data":\s*\{[^}]*\}\}'
+        matches = re.findall(pattern, result)
+        
+        for match in matches:
+            try:
+                command = json.loads(match)
+                self.ai_controller.handle_ai_command(command)
+            except json.JSONDecodeError:
+                pass
+
+    def action_toggle_pause(self) -> None:
+        """切换暂停状态"""
+        self.is_paused = not self.is_paused
+        
+        status_bar = self.query_one("#status-bar", StatusBar)
+        if self.is_paused:
+            status_bar.set_status("paused")
             log_view = self.query_one("#log-view", RichLog)
+            log_view.write("[yellow]⏸️ 已暂停[/yellow]")
+        else:
+            status_bar.set_status("running")
+            log_view.write("[green]▶️ 继续运行[/green]")
 
-            color_map = {
-                "info": "blue",
-                "success": "green",
-                "warning": "yellow",
-                "error": "red",
-                "ai": "cyan",
-                "debug": "dim",
-            }
-
-            color = color_map.get(level, "white")
-            log_view.write(f"[{color}]{message}[/{color}]")
-        except Exception as e:
-            # 如果 TUI 还没准备好，打印到 stdout（带时间戳）
-            import sys
-            from datetime import datetime
-            timestamp = datetime.now().strftime("%H:%M:%S")
-            print(f"[{timestamp}] [{level.upper()}] {message}")
-
-    def log_ai_output(self, output: str) -> None:
-        """记录 AI 输出"""
-        try:
-            log_view = self.query_one("#log-view", RichLog)
-            log_view.write(
-                f"\n[bold cyan]AI 输出:[/bold cyan]\n"
-                f"[dim]{output}[/dim]\n"
-            )
-        except Exception as e:
-            # 如果 TUI 还没准备好，打印到 stdout
-            import sys
-            from datetime import datetime
-            timestamp = datetime.now().strftime("%H:%M:%S")
-            print(f"[{timestamp}] [AI] 输出:\n{output}")
-
-    def log_error(self, error: str) -> None:
-        """记录错误"""
-        try:
-            log_view = self.query_one("#log-view", RichLog)
-            log_view.write(
-                f"\n[bold red]错误:[/bold red]\n"
-                f"{error}\n"
-            )
-        except Exception as e:
-            # 如果 TUI 还没准备好，打印到 stdout
-            import sys
-            from datetime import datetime
-            timestamp = datetime.now().strftime("%H:%M:%S")
-            print(f"[{timestamp}] [ERROR] {error}", file=sys.stderr)
-
-    def log_success(self, message: str) -> None:
-        """记录成功消息"""
-        try:
-            log_view = self.query_one("#log-view", RichLog)
-            log_view.write(f"[bold green]✓ {message}[/bold green]\n")
-        except Exception as e:
-            # 如果 TUI 还没准备好，打印到 stdout
-            import sys
-            from datetime import datetime
-            timestamp = datetime.now().strftime("%H:%M:%S")
-            print(f"[{timestamp}] [SUCCESS] ✓ {message}")
-
-
-
-    def clear_log(self) -> None:
+    def action_clear_log(self) -> None:
         """清空日志"""
         log_view = self.query_one("#log-view", RichLog)
         log_view.clear()
+        log_view.write("[dim]日志已清空[/dim]")
 
+    def action_show_help(self) -> None:
+        """显示帮助"""
+        log_view = self.query_one("#log-view", RichLog)
+        log_view.write("")
+        log_view.write("[bold]帮助信息[/bold]")
+        log_view.write("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        log_view.write("[q] 或 [Ctrl+C] - 退出程序")
+        log_view.write("[Space] - 暂停/继续 AI 运行")
+        log_view.write("[c] - 清空日志")
+        log_view.write("[h] - 显示此帮助信息")
+        log_view.write("")
+        log_view.write("输入指令:")
+        log_view.write("  直接在下方输入框输入指令，按 Enter 发送")
+        log_view.write("  示例: '创建任务列表: 编写测试、优化性能'")
+        log_view.write("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        log_view.write("")
 
-class TUILogger:
-    """TUI 日志记录器 - 用于与现有代码集成"""
-
-    def __init__(self, tui_app: DevBotTUI):
-        self.tui = tui_app
-
-    def _is_screen_ready(self) -> bool:
-        """检查 TUI 屏幕是否已准备好"""
+    def on_unmount(self) -> None:
+        if self.task:
+            self.task.cancel()
+        self.iflow.stop()
+        
         try:
-            # 尝试访问 screen 属性，如果会抛出 ScreenStackError 则说明屏幕未准备好
-            _ = self.tui.screen
-            return True
-        except Exception as e:
-            # 只忽略 ScreenStackError，其他异常应该被记录
-            if "ScreenStackError" in str(type(e).__name__):
-                return False
-            # 记录意外错误以便调试
-            import sys
-            print(f"[WARNING] Unexpected error checking screen readiness: {e}", file=sys.stderr)
-            return False
+            self.memory_system.save_context(self.memory)
+        except Exception:
+            pass
 
-    def info(self, message: str) -> None:
-        """记录信息"""
-        if self._is_screen_ready():
-            self.tui.write_log(message, level="info")
 
-    def success(self, message: str) -> None:
-        """记录成功"""
-        if self._is_screen_ready():
-            self.tui.log_success(message)
+class AIContentController:
+    """AI 内容控制器 - 让 AI 可以控制展示方式"""
+    
+    def __init__(self, app):
+        self.app = app
+        self.content_panel = None
+    
+    def set_content_panel(self, panel):
+        """设置内容面板"""
+        self.content_panel = panel
+    
+    def handle_ai_command(self, command: dict):
+        """处理 AI 指令"""
+        if not self.content_panel:
+            return
+        
+        action = command.get("action")
+        
+        if action == "show_checklist":
+            self._show_checklist(command["data"])
+        
+        elif action == "show_table":
+            self._show_table(command["data"])
+        
+        elif action == "show_tree":
+            self._show_tree(command["data"])
+        
+        elif action == "show_cards":
+            self._show_cards(command["data"])
+        
+        elif action == "show_metrics":
+            self._show_metrics(command["data"])
+        
+        elif action == "clear":
+            self.content_panel.clear()
+    
+    def _show_checklist(self, data: dict):
+        """显示检查清单"""
+        title = data.get("title", "检查清单")
+        items = data.get("items", [])
+        self.content_panel.show_checklist(title, items)
+    
+    def _show_table(self, data: dict):
+        """显示表格"""
+        title = data.get("title", "表格")
+        columns = data.get("columns", [])
+        rows = data.get("rows", [])
+        self.content_panel.show_table(title, columns, rows)
+    
+    def _show_tree(self, data: dict):
+        """显示树形结构"""
+        title = data.get("title", "树形结构")
+        items = data.get("items", [])
+        self.content_panel.show_tree(title, items)
+    
+    def _show_cards(self, data: dict):
+        """显示卡片"""
+        title = data.get("title", "卡片")
+        cards = data.get("cards", [])
+        self.content_panel.show_cards(title, cards)
+    
+    def _show_metrics(self, data: dict):
+        """显示指标"""
+        title = data.get("title", "指标")
+        metrics = data.get("metrics", [])
+        self.content_panel.show_metrics(title, metrics)
 
-    def warning(self, message: str) -> None:
-        """记录警告"""
-        if self._is_screen_ready():
-            self.tui.write_log(message, level="warning")
 
-    def error(self, message: str) -> None:
-        """记录错误"""
-        if self._is_screen_ready():
-            self.tui.log_error(message)
+def main():
+    """Dev-Bot TUI 主入口"""
+    app = DevBotTUI()
+    app.run()
 
-    def ai_output(self, output: str) -> None:
-        """记录 AI 输出"""
-        if self._is_screen_ready():
-            self.tui.log_ai_output(output)
 
-    def debug(self, message: str) -> None:
-        """记录调试信息"""
-        if self._is_screen_ready():
-            self.tui.write_log(message, level="debug")
+if __name__ == "__main__":
+    main()
+
+

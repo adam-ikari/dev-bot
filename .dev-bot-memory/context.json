@@ -1,0 +1,4656 @@
+{
+  "history": [
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:30.334588",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:26.865689"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:30.565189",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:27.040014"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:30.642426",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:27.188064"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:30.673303",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:27.334349"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:30.758985",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:27.316276"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:30.914311",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:27.443397"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:30.961648",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:27.513206"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:31.013519",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:27.558635"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:31.217040",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:27.803421"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:31.345950",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:27.906741"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:31.480121",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:28.093182"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:31.668396",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:28.162114"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:31.839940",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:28.273535"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:31.972060",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:28.567908"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:32.214245",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:28.643893"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:32.431154",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:28.841500"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:32.659198",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:28.997525"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:32.905493",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:29.165912"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:33.059070",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:29.151293"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:33.157398",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:29.330078"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:33.270460",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:29.513702"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:33.532937",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:29.646990"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:33.857782",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:29.891963"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:34.013864",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:30.053580"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:34.291156",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:30.248898"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:34.530388",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:30.308604"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:34.681155",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:30.590934"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:34.925863",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:30.819618"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:35.548493",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:31.127184"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:35.653031",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:31.150974"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:36.155414",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:31.415771"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:36.687680",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:31.757471"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:38.067732",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:32.440905"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:39.080013",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:33.048120"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:39.448269",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:32.606672"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:41.403246",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:33.475802"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:42.356291",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:35.150508"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:43.435138",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:35.431217"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:44.402120",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:36.136020"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:44.762403",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:36.394588"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:45.392903",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:34.802974"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:47.264112",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:36.964076"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:48.607219",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:38.954531"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:49.555628",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:37.110322"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:50.233145",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:38.816490"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:50.941023",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:36.582347"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:51.919064",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:36.465650"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:53.668196",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:39.090783"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:17:59.032286",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:44.129505"
+      }
+    },
+    {
+      "session": 5,
+      "phase": "evolution",
+      "timestamp": "2026-03-07T16:18:12.516669",
+      "content": "自主进化完成",
+      "evolution_result": {
+        "evolution_number": 1,
+        "phases": [
+          {
+            "phase": "analysis",
+            "status": "started"
+          },
+          {
+            "phase": "analysis",
+            "status": "completed"
+          },
+          {
+            "phase": "decision",
+            "status": "started"
+          },
+          {
+            "phase": "decision",
+            "status": "completed"
+          },
+          {
+            "phase": "execution",
+            "status": "started"
+          },
+          {
+            "phase": "execution",
+            "status": "completed"
+          },
+          {
+            "phase": "evaluation",
+            "status": "started"
+          },
+          {
+            "phase": "evaluation",
+            "status": "completed"
+          },
+          {
+            "phase": "learning",
+            "status": "started"
+          },
+          {
+            "phase": "learning",
+            "status": "completed"
+          },
+          {
+            "phase": "optimization",
+            "status": "started"
+          },
+          {
+            "phase": "optimization",
+            "status": "completed"
+          }
+        ],
+        "decision": {
+          "type": "no_action",
+          "name": "等待",
+          "score": 0,
+          "reasoning": "没有可执行的方案",
+          "plan": []
+        },
+        "execution": {
+          "result": "executed",
+          "success": false,
+          "output": "",
+          "error": "\n#\n# Fatal process OOM in Failed to reserve virtual memory for CodeRange\n#\n\n",
+          "decision_type": "no_action"
+        },
+        "evaluation": {
+          "score": 0,
+          "feedback": "=== 多角度评估结果 ===\n\n",
+          "metrics": {
+            "success": false,
+            "confidence": 0.0,
+            "consensus": 0.0,
+            "recommendations": []
+          },
+          "multi_iflow_used": true
+        },
+        "learning": {
+          "status": "completed",
+          "experiences_count": 1
+        },
+        "optimization": {
+          "prompt_optimized": false,
+          "code_optimized": false
+        },
+        "timestamp": "2026-03-07T16:17:37.959570"
+      }
+    }
+  ],
+  "learnings": [],
+  "context": {}
+}

@@ -1,0 +1,51 @@
+{
+  "core_guardian": {
+    "is_running": true,
+    "recovery_count": 1,
+    "last_check_time": 1772871476.8044717,
+    "check_interval": 30,
+    "monitored_processes": {
+      "tui": {
+        "pid": 63692,
+        "last_seen": 113585.709020524,
+        "restart_count": 1,
+        "max_restarts": 5,
+        "startup_command": [
+          "/home/zhaodi-chen/project/dev-bot/.venv/bin/python3",
+          "-m",
+          "dev_bot"
+        ],
+        "process_type": "tui"
+      },
+      "ai_loop": {
+        "pid": 63551,
+        "last_seen": 1772871476.8042717,
+        "restart_count": 0,
+        "max_restarts": 10,
+        "startup_command": [
+          "/home/zhaodi-chen/project/dev-bot/.venv/bin/python3",
+          "/home/zhaodi-chen/project/dev-bot/dev_bot/ai_loop_process.py",
+          "/home/zhaodi-chen/project/dev-bot",
+          "config.json"
+        ],
+        "process_type": "ai_loop"
+      }
+    },
+    "pid": 59120
+  },
+  "business_layer": {
+    "rules": [
+      "MaxRestartRule",
+      "IdleTimeRule"
+    ],
+    "custom_strategies": [],
+    "config": {}
+  },
+  "status_history_count": 0,
+  "pid": 59120,
+  "ipc_server": {
+    "running": true,
+    "socket_path": "/home/zhaodi-chen/project/dev-bot/.ipc/guardian.sock",
+    "clients_count": 11
+  }
+}

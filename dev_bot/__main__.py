@@ -1,412 +1,178 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Dev-Bot - 极简 AI 驱动开发代理
+"""AI 自循环（命令行版本）"""
 
-类似 OpenOAI 的极简实现：
-- 只负责调用 iflow
-- 不实现任何具体功能
-- 支持多端交互（TUI/Web/API）
-- 支持自我迭代
-- 支持AI对话
-"""
-
-import argparse
 import asyncio
+import os
 import sys
+import signal as signal_module
+import logging
 from pathlib import Path
 
-from dev_bot.core import get_core
-from dev_bot.interaction import get_interaction_manager, InteractionMode
-from dev_bot.self_iteration_simple import SimpleSelfIteration
+from dev_bot import IflowCaller, IflowError, IflowTimeoutError, IflowProcessError, get_memory_system
+
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('dev-bot.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# 初始化记忆系统
+memory_system = get_memory_system()
 
 
-def main_parser():
-    """创建主解析器"""
-    parser = argparse.ArgumentParser(
-        description="Dev-Bot - 极简 AI 驱动开发代理",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-示例：
-  # 交互模式（默认启动 TUI）
-  dev-bot                          # 启动 TUI 模式（默认）
-  dev-bot ui                       # 启动 TUI 模式
-  dev-bot ui --mode web            # 启动 Web 模式
-  dev-bot ui --mode api            # 启动 API 模式
-  
-  # 快速执行
-  dev-bot run --plan "分析"        # 规划模式
-  dev-bot run -y "执行"            # 执行模式
-  dev-bot run --thinking "思考"    # 思考模式
-  dev-bot run --headless "任务"    # 无头模式（自动化）
-  
-  # 迭代系统
-  dev-bot iterate                  # 运行一次自我迭代
-  dev-bot iterate --continuous     # 启动连续自我迭代
-  dev-bot iterate --project /path/to/project  # 迭代其他项目
-  
-  # 对话系统
-  dev-bot dialogue create "主题"    # 创建对话
-  dev-bot dialogue list            # 列出所有对话
-
-默认行为：
-  - 不带参数运行时，默认启动 TUI 模式
-  - TUI 模式提供交互式命令行界面
-  - 支持提交问题、查看队列、管理对话等功能
-        """
-    )
+def setup_signal_handlers(iflow_instance):
+    """设置信号处理器"""
+    def signal_handler(signum, frame):
+        logger.info(f"接收到信号 {signum}，正在停止...")
+        iflow_instance.stop()
+        sys.exit(0)
     
-    subparsers = parser.add_subparsers(dest="command", help="命令")
-    
-    # UI 命令
-    ui_parser = subparsers.add_parser("ui", help="启动用户界面")
-    ui_parser.add_argument(
-        "--mode",
-        choices=["tui", "web", "api"],
-        default="tui",
-        help="交互模式（默认: tui）"
-    )
-    ui_parser.add_argument(
-        "--host",
-        default="127.0.0.1",
-        help="Web/API 监听地址（默认: 127.0.0.1）"
-    )
-    ui_parser.add_argument(
-        "--port",
-        type=int,
-        default=8080,
-        help="Web/API 监听端口（默认: 8080）"
-    )
-    
-    # Run 命令
-    run_parser = subparsers.add_parser("run", help="快速执行")
-    run_parser.add_argument(
-        "--plan",
-        action="store_true",
-        help="规划模式"
-    )
-    run_parser.add_argument(
-        "-y",
-        action="store_true",
-        help="执行模式"
-    )
-    run_parser.add_argument(
-        "--thinking",
-        action="store_true",
-        help="思考模式"
-    )
-    run_parser.add_argument(
-        "--headless",
-        action="store_true",
-        help="无头模式（全自动运行，无交互）"
-    )
-    run_parser.add_argument(
-        "--api-host",
-        default="127.0.0.1",
-        help="API 主机地址（默认: 127.0.0.1）"
-    )
-    run_parser.add_argument(
-        "--api-port",
-        type=int,
-        default=8080,
-        help="API 端口（默认: 8080）"
-    )
-    run_parser.add_argument(
-        "prompt",
-        help="提示词"
-    )
-    
-    # Iterate 命令
-    iterate_parser = subparsers.add_parser("iterate", help="迭代系统")
-    iterate_parser.add_argument(
-        "--continuous",
-        action="store_true",
-        help="连续迭代模式"
-    )
-    iterate_parser.add_argument(
-        "--interval",
-        type=int,
-        default=1800,
-        help="迭代间隔（秒，默认: 1800）"
-    )
-    iterate_parser.add_argument(
-        "--project",
-        type=Path,
-        default=Path.cwd(),
-        help="项目路径（默认: 当前目录）"
-    )
-    iterate_parser.add_argument(
-        "--once",
-        action="store_true",
-        help="只运行一次迭代"
-    )
-    
-    # Dialogue 命令
-    dialogue_parser = subparsers.add_parser("dialogue", help="对话系统")
-    dialogue_subparsers = dialogue_parser.add_subparsers(dest="dialogue_action", help="对话操作")
-    
-    # Dialogue create
-    dialogue_create_parser = dialogue_subparsers.add_parser("create", help="创建对话")
-    dialogue_create_parser.add_argument("topic", help="对话主题")
-    dialogue_create_parser.add_argument("--participants", nargs="+", help="参与者")
-    
-    # Dialogue list
-    dialogue_subparsers.add_parser("list", help="列出所有对话")
-    
-    # Dialogue info
-    dialogue_info_parser = dialogue_subparsers.add_parser("info", help="查看对话信息")
-    dialogue_info_parser.add_argument("dialogue_id", help="对话 ID")
-    
-    # Dialogue run
-    dialogue_run_parser = dialogue_subparsers.add_parser("run", help="运行对话")
-    dialogue_run_parser.add_argument("dialogue_id", help="对话 ID")
-    dialogue_run_parser.add_argument("--duration", type=int, default=300, help="最大持续时间（秒）")
-    
-    return parser
+    signal_module.signal(signal_module.SIGTERM, signal_handler)
+    signal_module.signal(signal_module.SIGINT, signal_handler)
 
 
-async def handle_ui(args):
-    """处理 UI 命令"""
-    manager = get_interaction_manager()
+async def main_async():
+    """AI 自循环（异步版本）"""
+    project_path = Path.cwd()
     
-    print("Dev-Bot - 极简 AI 驱动开发代理")
-    print("类似 OpenOAI：只负责调用 iflow，不实现任何具体功能")
-    print(f"模式: {args.mode}")
-    print()
+    # 加载记忆
+    memory = memory_system.load_context()
+    memory_summary = memory_system.get_context_summary()
     
-    # 启动 AI 守护进程（如果是 TUI 模式）
-    guardian_process = None
-    process_manager = None
-    if args.mode == "tui":
-        try:
-            from dev_bot.process_manager import ProcessManager
-            from pathlib import Path
-            
-            process_manager = ProcessManager()
-            guardian_script = Path.cwd() / "dev_bot" / "guardian_process.py"
-            
-            if guardian_script.exists():
-                print(f"[系统] 启动 AI 守护进程...")
-                guardian_process = await process_manager.create_process(
-                    process_id="ai_guardian",
-                    script_path=guardian_script,
-                    args=["standalone", "30"],  # 传递模式和检查间隔
-                    cwd=Path.cwd(),
-                    use_new_session=True  # AI 守护在新的会话中运行
-                )
-                
-                if guardian_process:
-                    print(f"[系统] ✓ AI 守护已启动 (PID: {guardian_process.pid})")
-                    
-                    # 等待 AI 守护初始化（启动 IPC Server 和 AI 实例需要时间）
-                    print(f"[系统] 等待 AI 守护初始化后台进程...")
-                    await asyncio.sleep(8)  # 增加到 8 秒，确保 IPC Server 已启动
-                else:
-                    print(f"[系统] ✗ AI 守护启动失败，继续运行但后台功能不可用")
-            else:
-                print(f"[系统] 警告: AI 守护脚本不存在: {guardian_script}")
-        except Exception as e:
-            print(f"[系统] 警告: 启动 AI 守护失败: {e}")
-            print(f"[系统] 继续运行，但后台 AI 实例可能不可用")
+    # 更新项目信息
+    if not memory.get("project_info"):
+        memory["project_info"] = str(project_path)
+        memory_system.save_context(memory)
+    
+    iflow = IflowCaller()
+    setup_signal_handlers(iflow)
+    
+    prompt = f"""你是 Dev-Bot，一个 AI 驱动的自主开发代理。
+
+## 项目信息
+- 项目路径: {project_path}
+- 技术栈: Python 3.9+, asyncio
+- 代码风格: PEP 8, 4空格缩进
+
+## 你的使命
+分析当前项目 → 做出决策 → 执行开发 → 验证结果 → 继续改进
+
+## 工作原则
+1. 先分析，后行动 - 每次修改前先阅读相关代码
+2. 小步快跑，频繁验证 - 每次只修改一个功能点
+3. 遇到错误立即停止 - 分析错误原因，不要盲目重试
+4. 修改代码后必须测试 - 使用 pytest 运行相关测试
+5. 代码审查 - 修改后检查是否引入新问题
+
+## 输出格式
+每次输出必须包含：
+- [分析] 当前状态、问题分析、相关文件
+- [决策] 计划做什么、为什么这样做
+- [执行] 具体操作步骤、修改的文件和行号
+- [验证] 测试方法、测试结果
+- [结论] 成功/失败、影响范围、下一步计划
+
+## 停止条件
+当以下情况时停止：
+- 所有功能已实现且测试通过
+- 连续3次遇到相同错误无法解决
+- 需要用户决策或输入
+- 接收到停止信号
+
+## 安全规则
+- 不要删除重要文件（如 .git/、venv/ 等）
+- 不要提交未经测试的代码
+- 不要修改配置文件（除非明确需要且有备份）
+- 不要运行危险的系统命令
+- 修改代码前先备份或使用 git commit
+
+## 错误处理
+- 遇到错误时，先阅读错误信息，分析原因
+- 检查相关代码和测试用例
+- 如果错误持续出现，记录错误并暂停
+- 不要无限重试相同的操作
+
+现在开始分析当前项目！
+
+{memory_summary}
+"""
     
     try:
-        if args.mode == "tui":
-            await manager.start_tui()
-        elif args.mode == "web":
-            await manager.start_web(args.host, args.port)
-        elif args.mode == "api":
-            await manager.start_api(args.host, args.port)
-    except KeyboardInterrupt:
-        print("\nDev-Bot 已停止")
-    finally:
-        # 停止 AI 守护进程
-        if guardian_process and process_manager:
+        loop_interval_str = os.getenv('DEVBOT_LOOP_INTERVAL', '1')
+        loop_interval = int(loop_interval_str) if loop_interval_str.isdigit() else 1
+        loop_interval = max(1, min(loop_interval, 300))  # 限制在 1-300 秒
+    except Exception as e:
+        logger.warning(f"解析循环间隔失败: {e}，使用默认值 1 秒")
+        loop_interval = 1
+    
+    logger.info("Dev-Bot 启动（命令行模式）")
+    logger.info(f"循环间隔: {loop_interval} 秒")
+    logger.info("提示: 使用 'dev-bot tui' 启动图形界面以获得更好的交互体验")
+    
+    # 记录启动到历史
+    memory_system.add_history_entry("system_start", "Dev-Bot 启动")
+    
+    try:
+        iteration = 0
+        while True:
+            iteration += 1
+            logger.info(f"=== 迭代 {iteration} ===")
+            
             try:
-                await process_manager.stop_process("ai_guardian")
-                print(f"[系统] AI 守护已停止")
+                result = await iflow.call(prompt)
+                print(result)
+                logger.info(f"迭代 {iteration} 完成")
+                
+                # 记录迭代到历史
+                memory_system.add_history_entry("ai_iteration", f"迭代 {iteration}", result[:200])
+                
+                # 定期保存记忆（每10次迭代）
+                if iteration % 10 == 0:
+                    memory_system.save_context(memory)
+                    logger.info("记忆已保存")
+                    
+            except IflowTimeoutError as e:
+                logger.error(f"超时错误: {e}")
+                memory_system.add_history_entry("error", f"超时错误: {e}")
+            except IflowProcessError as e:
+                logger.error(f"进程错误: {e}")
+                memory_system.add_history_entry("error", f"进程错误: {e}")
+            except IflowError as e:
+                logger.error(f"Iflow 错误: {e}")
+                memory_system.add_history_entry("error", f"Iflow 错误: {e}")
             except Exception as e:
-                print(f"[系统] 警告: 停止 AI 守护时出错: {e}")
+                logger.error(f"未知错误: {e}", exc_info=True)
+                memory_system.add_history_entry("error", f"未知错误: {e}")
+            
+            await asyncio.sleep(loop_interval)
+    except (asyncio.CancelledError, KeyboardInterrupt):
+        logger.info("接收到停止信号")
+    finally:
+        logger.info("Dev-Bot 停止")
         
-        await manager.stop()
-
-
-async def handle_run(args):
-    """处理 Run 命令"""
-    core = get_core()
-    
-    # 选择模式
-    mode = "normal"
-    if args.plan:
-        mode = "plan"
-    elif args.y:
-        mode = "execute"
-    elif args.thinking:
-        mode = "thinking"
-    
-    # 执行任务
-    if mode == "plan":
-        result = await core.plan(args.prompt)
-    elif mode == "execute":
-        result = await core.execute(args.prompt)
-    elif mode == "thinking":
-        result = await core.think(args.prompt)
-    else:
-        result = await core.call_iflow(args.prompt)
-    
-    # 输出结果
-    if args.headless:
-        # 无头模式：输出 JSON 格式
-        import json
-        output = {
-            "success": result["success"],
-            "mode": mode,
-            "duration": result.get("duration", 0),
-            "output": result.get("output", ""),
-            "error": result.get("error", "")
-        }
-        print(json.dumps(output, ensure_ascii=False, indent=2))
-    else:
-        # 交互模式：输出人类可读格式
-        if result["success"]:
-            print(f"✓ 成功（耗时: {result.get('duration', 0):.2f}秒）")
-            print(result.get("output", ""))
-        else:
-            print(f"✗ 失败: {result.get('error', 'Unknown error')}")
-            if result.get("output"):
-                print(result["output"])
-
-
-async def handle_iterate(args):
-    """处理 Iterate 命令"""
-    iteration = SimpleSelfIteration(args.project)
-    
-    if args.once or not args.continuous:
-        # 运行一次迭代
-        print(f"运行一次迭代: {args.project}")
-        result = await iteration.run_iteration()
-        
-        print(f"\n迭代 ID: {result['iteration_id']}")
-        print(f"决策: {result['decision']['action']}")
-        print(f"执行成功: {result['execution']['success']}")
-        print(f"改进成功: {result['verification']['success']}")
-    else:
-        # 连续迭代模式
-        print(f"启动连续迭代模式")
-        print(f"项目: {args.project}")
-        print(f"间隔: {args.interval} 秒")
-        print("按 Ctrl+C 停止")
-        print()
-        
+        # 保存记忆和记录停止事件
         try:
-            await iteration.start_continuous_iteration(interval=args.interval)
-        except KeyboardInterrupt:
-            print("\n迭代已停止")
-        finally:
-            iteration.stop()
+            memory_system.save_context(memory)
+            memory_system.add_history_entry("system_stop", "Dev-Bot 停止")
+            logger.info("记忆已保存")
+        except Exception as e:
+            logger.error(f"保存记忆失败: {e}")
+        
+        iflow.stop()
 
 
-async def handle_dialogue(args):
-    """处理 Dialogue 命令"""
-    from dev_bot.dialogue_integrator import DialogueIntegrator
-    from dev_bot.ai_dialogue import DialogueMode
-    
-    integrator = DialogueIntegrator()
-    integrator._initialize()
-    
-    if args.dialogue_action == "create":
-        # 创建对话
-        participants = args.participants or ["analyzer", "developer", "tester"]
-        
-        dialogue_id = integrator.dialogue_manager.create_dialogue(
-            participants=participants,
-            topic=args.topic,
-            mode=DialogueMode.GROUP
-        )
-        
-        print(f"✓ 对话已创建: {dialogue_id}")
-        print(f"  主题: {args.topic}")
-        print(f"  参与者: {', '.join(participants)}")
-    
-    elif args.dialogue_action == "list":
-        # 列出所有对话
-        dialogues = await integrator.list_dialogues()
-        
-        print(f"共有 {len(dialogues)} 个对话:\n")
-        for d in dialogues:
-            print(f"  ID: {d.dialogue_id}")
-            print(f"  主题: {d.topic}")
-            print(f"  状态: {'活跃' if d.is_active else '结束'}")
-            print(f"  消息数: {len(d.messages)}")
-            print()
-    
-    elif args.dialogue_action == "info":
-        # 查看对话信息
-        dialogue = await integrator.get_dialogue(args.dialogue_id)
-        
-        if not dialogue:
-            print(f"✗ 对话不存在: {args.dialogue_id}")
-            return
-        
-        print(f"对话 ID: {dialogue.dialogue_id}")
-        print(f"主题: {dialogue.topic}")
-        print(f"状态: {'活跃' if dialogue.is_active else '结束'}")
-        print(f"参与者: {', '.join(dialogue.participants)}")
-        print(f"消息数: {len(dialogue.messages)}")
-        print()
-        
-        if dialogue.messages:
-            print("最近消息:")
-            for msg in list(dialogue.messages)[-5:]:
-                speaker = dialogue.participants.get(msg.sender_id, msg.sender_id)
-                print(f"  [{speaker}]: {msg.content[:100]}")
-    
-    elif args.dialogue_action == "run":
-        # 运行对话
-        print(f"运行对话: {args.dialogue_id}")
-        print(f"最大持续时间: {args.duration} 秒")
-        print()
-        
-        success = await integrator.run_dialogue(args.dialogue_id, max_duration=args.duration)
-        
-        if success:
-            print("✓ 对话完成")
-        else:
-            print("✗ 对话失败")
-
-
-async def main():
-    """主函数"""
-    parser = main_parser()
-    args = parser.parse_args()
-    
-    # 如果没有子命令，默认运行 UI
-    if args.command is None:
-        args.command = "ui"
-        args.mode = "tui"
-        args.host = "127.0.0.1"
-        args.port = 8080
-    
-    # 根据命令调用对应的处理函数
-    if args.command == "ui":
-        await handle_ui(args)
-    elif args.command == "run":
-        await handle_run(args)
-    elif args.command == "iterate":
-        await handle_iterate(args)
-    elif args.command == "dialogue":
-        await handle_dialogue(args)
-    else:
-        parser.print_help()
-
-
-def cli():
-    """CLI 入口函数（同步包装）"""
+def main():
+    """入口点函数（命令行模式）"""
     try:
-        asyncio.run(main())
+        asyncio.run(main_async())
     except KeyboardInterrupt:
-        print("\nDev-Bot 已停止")
         sys.exit(0)
 
 
-if __name__ == '__main__':
-    cli()
+if __name__ == "__main__":
+    main()
