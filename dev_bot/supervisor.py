@@ -68,10 +68,17 @@ def main():
         
         # 根据模式启动
         if args.mode == "tui":
-            command = ["python", "-m", "dev_bot.tui"]
             logger.info("启动 TUI 模式")
-            # TUI 模式不重定向输出，允许直接显示界面
-            guardian.run_process(command, redirect_output=False)
+            # TUI 模式直接运行，不通过 Guardian 的进程管理
+            try:
+                from dev_bot.tui import main as tui_main
+                tui_main()
+            except KeyboardInterrupt:
+                logger.info("TUI 模式已停止")
+            except Exception as e:
+                logger.error(f"TUI 模式异常: {e}", exc_info=True)
+                # 使用 Guardian 尝试修复
+                guardian.try_auto_fix()
         elif args.mode == "headless":
             command = ["python", "-m", "dev_bot.__main__"]
             logger.info("启动无头模式")
