@@ -32,7 +32,7 @@ from textual import events
 from textual.reactive import reactive
 
 from dev_bot import IflowCaller, get_memory_system
-from dev_bot.iflow import IflowError, IflowTokenExpiredError
+from dev_bot.iflow import IflowError, IflowTokenExpiredError, IflowMemoryError
 
 
 class StatusBar(Static):
@@ -453,6 +453,22 @@ class DevBotTUI(App):
             status_bar.set_message("令牌过期，需要重新授权")
             
             self.memory_system.add_history_entry("error", f"令牌过期: {e}")
+        except IflowMemoryError as e:
+            log_view.write(f"[red]❌ 内存不足错误[/red]")
+            log_view.write("[yellow]系统或 iflow 进程内存不足[/yellow]")
+            log_view.write("[dim]建议:[/dim]")
+            log_view.write("  1. 关闭其他应用程序释放内存")
+            log_view.write("  2. 重启 iflow 进程")
+            log_view.write("  3. 增加系统内存")
+            log_view.write("")
+            log_view.write("[dim]解决内存问题后按 [Space] 继续 AI 工作[/dim]")
+            
+            self.is_paused = True
+            status_bar = self.query_one("#status-bar", StatusBar)
+            status_bar.set_status("paused")
+            status_bar.set_message("内存不足，需要释放内存")
+            
+            self.memory_system.add_history_entry("error", f"内存错误: {e}")
         except IflowError as e:
             log_view.write(f"[red]错误: {e}[/red]")
             self.memory_system.add_history_entry("error", str(e))
@@ -553,6 +569,22 @@ class DevBotTUI(App):
             status_bar.set_message("令牌过期，需要重新授权")
             
             self.memory_system.add_history_entry("error", f"令牌过期: {e}")
+        except IflowMemoryError as e:
+            log_view.write(f"[red]❌ 内存不足错误[/red]")
+            log_view.write("[yellow]系统或 iflow 进程内存不足[/yellow]")
+            log_view.write("[dim]建议:[/dim]")
+            log_view.write("  1. 关闭其他应用程序释放内存")
+            log_view.write("  2. 重启 iflow 进程")
+            log_view.write("  3. 增加系统内存")
+            log_view.write("")
+            log_view.write("[dim]解决内存问题后按 [Space] 继续 AI 工作[/dim]")
+            
+            self.is_paused = True
+            status_bar = self.query_one("#status-bar", StatusBar)
+            status_bar.set_status("paused")
+            status_bar.set_message("内存不足，需要释放内存")
+            
+            self.memory_system.add_history_entry("error", f"内存错误: {e}")
         except Exception as e:
             log_view.write(f"[red]AI 分析失败: {e}[/red]")
             self.memory_system.add_history_entry("error", str(e))

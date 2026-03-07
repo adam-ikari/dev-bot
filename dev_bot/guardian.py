@@ -247,7 +247,8 @@ class Guardian:
             IflowError,
             IflowTimeoutError,
             IflowProcessError,
-            IflowTokenExpiredError
+            IflowTokenExpiredError,
+            IflowMemoryError
         )
         from pathlib import Path
         import os
@@ -369,6 +370,31 @@ class Guardian:
                     print("  iflow auth")
                     print("=" * 60)
                     print("\nAI 循环已暂停，请重新授权后手动重启")
+                    
+                    self.ai_loop_running = False
+                    break
+                except IflowMemoryError as e:
+                    logger.error(f"❌ iflow 内存错误: {e}")
+                    logger.error("=" * 50)
+                    logger.error("系统或 iflow 进程内存不足")
+                    logger.error("建议:")
+                    logger.error("  1. 关闭其他应用程序释放内存")
+                    logger.error("  2. 重启 iflow 进程")
+                    logger.error("  3. 增加系统内存")
+                    logger.error("=" * 50)
+                    memory_system.add_history_entry("error", f"内存错误: {e}")
+                    
+                    # 内存错误后停止循环，等待用户解决内存问题
+                    print("\n" + "=" * 60)
+                    print("⚠️  内存不足错误")
+                    print("=" * 60)
+                    print("系统或 iflow 进程内存不足")
+                    print("建议:")
+                    print("  1. 关闭其他应用程序释放内存")
+                    print("  2. 重启 iflow 进程")
+                    print("  3. 增加系统内存")
+                    print("=" * 60)
+                    print("\nAI 循环已暂停，请解决内存问题后手动重启")
                     
                     self.ai_loop_running = False
                     break

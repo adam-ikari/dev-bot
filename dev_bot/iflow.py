@@ -26,6 +26,10 @@ class IflowTokenExpiredError(IflowError):
     """Iflow 令牌过期错误"""
 
 
+class IflowMemoryError(IflowError):
+    """Iflow 内存错误（WebAssembly 或堆内存不足）"""
+
+
 class IflowCaller:
     """iflow 命令行工具的异步调用器"""
     
@@ -111,11 +115,31 @@ class IflowCaller:
                     "access token expired"
                 ]
                 
+                # 检测内存错误（WebAssembly 或堆内存不足）
+                memory_error_keywords = [
+                    "RangeError: WebAssembly",
+                    "WebAssembly.instantiate",
+                    "out of memory",
+                    "JavaScript heap out of memory",
+                    "ENOMEM",
+                    "Cannot allocate memory",
+                    "memory limit",
+                    "insufficient memory"
+                ]
+                
                 error_msg_lower = error_msg.lower()
+                
                 if any(keyword in error_msg_lower for keyword in token_expired_keywords):
                     raise IflowTokenExpiredError(
                         f"iflow token expired: {error_msg}. "
                         f"Please re-run 'iflow auth' to refresh your token."
+                    )
+                
+                if any(keyword in error_msg_lower for keyword in memory_error_keywords):
+                    raise IflowMemoryError(
+                        f"iflow memory error: {error_msg}. "
+                        f"System or iflow process has insufficient memory. "
+                        f"Try: 1) Close other applications, 2) Restart iflow, 3) Increase system memory."
                     )
                 
                 raise IflowProcessError(f"iflow exited with code {self.process.returncode}: {error_msg}")
