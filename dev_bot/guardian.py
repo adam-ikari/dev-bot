@@ -24,12 +24,6 @@ file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
-# 控制台处理器（默认启用）
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.INFO)
-console_handler.setFormatter(formatter)
-logger.addHandler(console_handler)
-
 # TUI 日志处理器（如果可用）
 _tui_handler = None
 

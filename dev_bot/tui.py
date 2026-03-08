@@ -21,9 +21,6 @@ from textual.reactive import reactive
 from dev_bot import AIRunner, get_memory_system
 from dev_bot.iflow import IflowCaller, IflowError, IflowTokenExpiredError, IflowMemoryError
 
-# 配置日志
-logging.basicConfig(level=logging.INFO)
-
 
 class StatusBar(Static):
     """状态栏 - 显示运行状态和消息"""
