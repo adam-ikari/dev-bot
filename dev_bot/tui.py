@@ -4,9 +4,8 @@ Dev-Bot TUI 界面 - 终端用户界面
 
 改进布局 + AI 可控制的展示组件：
 - 顶部状态栏：显示运行状态、迭代次数、时间
-- 左侧监控面板：CPU、内存、时间
-- 右侧日志区：AI 运行日志
-- 中间内容区：AI 可控制的展示组件（checklist、table、tree、card）
+- 日志区：AI 运行日志
+- 内容区：AI 可控制的展示组件（checklist、table、tree、card）
 - 底部面板：Spec 问题 + REPL 输入
 """
 
@@ -44,10 +43,31 @@ class StatusBar(Static):
         self.iteration_count = 0
         self.start_time = datetime.now()
         self.message = "就绪"
+        self.current_phase = "待机"
+        self.total_cycles = 0
     
     def set_status(self, status: str):
         """设置状态"""
         self.status = status
+    
+    def set_phase(self, phase: str, iteration: int = 0, total_cycles: int = 0):
+        """设置阶段状态
+        
+        Args:
+            phase: 当前阶段 (execution/review/待机)
+            iteration: 当前迭代次数
+            total_cycles: 总循环数
+        """
+        self.current_phase = phase
+        self.total_cycles = total_cycles
+        
+        phase_map = {
+            "execution": "执行",
+            "review": "复盘",
+            "待机": "待机"
+        }
+        
+        self.update()
         self.update_display()
     
     def set_iteration(self, count: int):
@@ -78,45 +98,6 @@ class StatusBar(Static):
         )
 
 
-class MonitorPanel(Static):
-    """监控面板 - 显示 CPU、内存、时间"""
-    
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.update_task = None
-    
-    def on_mount(self):
-        """挂载时启动更新任务"""
-        self.update_task = asyncio.create_task(self.update_loop())
-    
-    async def update_loop(self):
-        """更新循环"""
-        while True:
-            self.update_display()
-            await asyncio.sleep(2)
-    
-    def update_display(self):
-        """更新显示"""
-        cpu_percent = psutil.cpu_percent()
-        memory = psutil.Process().memory_info()
-        memory_mb = memory.rss / 1024 / 1024
-        
-        elapsed = datetime.now() - self.app.start_time if hasattr(self.app, 'start_time') else timedelta()
-        elapsed_str = str(elapsed).split(".")[0]
-        
-        # 限制进度条长度，避免溢出
-        cpu_bar_length = min(15, int(cpu_percent // 5))
-        memory_bar_length = min(15, int((memory_mb / 2048) * 15))
-        
-        content = f"""CPU: {cpu_percent:5.1f}%
-{"█" * cpu_bar_length}{" " * (15 - cpu_bar_length)}
-
-MEM: {memory_mb:6.0f} MB
-{"█" * memory_bar_length}{" " * (15 - memory_bar_length)}
-
-⏱ {elapsed_str}"""
-        
-        self.update(content)
 
 
 class ContentPanel(Container):
@@ -294,14 +275,6 @@ class DevBotTUI(App):
         height: 1;
     }
 
-    #monitor-panel {
-        width: 20;
-        min-width: 18;
-
-        border: solid blue;
-        padding: 0 1;
-    }
-
     #main-container {
         height: 1fr;
     }
@@ -389,7 +362,7 @@ class DevBotTUI(App):
             logger = logging.getLogger(__name__)
             logger.error(f"❌ iflow 不可用: {self.iflow_status}")
         
-        self.iflow = IflowCaller() if self.iflow_available else None
+        self.iflow = IflowCaller(timeout=300) if self.iflow_available else None
         self.memory_system = get_memory_system()
         
         # 重定向日志到TUI log_view
@@ -404,13 +377,9 @@ class DevBotTUI(App):
 
     def compose(self) -> ComposeResult:
         yield StatusBar(id="status-bar")
-        yield Horizontal(
-            MonitorPanel(id="monitor-panel"),
-            Container(
-                LogView(id="log-view"),
-                id="log-container"
-            ),
-            id="main-container"
+        yield Container(
+            LogView(id="log-view"),
+            id="log-container"
         )
         yield Horizontal(
             SpecQuestionView(id="spec-container"),
@@ -442,31 +411,40 @@ class DevBotTUI(App):
                     
                     # 格式化日志消息（简化格式）
                     msg = record.getMessage()
-                    # 格式化日志消息（简化格式）
-                    msg = record.getMessage()
                     
-                    # 根据日志级别设置前缀
+                    # 根据日志级别设置颜色
                     if record.levelno >= logging.ERROR:
-                        log_view.write(f"ERROR: {msg}")
+                        log_view.write(f"[red]ERROR: {msg}[/red]")
                     elif record.levelno >= logging.WARNING:
-                        log_view.write(f"WARNING: {msg}")
+                        log_view.write(f"[yellow]WARNING: {msg}[/yellow]")
                     elif record.levelno >= logging.INFO:
-                        log_view.write(f"INFO: {msg}")
+                        log_view.write(f"[green]INFO: {msg}[/green]")
                     else:
-                        log_view.write(f"DEBUG: {msg}")
+                        log_view.write(f"[dim]DEBUG: {msg}[/dim]")
                 except Exception:
                     pass  # 避免日志处理器本身出错
         
         # 获取根日志记录器
         root_logger = logging.getLogger()
         
-        # 添加TUI日志处理器
+        # 添加TUI日志处理器到根日志记录器
         tui_handler = TUILogHandler(self)
         tui_handler.setLevel(logging.INFO)
         root_logger.addHandler(tui_handler)
         
         # 设置日志级别
         root_logger.setLevel(logging.INFO)
+        
+        # 同时设置 guardian 模块的日志输出到 TUI
+        try:
+            from dev_bot import guardian
+            if hasattr(guardian, 'setup_tui_logging'):
+                guardian.setup_tui_logging(self)
+            # 设置历史日志记录
+            if hasattr(guardian, 'setup_history_logging'):
+                guardian.setup_history_logging()
+        except ImportError:
+            pass
     def on_mount(self) -> None:
         log_view = self.query_one("#log-view", RichLog)
         status_bar = self.query_one("#status-bar", StatusBar)

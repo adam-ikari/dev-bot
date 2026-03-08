@@ -2,12 +2,15 @@
 """iflow 调用器"""
 
 import asyncio
+import logging
 import os
 from pathlib import Path
 import sys
 import signal as signal_module
 import resource
 import shutil
+
+logger = logging.getLogger(__name__)
 
 
 class IflowError(Exception):
@@ -38,11 +41,21 @@ class IflowCaller:
     DEFAULT_NODE_MEMORY_MB = 4096  # Node.js 堆内存限制（MB）
     ALLOWED_COMMANDS = {"iflow"}  # 只允许 iflow 命令
     
-    def __init__(self, command: str = "iflow", timeout: int = DEFAULT_TIMEOUT, node_memory_mb: int = DEFAULT_NODE_MEMORY_MB):
+    # 热重载指令标识符
+    HOT_RELOAD_COMMANDS = [
+        "RELOAD_PROMPT",
+        "HOT_RELOAD",
+        "重新加载提示词",
+        "reload prompt",
+        "reload the prompt"
+    ]
+    
+    def __init__(self, command: str = "iflow", timeout: int = DEFAULT_TIMEOUT, node_memory_mb: int = DEFAULT_NODE_MEMORY_MB, hot_reload_callback=None):
         self.command = self._validate_command(command)
         self.timeout = timeout
         self.node_memory_mb = node_memory_mb
         self.process = None
+        self.hot_reload_callback = hot_reload_callback  # 热重载回调函数
         self._set_resource_limits()
     
     def _validate_command(self, command: str) -> str:
@@ -171,6 +184,13 @@ class IflowCaller:
             
             result = stdout.decode('utf-8', errors='replace')
             logger.info(f"✅ iflow call successful: output length={len(result)} chars")
+            
+            # 检测热重载指令
+            if self._detect_hot_reload_command(result):
+                logger.info("🔄 检测到热重载指令，触发回调...")
+                if self.hot_reload_callback:
+                    self.hot_reload_callback()
+            
             return result
         except asyncio.TimeoutError:
             logger.error(f"⏰ iflow timeout after {self.timeout} seconds")
@@ -206,6 +226,22 @@ class IflowCaller:
                 pass
             finally:
                 self.process = None
+    
+    def _detect_hot_reload_command(self, text: str) -> bool:
+        """检测文本中是否包含热重载指令
+        
+        Args:
+            text: 要检测的文本
+            
+        Returns:
+            bool: 如果检测到热重载指令返回 True，否则返回 False
+        """
+        text_lower = text.lower()
+        for command in self.HOT_RELOAD_COMMANDS:
+            if command.lower() in text_lower:
+                logger.info(f"检测到热重载指令: {command}")
+                return True
+        return False
     
     async def __aenter__(self):
         return self

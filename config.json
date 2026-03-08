@@ -1,1 +1,68 @@
-{"iflow_command": "iflow", "ai_command": "iflow", "prompt_file": "PROMPT.md", "description": "Dev-Bot 极简配置 - 只负责调用 iflow，不实现任何具体功能", "enable_guardian": true, "ai_features": {"enabled": true, "health_check_enabled": true, "ai_recovery_enabled": true, "diagnosis_cache_enabled": true, "health_check_cache_ttl": 60, "max_diagnosis_cache_size": 100}, "modes": {"tui": {"description": "终端用户界面", "default": true}, "web": {"description": "网页端", "host": "127.0.0.1", "port": 8080}, "api": {"description": "REST API", "host": "127.0.0.1", "port": 8080}}, "iflow_modes": {"plan": {"flag": "--plan", "description": "规划模式 - 只分析不执行", "timeout": 300}, "execute": {"flag": "-y", "description": "执行模式 - 直接执行无需授权", "timeout": 600}, "thinking": {"flag": "--thinking", "description": "思考模式 - 更全面的分析", "timeout": 600}, "normal": {"flag": "", "description": "普通模式", "timeout": 300}}}
+{
+  "iflow_command": "iflow",
+  "ai_command": "iflow",
+  "prompt_file": "PROMPT.md",
+  "description": "Dev-Bot 极简配置 - 只负责调用 iflow，不实现任何具体功能",
+  "enable_guardian": true,
+  "ai_features": {
+    "enabled": true,
+    "health_check_enabled": true,
+    "ai_recovery_enabled": true,
+    "diagnosis_cache_enabled": true,
+    "health_check_cache_ttl": 60,
+    "max_diagnosis_cache_size": 100,
+    "hot_reload_enabled": true,
+    "hot_reload_commands": [
+      "RELOAD_PROMPT",
+      "HOT_RELOAD",
+      "重新加载提示词",
+      "reload prompt",
+      "reload the prompt"
+    ],
+    "code_reload_enabled": true,
+    "code_reload_check_interval": 5,
+    "code_reload_monitor_dirs": [
+      "dev_bot"
+    ],
+    "dynamic_prompt_enabled": true,
+    "dynamic_prompt_version_control": true
+  },
+  "modes": {
+    "tui": {
+      "description": "终端用户界面",
+      "default": true
+    },
+    "web": {
+      "description": "网页端",
+      "host": "127.0.0.1",
+      "port": 8080
+    },
+    "api": {
+      "description": "REST API",
+      "host": "127.0.0.1",
+      "port": 8080
+    }
+  },
+  "iflow_modes": {
+    "plan": {
+      "flag": "--plan",
+      "description": "规划模式 - 只分析不执行",
+      "timeout": 300
+    },
+    "execute": {
+      "flag": "-y",
+      "description": "执行模式 - 直接执行无需授权",
+      "timeout": 600
+    },
+    "thinking": {
+      "flag": "--thinking",
+      "description": "思考模式 - 更全面的分析",
+      "timeout": 600
+    },
+    "normal": {
+      "flag": "",
+      "description": "普通模式",
+      "timeout": 300
+    }
+  }
+}

@@ -37,6 +37,7 @@ env/
 .ai-logs/
 .crash-logs/
 .dev-bot-cache/
+.dev-bot-memory/
 .stats.json
 .session_counter.json
 
