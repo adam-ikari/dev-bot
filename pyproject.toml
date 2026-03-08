@@ -40,7 +40,8 @@ dev = [
 ]
 
 [project.scripts]
-dev-bot = "dev_bot.supervisor:main"
+dev-bot = "dev_bot.__main__:main"
+dev-bot-tui = "dev_bot.tui:main"
 
 [tool.setuptools]
 packages = ["dev_bot"]

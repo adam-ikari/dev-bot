@@ -1,41 +1,32 @@
 #!/usr/bin/env python3
-"""
-Dev-Bot TUI 界面 - 终端用户界面
-
-改进布局 + AI 可控制的展示组件：
-- 顶部状态栏：显示运行状态、迭代次数、时间
-- 日志区：AI 运行日志
-- 内容区：AI 可控制的展示组件（checklist、table、tree、card）
-- 底部面板：Spec 问题 + REPL 输入
-"""
+"""Dev-Bot TUI 界面 - 简洁的终端用户界面"""
 
 import asyncio
-import psutil
-from datetime import datetime, timedelta
+import logging
+from datetime import datetime
 from pathlib import Path
 
 from textual.app import App, ComposeResult
-from textual.containers import Container, Vertical, Horizontal
+from textual.containers import Container, Horizontal, Vertical
 from textual.widgets import (
     Footer,
     Header,
     Input,
     RichLog,
     Static,
-    ProgressBar,
-    DataTable,
-    Checkbox,
-    Label,
+    TextArea,
 )
-from textual import events
 from textual.reactive import reactive
 
-from dev_bot import IflowCaller, get_memory_system
-from dev_bot.iflow import IflowError, IflowTokenExpiredError, IflowMemoryError
+from dev_bot import AIRunner, get_memory_system
+from dev_bot.iflow import IflowCaller, IflowError, IflowTokenExpiredError, IflowMemoryError
+
+# 配置日志
+logging.basicConfig(level=logging.INFO)
 
 
 class StatusBar(Static):
-    """状态栏 - 显示运行状态、迭代次数、时间"""
+    """状态栏 - 显示运行状态和消息"""
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -43,31 +34,10 @@ class StatusBar(Static):
         self.iteration_count = 0
         self.start_time = datetime.now()
         self.message = "就绪"
-        self.current_phase = "待机"
-        self.total_cycles = 0
     
     def set_status(self, status: str):
         """设置状态"""
         self.status = status
-    
-    def set_phase(self, phase: str, iteration: int = 0, total_cycles: int = 0):
-        """设置阶段状态
-        
-        Args:
-            phase: 当前阶段 (execution/review/待机)
-            iteration: 当前迭代次数
-            total_cycles: 总循环数
-        """
-        self.current_phase = phase
-        self.total_cycles = total_cycles
-        
-        phase_map = {
-            "execution": "执行",
-            "review": "复盘",
-            "待机": "待机"
-        }
-        
-        self.update()
         self.update_display()
     
     def set_iteration(self, count: int):
@@ -98,99 +68,6 @@ class StatusBar(Static):
         )
 
 
-
-
-class ContentPanel(Container):
-    """内容面板 - AI 可控制的展示组件区域"""
-    
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.current_component = None
-        self.components = {}
-    
-    def show_checklist(self, title: str, items: list):
-        """显示检查清单"""
-        self.clear()
-        
-        self.mount(Label(f"✅ {title}", classes="component-title"))
-        
-        for item in items:
-            label = item.get("text", item)
-            checked = item.get("checked", False)
-            self.mount(Checkbox(label, value=checked, classes="checklist-item"))
-        
-        self.current_component = "checklist"
-    
-    def show_table(self, title: str, columns: list, rows: list):
-        """显示表格"""
-        self.clear()
-        
-        self.mount(Label(f"📊 {title}", classes="component-title"))
-        
-        table = DataTable()
-        table.add_column(*columns)
-        
-        for row in rows:
-            table.add_row(*row)
-        
-        self.mount(table)
-        self.current_component = "table"
-    
-    def show_tree(self, title: str, items: list):
-        """显示树形结构"""
-        self.clear()
-        
-        self.mount(Label(f"🌳 {title}", classes="component-title"))
-        
-        for item in items:
-            indent = "  " * item.get("level", 0)
-            prefix = "├─" if item.get("has_children") else "└─"
-            label = f"{indent}{prefix} {item.get('text', '')}"
-            self.mount(Label(label, classes="tree-item"))
-        
-        self.current_component = "tree"
-    
-    def show_cards(self, title: str, cards: list):
-        """显示卡片"""
-        self.clear()
-        
-        self.mount(Label(f"📋 {title}", classes="component-title"))
-        
-        for card in cards:
-            card_content = f"""
-┌─────────────────────┐
-│ {card.get('title', '')}
-│ {card.get('description', '')}
-└─────────────────────┘"""
-            self.mount(Static(card_content, classes="card-item"))
-        
-        self.current_component = "cards"
-    
-    def show_metrics(self, title: str, metrics: list):
-        """显示指标"""
-        self.clear()
-        
-        self.mount(Label(f"📈 {title}", classes="component-title"))
-        
-        for metric in metrics:
-            value = metric.get("value", 0)
-            max_val = metric.get("max", 100)
-            label = metric.get("label", "")
-            percentage = min((value / max_val) * 100, 100)
-            
-            bar = "█" * int(percentage // 5)
-            empty = " " * (20 - int(percentage // 5))
-            
-            content = f"{label}\n{bar}{empty} {value}/{max_val}"
-            self.mount(Static(content, classes="metric-item"))
-        
-        self.current_component = "metrics"
-    
-    def clear(self):
-        """清空面板"""
-        self.children.clear()
-
-
 class LogView(RichLog):
     """日志视图 - 显示 AI 运行日志"""
 
@@ -203,59 +80,70 @@ class LogView(RichLog):
         )
 
 
-class SpecQuestionView(Container):
-    """Spec 问题视图"""
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.questions = []
-    
-    def update_questions(self, questions):
-        """更新问题列表"""
-        self.questions = questions
-        self.update_view()
-    
-    def compose(self) -> ComposeResult:
-        yield Static("📋 Spec 问题", classes="spec-label")
-        yield Static("[dim]✓ 没有待处理的 Spec 问题[/dim]", id="spec-content", classes="spec-content")
-    
-    def update_view(self):
-        try:
-            content = self.query_one("#spec-content", Static)
-            if not self.questions:
-                content.update("[dim]✓ 没有待处理的 Spec 问题[/dim]")
-            else:
-                lines = []
-                for i, q in enumerate(self.questions, 1):
-                    lines.append(f"  [{i}] {q}")
-                content.update("\n".join(lines))
-        except Exception:
-            pass
-
-
-class REPLView(Container):
-    """REPL 视图"""
+class REPLView(Vertical):
+    """REPL 视图 - 用户输入"""
 
     def __init__(self, on_submit, **kwargs):
         super().__init__(**kwargs)
         self.on_submit = on_submit
         self.input_history = []
         self.history_index = -1
+        self._min_height = 3
+        self._max_height = 10
     
     def compose(self) -> ComposeResult:
-        yield Input(placeholder="输入你的指令 (Enter 发送, ↑/↓ 历史)...", id="repl-input")
+        yield Static("💬 用户输入 (按 Enter 发送):", classes="label")
+        from textual.widgets import TextArea
+        yield TextArea("", placeholder="输入指令...", id="repl-input")
     
-    def on_input_submitted(self, event: Input.Submitted) -> None:
-        if event.value.strip():
-            self.input_history.append(event.value)
-            self.history_index = -1
-            self.on_submit(event.value)
-            
-            # 异步调用处理函数
-            import asyncio
-            loop = asyncio.get_event_loop()
-            loop.create_task(self.on_submit(event.value))
-            event.input.value = ""
+    def on_mount(self) -> None:
+        text_area = self.query_one("#repl-input", TextArea)
+        text_area.show_line_numbers = False
+        text_area.soft_wrap = True
+    
+    def on_text_area_changed(self, event: TextArea.Changed) -> None:
+        """根据内容调整高度"""
+        text_area = event.text_area
+        line_count = len(text_area.text.split('\n'))
+        
+        # 计算自适应高度
+        new_height = max(self._min_height, min(line_count, self._max_height))
+        
+        # 更新容器高度
+        self.styles.height = new_height
+    
+    def on_key(self, event) -> None:
+        """处理键盘事件"""
+        text_area = self.query_one("#repl-input", TextArea)
+        
+        # Enter 键提交（单行模式）
+        if event.key == "enter" and not event.shift:
+            event.prevent_default()
+            if text_area.text.strip():
+                self.input_history.append(text_area.text)
+                self.history_index = -1
+                self.on_submit(text_area.text)
+                text_area.text = ""
+                # 重置高度
+                self.styles.height = self._min_height
+        # Ctrl+Enter 在多行输入时换行
+        elif event.key == "enter" and event.shift:
+            event.prevent_default()
+            # 允许默认行为（换行）
+            pass
+        # 上箭头 - 历史记录
+        elif event.key == "up":
+            if self.input_history and self.history_index < len(self.input_history) - 1:
+                self.history_index += 1
+                text_area.text = self.input_history[-(self.history_index + 1)]
+        # 下箭头 - 历史记录
+        elif event.key == "down":
+            if self.history_index > 0:
+                self.history_index -= 1
+                text_area.text = self.input_history[-(self.history_index + 1)]
+            elif self.history_index == 0:
+                self.history_index = -1
+                text_area.text = ""
 
 
 class DevBotTUI(App):
@@ -279,67 +167,28 @@ class DevBotTUI(App):
         height: 1fr;
     }
 
-
-    #log-container {
+    #log-view {
         height: 1fr;
+        min-height: 10;
         border: solid green;
-        padding: 0 1;
     }
 
-    #content-panel {
-        width: 30;
-        min-width: 30;
-        border: solid cyan;
-        padding: 0 1;
-    }
-
-    #bottom-panel {
-        height: 6;
+    REPLView {
+        height: auto;
+        min-height: 3;
+        max-height: 15;
         border: solid yellow;
     }
 
-    #spec-container {
-        width: 35%;
+    TextArea {
+        height: auto;
+        min-height: 2;
+        max-height: 10;
     }
 
-    #repl-container {
-        width: 65%;
-    }
-
-    #spec-content {
-        padding: 0 0;
-    }
-
-    .spec-label {
-        padding: 0 0;
+    .label {
         text-style: bold;
-    }
-
-    .component-title {
-        padding: 0 0;
-        text-style: bold;
-        margin-bottom: 0;
-    }
-
-    .checklist-item {
-        padding: 0 0;
-    }
-
-    .tree-item {
-        padding: 0 0;
-    }
-
-    .card-item {
-        padding: 0 0;
-    }
-
-    .metric-item {
-        padding: 0 0;
-        margin-bottom: 0;
-    }
-
-    RichLog {
-        scrollbar-size: 1 1;
+        height: 1;
     }
     """
 
@@ -357,12 +206,9 @@ class DevBotTUI(App):
         # 检查 iflow 可用性
         self.iflow_available, self.iflow_status = IflowCaller.check_availability()
         
-        if not self.iflow_available:
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.error(f"❌ iflow 不可用: {self.iflow_status}")
-        
-        self.iflow = IflowCaller(timeout=300) if self.iflow_available else None
+        # 初始化 iflow 对象
+        self.iflow = IflowCaller() if self.iflow_available else None
+        self.ai_runner = AIRunner() if self.iflow_available else None
         self.memory_system = get_memory_system()
         
         # 重定向日志到TUI log_view
@@ -373,24 +219,18 @@ class DevBotTUI(App):
         self.is_paused = False
         self.ai_loop_stopped = False
         self.start_time = datetime.now()
-        self.ai_controller = AIContentController(self)
 
     def compose(self) -> ComposeResult:
         yield StatusBar(id="status-bar")
         yield Container(
             LogView(id="log-view"),
-            id="log-container"
+            REPLView(on_submit=self._handle_repl_input),
+            id="main-container"
         )
-        yield Horizontal(
-            SpecQuestionView(id="spec-container"),
-            REPLView(on_submit=self._handle_repl_input, id="repl-container"),
-            id="bottom-panel"
-        )
-
+        yield Footer()
 
     def _setup_logging_to_tui(self) -> None:
         """设置日志输出到TUI log_view"""
-        import logging
         
         class TUILogHandler(logging.Handler):
             """自定义日志处理器，将日志输出到TUI log_view"""
@@ -401,7 +241,6 @@ class DevBotTUI(App):
             
             def emit(self, record):
                 try:
-                    # 只在组件已挂载时输出日志
                     if not hasattr(self.app, "_components_mounted"):
                         return
                     
@@ -409,10 +248,8 @@ class DevBotTUI(App):
                     if log_view is None:
                         return
                     
-                    # 格式化日志消息（简化格式）
                     msg = record.getMessage()
                     
-                    # 根据日志级别设置颜色
                     if record.levelno >= logging.ERROR:
                         log_view.write(f"[red]ERROR: {msg}[/red]")
                     elif record.levelno >= logging.WARNING:
@@ -422,49 +259,28 @@ class DevBotTUI(App):
                     else:
                         log_view.write(f"[dim]DEBUG: {msg}[/dim]")
                 except Exception:
-                    pass  # 避免日志处理器本身出错
+                    pass
         
-        # 获取根日志记录器
         root_logger = logging.getLogger()
-        
-        # 添加TUI日志处理器到根日志记录器
         tui_handler = TUILogHandler(self)
         tui_handler.setLevel(logging.INFO)
         root_logger.addHandler(tui_handler)
-        
-        # 设置日志级别
         root_logger.setLevel(logging.INFO)
-        
-        # 同时设置 guardian 模块的日志输出到 TUI
-        try:
-            from dev_bot import guardian
-            if hasattr(guardian, 'setup_tui_logging'):
-                guardian.setup_tui_logging(self)
-            # 设置历史日志记录
-            if hasattr(guardian, 'setup_history_logging'):
-                guardian.setup_history_logging()
-        except ImportError:
-            pass
+    
     def on_mount(self) -> None:
         log_view = self.query_one("#log-view", RichLog)
         status_bar = self.query_one("#status-bar", StatusBar)
-        # # No fixed content panel - AI content shown in log or popups
         
-        # 标记组件已挂载，允许日志输出到log_view
         self._components_mounted = True
-
         status_bar.start_time = self.start_time
         status_bar.set_status("running")
         status_bar.set_message("AI 正在自主工作")
-
-        # # AI controller works without fixed panel
 
         log_view.write("[bold cyan]╔══════════════════════════════════════════════════════════════╗[/bold cyan]")
         log_view.write("[bold cyan]║  🤖 Dev-Bot v2.0 - AI 驱动的自主开发工具                        ║[/bold cyan]")
         log_view.write("[bold cyan]╚══════════════════════════════════════════════════════════════╝[/bold cyan]")
         log_view.write("")
         
-        # 显示 iflow 状态
         if self.iflow_available:
             log_view.write(f"[green]✅ iflow 可用: {self.iflow_status}[/green]")
         else:
@@ -475,19 +291,19 @@ class DevBotTUI(App):
             status_bar.set_message("iflow 不可用")
         
         log_view.write("")
+        log_view.write("[dim]按 [h] 查看帮助，按 [q] 退出[/dim]")
+        log_view.write("")
 
         # 启动 AI 自动分析任务
         self.set_interval(1, self._auto_ai_loop)
-        self.set_interval(30, self._monitor_ai_loop_status)
 
     async def _handle_repl_input(self, prompt: str) -> None:
-        """处理 REPL 输入 - 用户指令，不影响 AI 自主工作"""
+        """处理 REPL 输入"""
         log_view = self.query_one("#log-view", RichLog)
         log_view.write(f"[bold cyan]> 用户指令: {prompt}[/bold cyan]")
 
         self.memory_system.add_history_entry("user_input", prompt)
 
-        # 检查是否是 restart 命令
         if prompt.strip().lower() == "restart":
             if self.ai_loop_stopped:
                 self.ai_loop_stopped = False
@@ -501,7 +317,6 @@ class DevBotTUI(App):
                 log_view.write("[dim]AI 循环正在运行，无需重新启动[/dim]")
             return
 
-        # 检查 iflow 是否可用
         if not self.iflow_available or self.iflow is None:
             log_view.write("[red]❌ iflow 不可用，无法处理用户指令[/red]")
             log_view.write(f"[red]状态: {self.iflow_status}[/red]")
@@ -510,21 +325,11 @@ class DevBotTUI(App):
         try:
             result = await self.iflow.call(prompt)
             log_view.write(result)
-
             self.memory_system.add_history_entry("ai_output", result[:200])
-
-            # 用户输入不影响 AI 迭代计数
-            # AI 继续自主工作
-
-            # 尝试解析 AI 返回中的展示命令
-            self._parse_ai_display_command(result)
-
         except IflowTokenExpiredError as e:
             log_view.write(f"[red]❌ iflow 令牌过期[/red]")
             log_view.write("[yellow]请执行以下命令重新授权:[/yellow]")
             log_view.write("[bold cyan]  iflow auth[/bold cyan]")
-            log_view.write("")
-            log_view.write("[dim]授权后按 [Space] 继续 AI 工作[/dim]")
             
             self.is_paused = True
             status_bar = self.query_one("#status-bar", StatusBar)
@@ -547,63 +352,15 @@ class DevBotTUI(App):
             log_view.write(f"[red]错误: {e}[/red]")
             self.memory_system.add_history_entry("error", str(e))
     
-    def _parse_ai_display_command(self, result: str):
-        """解析 AI 返回中的展示命令"""
-        import json
-        import re
-        
-        # 查找 JSON 格式的展示命令
-        pattern = r'\{"action":\s*"[^"]+",\s*"data":\s*\{[^}]*\}\}'
-        matches = re.findall(pattern, result)
-        
-        for match in matches:
-            try:
-                command = json.loads(match)
-                self.ai_controller.handle_ai_command(command)
-            except json.JSONDecodeError:
-                pass
-
-    def show_popup(self, title: str, content: str) -> None:
-        """显示弹窗"""
-        from textual.widgets import ModalScreen
-        
-        class PopupScreen(ModalScreen):
-            def __init__(self, app, title, content):
-                super().__init__()
-                self.app_instance = app
-                self.title_text = title
-                self.content_text = content
-            
-            def compose(self):
-                from textual.containers import Vertical, Horizontal
-                from textual.widgets import Button, Static
-                
-                with Vertical():
-                    yield Static(self.title_text, id="popup-title")
-                    yield Static(self.content_text, id="popup-content")
-                    with Horizontal():
-                        yield Button("关闭", id="close-btn", variant="primary")
-            
-            def on_button_pressed(self, event: Button.Pressed) -> None:
-                if event.button.id == "close-btn":
-                    self.app_instance.pop_screen()
-        
-        self.push_screen(PopupScreen(self, title, content))
-
     async def _auto_ai_loop(self) -> None:
-        """自动 AI 循环 - 独立运行，不依赖用户输入"""
-        if self.is_paused:
-            return
-        
-        # 如果 AI 循环因错误停止，不再继续
-        if self.ai_loop_stopped:
+        """自动 AI 循环"""
+        if self.is_paused or self.ai_loop_stopped:
             return
 
         self.ai_iteration_count += 1
         log_view = self.query_one("#log-view", RichLog)
         log_view.write(f"[yellow]🔄 AI 分析 #{self.ai_iteration_count}[/yellow]")
 
-        # 构建 AI 提示
         project_path = Path.cwd()
         memory_summary = self.memory_system.get_context_summary()
 
@@ -611,12 +368,7 @@ class DevBotTUI(App):
 
 ## 项目信息
 - 项目路径: {project_path}
-- 技术栈: Python 3.9+, asyncio
-- 代码风格: PEP 8, 4空格缩进
 - 当前迭代: #{self.ai_iteration_count}
-
-## 你的使命
-分析当前项目 → 做出决策 → 执行开发 → 验证结果 → 继续改进
 
 ## 当前状态
 {memory_summary}
@@ -626,8 +378,7 @@ class DevBotTUI(App):
 2. 小步快跑，频繁验证 - 每次只修改一个功能点
 3. 遇到错误立即停止 - 分析错误原因，不要盲目重试
 4. 修改代码后必须测试 - 使用 pytest 运行相关测试
-5. 代码审查 - 修改后检查是否引入新问题
-6. 完全自主工作 - 不需要用户干预，自己决策、自己执行
+5. 完全自主工作 - 不需要用户干预，自己决策、自己执行
 
 ## 输出格式
 每次输出必须包含：
@@ -647,7 +398,6 @@ class DevBotTUI(App):
 现在开始自主分析和工作！
 """
 
-        # 检查 iflow 是否可用
         if not self.iflow_available or self.iflow is None:
             log_view.write("[red]❌ iflow 不可用，无法进行 AI 分析[/red]")
             log_view.write(f"[red]状态: {self.iflow_status}[/red]")
@@ -660,14 +410,8 @@ class DevBotTUI(App):
         try:
             result = await self.iflow.call(prompt)
             log_view.write(result)
-
-            # 记录到历史
             self.memory_system.add_history_entry("ai_analysis", result[:200])
-
-            # 解析展示命令
-            self._parse_ai_display_command(result)
-
-            # 更新迭代计数显示
+            
             status_bar = self.query_one("#status-bar", StatusBar)
             status_bar.set_iteration(self.ai_iteration_count)
 
@@ -675,8 +419,6 @@ class DevBotTUI(App):
             log_view.write(f"[red]❌ iflow 令牌过期[/red]")
             log_view.write("[yellow]请执行以下命令重新授权:[/yellow]")
             log_view.write("[bold cyan]  iflow auth[/bold cyan]")
-            log_view.write("")
-            log_view.write("[dim]授权后按 [Space] 继续 AI 工作[/dim]")
             
             self.is_paused = True
             status_bar = self.query_one("#status-bar", StatusBar)
@@ -698,31 +440,6 @@ class DevBotTUI(App):
         except Exception as e:
             log_view.write(f"[red]AI 分析失败: {e}[/red]")
             self.memory_system.add_history_entry("error", str(e))
-
-    def _monitor_ai_loop_status(self) -> None:
-        """监控AI循环状态，如果停止且iflow可用，尝试自动重启"""
-        if not self.ai_loop_stopped:
-            return  # AI循环正在运行，无需处理
-        
-        # 检查是否需要重启的条件
-        if not self.iflow_available:
-            return  # iflow不可用，无法重启
-        
-        if self.is_paused:
-            return  # 用户主动暂停，不应自动重启
-        
-        # 尝试自动重启AI循环
-        log_view = self.query_one("#log-view", RichLog)
-        status_bar = self.query_one("#status-bar", StatusBar)
-        
-        log_view.write("[yellow]🔄 检测到AI循环已停止，尝试自动重启...[/yellow]")
-        
-        self.ai_loop_stopped = False
-        status_bar.set_status("running")
-        status_bar.set_message("AI 正在自主工作")
-        
-        self.memory_system.add_history_entry("info", "AI循环自动重启")
-        log_view.write("[green]✅ AI 循环已自动重启[/green]")
 
     def action_toggle_pause(self) -> None:
         """切换暂停状态"""
@@ -758,13 +475,14 @@ class DevBotTUI(App):
         log_view.write("[h] - 显示此帮助信息")
         log_view.write("")
         log_view.write("输入指令:")
-        log_view.write("  直接在下方输入框输入指令，按 Enter 发送")
+        log_view.write("  直接在右侧输入框输入指令，按 Enter 发送")
         log_view.write("  示例: '创建任务列表: 编写测试、优化性能'")
         log_view.write("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
         log_view.write("")
 
     def on_unmount(self) -> None:
-        self.iflow.stop()
+        if self.iflow:
+            self.iflow.stop()
         
         try:
             self.memory_system.save_context(self.memory)
@@ -772,81 +490,18 @@ class DevBotTUI(App):
             pass
 
 
-class AIContentController:
-    """AI 内容控制器 - 让 AI 可以控制展示方式"""
-    
-    def __init__(self, app):
-        self.app = app
-        self.content_panel = None
-    
-    def set_content_panel(self, panel):
-        """设置内容面板"""
-        self.content_panel = panel
-    
-    def handle_ai_command(self, command: dict):
-        """处理 AI 指令"""
-        if not self.content_panel:
-            return
-        
-        action = command.get("action")
-        
-        if action == "show_checklist":
-            self._show_checklist(command["data"])
-        
-        elif action == "show_table":
-            self._show_table(command["data"])
-        
-        elif action == "show_tree":
-            self._show_tree(command["data"])
-        
-        elif action == "show_cards":
-            self._show_cards(command["data"])
-        
-        elif action == "show_metrics":
-            self._show_metrics(command["data"])
-        
-        elif action == "clear":
-            self.content_panel.clear()
-    
-    def _show_checklist(self, data: dict):
-        """显示检查清单"""
-        title = data.get("title", "检查清单")
-        items = data.get("items", [])
-        self.content_panel.show_checklist(title, items)
-    
-    def _show_table(self, data: dict):
-        """显示表格"""
-        title = data.get("title", "表格")
-        columns = data.get("columns", [])
-        rows = data.get("rows", [])
-        self.content_panel.show_table(title, columns, rows)
-    
-    def _show_tree(self, data: dict):
-        """显示树形结构"""
-        title = data.get("title", "树形结构")
-        items = data.get("items", [])
-        self.content_panel.show_tree(title, items)
-    
-    def _show_cards(self, data: dict):
-        """显示卡片"""
-        title = data.get("title", "卡片")
-        cards = data.get("cards", [])
-        self.content_panel.show_cards(title, cards)
-    
-    def _show_metrics(self, data: dict):
-        """显示指标"""
-        title = data.get("title", "指标")
-        metrics = data.get("metrics", [])
-        self.content_panel.show_metrics(title, metrics)
-
-
 def main():
     """Dev-Bot TUI 主入口"""
-    app = DevBotTUI()
-    app.run()
+    try:
+        app = DevBotTUI()
+        app.run()
+    except KeyboardInterrupt:
+        pass
+    except Exception as e:
+        print(f"❌ TUI 启动失败: {e}")
+        import traceback
+        traceback.print_exc()
 
 
 if __name__ == "__main__":
     main()
-
-

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""AI 自循环（命令行版本）- 由 Guardian 统一管理"""
+"""Dev-Bot 主入口 - 自动启动 AI 循环"""
 
 import asyncio
+import logging
 import os
 import sys
 import signal as signal_module
-import logging
 
-from dev_bot.guardian import Guardian
+from dev_bot.ai_runner import AIRunner
 
 # 配置日志
 logging.basicConfig(
@@ -21,11 +21,11 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def setup_signal_handlers(guardian_instance):
+def setup_signal_handlers(runner):
     """设置信号处理器"""
     def signal_handler(signum, frame):
         logger.info(f"接收到信号 {signum}，正在停止...")
-        asyncio.create_task(guardian_instance.stop_ai_loop())
+        runner.stop()
         sys.exit(0)
     
     signal_module.signal(signal_module.SIGTERM, signal_handler)
@@ -33,27 +33,23 @@ def setup_signal_handlers(guardian_instance):
 
 
 async def main_async():
-    """AI 自循环（异步版本）- 由 Guardian 统一管理"""
-    # 创建 Guardian 实例（所有 AI 进程的统一管理器）
-    try:
-        loop_interval_str = os.getenv('DEVBOT_LOOP_INTERVAL', '1')
-        loop_interval = int(loop_interval_str) if loop_interval_str.isdigit() else 1
-        loop_interval = max(1, min(loop_interval, 300))  # 限制在 1-300 秒
-    except Exception as e:
-        logger.warning(f"解析循环间隔失败: {e}，使用默认值 1 秒")
-        loop_interval = 1
-    
-    guardian = Guardian(ai_loop_interval=loop_interval)
-    setup_signal_handlers(guardian)
+    """主异步函数"""
+    runner = AIRunner()
+    setup_signal_handlers(runner)
     
     logger.info("Dev-Bot 启动（命令行模式）")
-    logger.info(f"循环间隔: {loop_interval} 秒")
-    logger.info("AI 循环由 Guardian 统一管理")
-    logger.info("提示: 使用 'dev-bot tui' 启动图形界面以获得更好的交互体验")
+    logger.info("提示: 使用 'dev-bot-tui' 启动图形界面以获得更好的交互体验")
     
-    # 启动 AI 循环（由 Guardian 统一管理）
+    # 启动 AI 循环
     try:
-        await guardian.run_ai_loop()
+        await runner.run()
+        
+        # 检查是否需要重启
+        if runner.restart_pending:
+            logger.info("🔄 正在重启以加载新代码...")
+            with open(".restart-flag", "w") as f:
+                f.write("restart")
+            sys.exit(0)
     except (asyncio.CancelledError, KeyboardInterrupt):
         logger.info("接收到停止信号")
     finally:
@@ -61,7 +57,7 @@ async def main_async():
 
 
 def main():
-    """入口点函数（命令行模式）"""
+    """入口点函数"""
     try:
         asyncio.run(main_async())
     except KeyboardInterrupt:

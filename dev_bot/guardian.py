@@ -403,8 +403,8 @@ class Guardian:
         logger.info("守护系统停止信号已发送")
     
     async def run_ai_loop(self) -> None:
-        """运行 AI 循环（执行+复盘两阶段循环）"""
-        from dev_bot import IflowCaller, get_memory_system
+        """运行 AI 循环（持久的 iflow 会话，执行→复盘循环）"""
+        from dev_bot import IflowSession, get_memory_system
         from dev_bot.iflow import (
             IflowError,
             IflowTimeoutError,
@@ -414,36 +414,38 @@ class Guardian:
         )
         from pathlib import Path
         import os
-        
+
         self.ai_loop_running = True
         self.ai_loop_iteration = 0
-        
+
         # 初始化记忆系统
         memory_system = get_memory_system()
         memory = memory_system.load_context()
-        
-        # 初始化 IflowCaller
-        if self.iflow is None:
-            self.iflow = IflowCaller(timeout=300)  # 5分钟超时
-        
+
+        # 初始化持久的 IflowSession
+        iflow_session = IflowSession(timeout=600)  # 10分钟超时
+
         # 初始化提示词系统
         self.initialize_prompt_template()
-        
+
         # 执行结果存储（用于复盘阶段）
         execution_results = []
-        
+
         logger.info("=" * 50)
-        logger.info("AI 循环进程启动（执行+复盘两阶段）")
+        logger.info("AI 循环进程启动（持久的 iflow 会话）")
         logger.info(f"循环间隔: {self.ai_loop_interval} 秒")
         logger.info("=" * 50)
-        
+
         # 记录启动到历史
-        memory_system.add_history_entry("ai_loop_start", "AI 循环启动（两阶段）")
-        
+        memory_system.add_history_entry("ai_loop_start", "AI 循环启动（持久会话）")
+
         try:
+            # 启动 iflow 会话
+            await iflow_session.start()
+
             while self.ai_loop_running:
                 self.ai_loop_iteration += 1
-                
+
                 # 检查是否需要重启（功能完成且待重启）
                 if self.restart_pending:
                     logger.info("🔄 功能已完成，准备重启以加载新代码")
@@ -455,22 +457,22 @@ class Guardian:
                         "last_iteration": self.ai_loop_iteration,
                         "last_update": datetime.now().isoformat()
                     })
-                    # 停止循环
+                    # 停止循环和会话
                     self.ai_loop_running = False
+                    await iflow_session.stop()
                     break
-                
+
                 if self.current_phase == "execution":
                     # ============ 执行阶段 ============
                     logger.info(f"=== 执行阶段 {self.execution_iteration} ===")
-                    
+
                     # 首次进入执行阶段，设置开始时间
                     if self.execution_start_time is None:
                         self.execution_start_time = datetime.now()
                         self.last_activity_time = datetime.now()
                         logger.info(f"⏱️ 执行阶段开始计时: {self.execution_start_time.strftime('%H:%M:%S')}")
-                    
+
                     # 检查执行阶段超时（基于最后活动时间）
-                    # 只有在没有活动时才认为超时，避免打断正在工作的 iflow
                     if self.last_activity_time:
                         inactive_time = (datetime.now() - self.last_activity_time).total_seconds()
                         if inactive_time > self.execution_timeout:
@@ -478,21 +480,21 @@ class Guardian:
                             memory_system.add_history_entry("warning", f"执行阶段无活动超时: {inactive_time:.0f}秒")
                             self.switch_phase("review")
                             continue
-                    
+
                     # 更新活动时间
                     self.last_activity_time = datetime.now()
-                    
+
                     # 构建执行阶段提示词
                     memory_summary = memory_system.get_context_summary()
                     prompt = self.build_execution_prompt(memory_summary)
-                    
+
                     try:
-                        result = await self.iflow.call(prompt)
+                        result = await iflow_session.send(prompt)
                         logger.info(f"执行阶段 {self.execution_iteration} 完成")
-                        
+
                         # 增加执行迭代计数
                         self.execution_iteration += 1
-                        
+
                         # 保存执行结果
                         execution_results.append({
                             "iteration": self.execution_iteration,
@@ -565,7 +567,7 @@ class Guardian:
                     prompt = self.build_review_prompt(memory_summary, execution_summary)
                     
                     try:
-                        result = await self.iflow.call(prompt)
+                        result = await iflow_session.send(prompt)
                         logger.info(f"复盘阶段 {self.review_iteration} 完成")
                         
                         # 解析 AI 输出中的指令
@@ -962,6 +964,11 @@ class Guardian:
         phase_context = f"""
 ## 复盘任务
 评估执行阶段的工作，判断功能是否完全开发完成且经过充分验证，并决定下一步行动。
+
+## 重要说明
+- **当前在同一个 iflow 会话中**，你可以访问之前的执行结果
+- **根据复盘结果决定是否继续工作或完成功能**
+- **如果需要继续执行，输出 [继续执行]；如果功能完全完成，输出 [功能完成，建议重启]**
 
 ## 评估维度
 1. 工作完成度：0-100%，功能是否完全实现
