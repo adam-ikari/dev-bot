@@ -15,7 +15,13 @@ logger = logging.getLogger(__name__)
 
 
 class AIRunner:
-    """AI 循环运行器 - 核心循环：while :; cat PROMPT.md | iflow; done"""
+    """AI 循环运行器 - 核心循环：while :; cat PROMPT.md | iflow; done
+    
+    设计原则：
+    - 完全交给 iflow 决定，不做任何判断
+    - iflow 输出什么指令就执行什么指令
+    - 不等待用户回答，AI 自主决策
+    """
     
     def __init__(
         self,
@@ -35,10 +41,6 @@ class AIRunner:
         # 初始化组件
         self.iflow = IflowCaller(timeout=timeout)
         self.ai_logger = InteractionLogger("ai_interactions.log")
-        
-        # 代码文件监控
-        self.code_files_mtimes = {}
-        self.code_reload_count = 0
     
     async def run(self) -> None:
         """运行核心循环
@@ -47,6 +49,8 @@ class AIRunner:
         while :; do
             cat PROMPT.md | iflow
         done
+        
+        完全交给 iflow 决定，不做任何判断
         """
         self.running = True
         self.iteration = 0
@@ -72,47 +76,26 @@ class AIRunner:
                 # 3. 计算持续时间
                 duration = time.time() - start_time
                 
-                # 4. 检查指令
-                prompt_updated = self._check_update_prompt(response)
-                code_modified = self._check_restart(response)
-                should_stop = self._check_stop(response)
+                # 4. 执行 iflow 的指令（完全交给 iflow 决定）
+                instruction = self._extract_instruction(response)
+                if instruction:
+                    self._execute_instruction(instruction, response)
                 
                 # 5. 记录日志
                 self.ai_logger.log_interaction(
                     prompt=prompt,
                     response=response,
-                    duration=duration,
-                    prompt_updated=prompt_updated,
-                    code_modified=code_modified
+                    duration=duration
                 )
                 
-                # 6. 检查代码变化
-                if self._check_code_changes():
-                    logger.info("🔄 检测到代码变化，准备重启...")
-                    self.restart_pending = True
-                    self.running = False
-                    break
-                
-                # 7. 检查是否停止
-                if should_stop:
-                    logger.info("✅ iflow 要求停止")
-                    self.running = False
-                    break
-                
-                # 8. 检查是否重启
-                if code_modified:
-                    logger.info("🔄 iflow 要求重启以加载新代码")
-                    self.restart_pending = True
-                    self.running = False
-                    break
-                
-                # 9. 输出统计信息（每10次）
+                # 6. 输出统计信息（每10次）
                 if self.iteration % 10 == 0:
                     stats = self.ai_logger.get_statistics()
                     logger.info(f"📊 统计: {stats}")
                 
-                # 10. 等待下一次
-                await asyncio.sleep(self.loop_interval)
+                # 7. 等待下一次
+                if self.running:
+                    await asyncio.sleep(self.loop_interval)
         
         except asyncio.CancelledError:
             logger.info("AI 循环接收到停止信号")
@@ -134,15 +117,41 @@ class AIRunner:
             logger.error(f"读取提示词文件失败: {e}")
             raise
     
-    def _check_update_prompt(self, response: str) -> bool:
-        """检查是否需要更新提示词"""
-        if "UPDATE_PROMPT:" in response or "优化提示词" in response:
+    def _extract_instruction(self, response: str) -> str:
+        """从 iflow 响应中提取指令
+        
+        支持的指令：
+        - UPDATE_PROMPT: 更新提示词
+        - RESTART: 重启以加载新代码
+        - STOP: 停止循环
+        """
+        if "UPDATE_PROMPT:" in response:
+            return "UPDATE_PROMPT"
+        elif "RESTART" in response:
+            return "RESTART"
+        elif "STOP" in response:
+            return "STOP"
+        return None
+    
+    def _execute_instruction(self, instruction: str, response: str) -> None:
+        """执行 iflow 的指令
+        
+        完全按照 iflow 的指示执行，不做任何判断
+        """
+        if instruction == "UPDATE_PROMPT":
             new_prompt = self._extract_new_prompt(response)
             if new_prompt:
                 self._update_prompt(new_prompt)
-                logger.info("✅ 提示词已更新")
-                return True
-        return False
+                logger.info("✅ 已执行 iflow 指令: UPDATE_PROMPT")
+        
+        elif instruction == "RESTART":
+            logger.info("🔄 已执行 iflow 指令: RESTART")
+            self.restart_pending = True
+            self.running = False
+        
+        elif instruction == "STOP":
+            logger.info("✅ 已执行 iflow 指令: STOP")
+            self.running = False
     
     def _extract_new_prompt(self, response: str) -> str:
         """从响应中提取新提示词"""
@@ -174,37 +183,7 @@ class AIRunner:
         except Exception as e:
             logger.error(f"更新提示词失败: {e}")
     
-    def _check_restart(self, response: str) -> bool:
-        """检查是否需要重启"""
-        return "RESTART" in response or "代码已修改" in response
     
-    def _check_stop(self, response: str) -> bool:
-        """检查是否需要停止"""
-        return "STOP" in response or "任务完成" in response
-    
-    def _check_code_changes(self) -> bool:
-        """检查代码文件是否有变化"""
-        changes_detected = False
-        
-        # 扫描 dev_bot 目录
-        for root, dirs, files in os.walk("dev_bot"):
-            for file in files:
-                if file.endswith(".py") and not file.startswith("__"):
-                    filepath = os.path.join(root, file)
-                    try:
-                        mtime = os.path.getmtime(filepath)
-                        
-                        if filepath in self.code_files_mtimes:
-                            if mtime > self.code_files_mtimes[filepath]:
-                                logger.info(f"📝 检测到文件修改: {filepath}")
-                                changes_detected = True
-                        
-                        self.code_files_mtimes[filepath] = mtime
-                    
-                    except OSError:
-                        pass
-        
-        return changes_detected
     
     def stop(self) -> None:
         """停止 AI 循环"""

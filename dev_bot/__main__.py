@@ -9,13 +9,12 @@ import signal as signal_module
 
 from dev_bot.ai_runner import AIRunner
 
-# 配置日志
+# 配置日志（只输出到文件，不输出到标准输出）
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('dev-bot.log'),
-        logging.StreamHandler()
+        logging.FileHandler('dev-bot.log')
     ]
 )
 logger = logging.getLogger(__name__)

@@ -182,7 +182,7 @@ class DevBotTUI(App):
 
     TextArea {
         height: auto;
-        min-height: 2;
+        min-height: 3;
         max-height: 10;
     }
 
